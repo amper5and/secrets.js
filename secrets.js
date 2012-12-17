@@ -51,14 +51,7 @@ exports.init = function(bits, radix){
 };
 
 function isInited(){
-	var required = ['bits', 'radix', 'logs', 'exps'];
-	for(var i=0, len=required.length; i<len; i++){
-		if(!config[required[i]]){
-			return false;
-		}
-	}
-		
-	if(config.logs.length !== config.size || config.exps.length !== config.size){
+	if(!config.bits || !config.radix || !config.logs || !config.exps || !config.size || !config.max || config.logs.length !== config.size || config.exps.length !== config.size){
 		return false;
 	}
 	return true;

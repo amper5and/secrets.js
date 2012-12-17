@@ -167,7 +167,7 @@ A very easy way to "expand" the size of a short text password is to use more byt
 
 
 ## Dependencies
-There are no external dependencies. secrets.js is bundled with a sub-set of Tom Wu's BSD-licensed Javascript BigInteger library [jsbn](http://www-cs-students.stanford.edu/~tjw/jsbn/). This is only used for number string conversion, not arithmetic. See `jsbnLICENSE` for the license.
+There are no external dependencies. secrets.js is bundled with a modified sub-set of Tom Wu's BSD-licensed Javascript BigInteger library [jsbn](http://www-cs-students.stanford.edu/~tjw/jsbn/). This is only used for number string conversion, not arithmetic. See `jsbnLICENSE` for the license.
 
 
 ## License
