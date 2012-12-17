@@ -26,7 +26,11 @@ Divide a 512-bit key, expressed in hexadecimal form, into 10 shares, requiring t
 	var comb = secrets.combine( shares.slice(4,9) );
 	console.log(comb === key); // => true
 	
-	// create another share with id 8:
+	// combine ALL shares
+	var comb = secrets.combine( shares );
+	console.log(comb === key); // => true
+	
+	// create another share with id 8
 	var newShare = secrets.newShare(8, shares); // => newShare = '8-xxx...xxx'
 	
 	// reconstruct using 4 original shares and the new share:
@@ -147,9 +151,7 @@ Return the radix and number of bits used for the current initialized finite fiel
 ## Note on security
 Shamir's secret sharing scheme is "information-theoretically secure" and "perfectly secure" in that less than the requisite number of shares provide no information about the secret (i.e. knowing less than the requisite number of shares is the same as knowing none of the shares). However, because the size of each share is the same as the size of the secret, it practically does leak _some_ information. Therefore, if you will be using secrets.js to share short password strings, it would be wise to pad them (for example, with spaces before converting to hex, or with zeros if sharing a number string) so that the shares do not leak information about the size of the password. 
 
-For example, in the second example above, the password string could be "The super-secret shared password is the following:<<PassWord123>>", which would result in shares that are 519 bits, instead of the original 118.
-
-Another very easy way to "expand" the size of a short password is to use more bytes per character when converting to hex. For example, using 6 bytes per character in the second example would result in a 678-bit password and larger shares. Just be sure to use the same `bytesPerChar` when converting back to a string from the reconstructed secret:
+A very easy way to "expand" the size of a short text password is to use more bytes per character when converting to hex. For example, using 6 bytes per character in the second example would result in a 678-bit password and larger shares. Just be sure to use the same `bytesPerChar` when converting back to a string from the reconstructed secret:
 
 	// convert the text into a hex string, using 6 bytes per character
 	var pw = '<<PassWord123>>';
