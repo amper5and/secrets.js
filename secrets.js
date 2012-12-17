@@ -12,7 +12,9 @@ var defaults = {
 	// Primitive polynomials (in decimal form) for Galois Fields GF(2^n), for 2 <= n <= 30
 	// The index of each term in the array corresponds to the n for that polynomial
 	// i.e. to get the polynomial for n=16, use primitivePolynomials[16]
-	primitivePolynomials: [null,null,1,3,3,5,3,3,29,17,9,5,83,27,43,3,45,9,39,39,9,5,3,33,27,9,71,39,9,5,83]
+	primitivePolynomials: [null,null,1,3,3,5,3,3,29,17,9,5,83,27,43,3,45,9,39,39,9,5,3,33,27,9,71,39,9,5,83],
+	
+	warning: 'WARNING:\nA secure random number generator was not found.\nUsing Math.random(), which is NOT cryptographically strong!'
 };
 
 // protected settings object
@@ -84,7 +86,7 @@ function getRNG(){
 			i++;
 		}
 		str = str.substr(-bits);
-		if( (str.match(/0/g)||[]).length === str.length){ // all zeros
+		if( (str.match(/0/g)||[]).length === str.length){ // all zeros?
 			return null;
 		}else{
 			return str;
@@ -107,7 +109,6 @@ function getRNG(){
 	// browsers with window.crypto.getRandomValues()
 	if(global['crypto'] && typeof global['crypto']['getRandomValues'] === 'function' && typeof global['Uint32Array'] === 'function'){
 		crypto = global['crypto'];
-		
 		return function(bits){
 			var elems = Math.ceil(bits/32),
 				str = null,
@@ -122,12 +123,9 @@ function getRNG(){
 		}
 	}
 
-	// a totally insecure RNG!!! (except in Safari)
-	var msg = 'WARNING:\nA secure random number generator was not found.\nUsing Math.random(), which is NOT cryptographically strong!';
-	global['console']['warn'](msg);
-	if(typeof global['alert'] === 'function'){
-		global['alert'](msg);
-	}
+	// A totally insecure RNG!!! (except in Safari)
+	config.unsafePRNG = true;
+	warn();
 	
 	var bitsPerNum = 32;
 	var max = Math.pow(2,bitsPerNum)-1;
@@ -143,6 +141,13 @@ function getRNG(){
 		return str;
 	};
 };
+
+function warn(){
+	global['console']['warn'](defaults.warning);
+	if(typeof global['alert'] === 'function'){
+		global['alert'](defaults.warning);
+	}
+}
 
 /** @expose **/
 exports.setRNG = function(rng){
@@ -169,6 +174,9 @@ exports.random = function(bits){
 	if(!isSetRNG()){
 		this.setRNG();
 	}
+	if(config.unsafePRNG){
+		warn();
+	}
 	if(typeof bits !== 'number' || bits%1 !== 0 || bits < 2){
 		throw new Error('Number of bits must be an integer greater than 1.')
 	}
@@ -186,6 +194,9 @@ exports.share = function(secret, numShares, threshold, inputRadix, outputRadix){
 	}
 	if(!isSetRNG()){
 		this.setRNG();
+	}
+	if(config.unsafePRNG){
+		warn();
 	}
 	
 	inputRadix = inputRadix || config.radix;

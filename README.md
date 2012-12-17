@@ -125,7 +125,7 @@ Set the pseudo-random number generator used to compute shares.
 
 secrets.js uses a PRNG in the `secrets.share()` and `secrets.random()` functions. By default, it tries to use a cryptographically strong PRNG. In node.js this is `crypto.randomBytes()`. In browsers that support it, it is `crypto.getRandomValues()` (using typed arrays, which must be supported too). If neither of these are available it defaults to using `Math.random()`, which is NOT cryptographically strong (except reportedly in Safari, though I have yet to confirm this). A warning will be displayed in the console and in an alert box in browsers when `Math.random()` is being used.
 
-To supply your own PRNG, use `secrets.setRNG()`. It expects a Function of the form `function(bits){}`. The output must be a String of length `bits` containing only 1's and 0's. When `secrets.setRNG()` is called, it tries to check the PRNG to make sure it complies with some of these demands, but obviously it's not possible to run through all possible outputs. So make sure that it works correctly.
+To supply your own PRNG, use `secrets.setRNG()`. It expects a Function of the form `function(bits){}`. It should compute a random integer between 1 and 2^bits-1. The output must be a String of length `bits` containing random 1's and 0's (cannot be ALL 0's). When `secrets.setRNG()` is called, it tries to check the PRNG to make sure it complies with some of these demands, but obviously it's not possible to run through all possible outputs. So make sure that it works correctly.
 
 If you are just planning on using `secrets.combine()` or `secrets.newShare()`, then no PRNG is required. It is only used by the `secrets.share()` and `secrets.random()` functions.
 
@@ -176,7 +176,6 @@ secrets.js is released under the MIT License. See `LICENSE`.
 
 ## Possible future enhancements
 * A full-featured online demo page
-* Multiple annoying warnings in browsers that don't have crypto.getRandomValues() and are forced to use Math.random()
 * A strong PRNG for browsers that don't have crypto.getRandomValues()
 * Use just XOR operations for (n,n) sharing
 * Operate on [node.js streams](http://nodejs.org/api/stream.html)
