@@ -175,6 +175,9 @@ secrets.js is released under the MIT License. See `LICENSE`.
 
 
 ## Possible future enhancements
+* A full-featured online demo page
+* Multiple annoying warnings in browsers that don't have crypto.getRandomValues() and are forced to use Math.random()
+* A strong PRNG for browsers that don't have crypto.getRandomValues()
 * Use just XOR operations for (n,n) sharing
 * Operate on [node.js streams](http://nodejs.org/api/stream.html)
 * Compatibility with other secret sharing programs, such as [ssss-split](http://point-at-infinity.org/ssss/) and [SecretSplitter](https://github.com/moserware/SecretSplitter)
