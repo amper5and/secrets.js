@@ -111,7 +111,7 @@ Set the number of bits to use for finite field arithmetic and the default radix 
 
 Internally, secrets.js uses finite field arithmetic in binary Galois Fields of size 2^n, where `n` is the number of bits. Multiplication is implemented by the means of log and exponential tables. Before any arithmetic is performed the log and exp tables are pre-computed. Each table contains 2^n entries. 
 
-`bits` is the limiting factor on `numShares` and `threshold`. The maximum number of shares possible for a particular `bits` is (2^bits)-1 (the zeroth share cannot be used as it is the `secret` by definition.). By default, secrets.js uses 8 bits, for a total possible number of shares of 2^8-1 = 255. To compute more shares, a larger field must be used. To compute the number of bits you will need for your `numShares`, compute the log-base2 of `numShares` and round up, i.e. in javascript: `Math.ceil(Math.log(numShares)/Math.log(2))`. 
+`bits` is the limiting factor on `numShares` and `threshold`. The maximum number of shares possible for a particular `bits` is (2^bits)-1 (the zeroth share cannot be used as it is the `secret` by definition.). By default, secrets.js uses 8 bits, for a total possible number of shares of 2^8-1 = 255. To compute more shares, a larger field must be used. To compute the number of bits you will need for your `numShares`, compute the log-base2 of (`numShares`+1) and round up, i.e. in javascript: `Math.ceil(Math.log(numShares+1)/Math.log(2))`. 
 
 Note:
 
