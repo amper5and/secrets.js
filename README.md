@@ -40,21 +40,26 @@ Divide a 512-bit key, expressed in hexadecimal form, into 10 shares, requiring t
 
 Divide a password containing a mix of numbers, letters, and other characters, requiring that any 3 shares must be present to reconstruct the original password:
 
-	// convert the text into a hex string
 	var pw = '<<PassWord123>>';
+	
+	// convert the text into a hex string
 	var pwHex = secrets.toHex(pw); // => hex string
 	
-	// split into 5 shares, with a treshold of 3
+	// split into 5 shares, with a threshold of 3
 	var shares = secrets.share(pwHex, 5, 3);
 	
-	// combine 2 shares
+	// combine 2 shares:
 	var comb = secrets.combine( shares.slice(1,3) );
+	//convert back to UTF string:
 	comb = secrets.toString(comb);
 	console.log( comb === pw  ); // => false
 	
-	// combine 3 shares
+	
+	// combine 3 shares:
 	var comb = secrets.combine( [ shares[1], shares[3], shares[4] ] );
+	//convert back to UTF string:
 	comb = secrets.toString(comb);
+	
 	console.log( comb === pw  ); // => true
 
 ## Installation and usage
@@ -75,7 +80,7 @@ To use it in the browser, include *secrets.js* or *secrets.min.js* (minified usi
 #### secrets.share( secret, numShares, threshold, [inputRadix, outputRadix] )
 Divide a `secret` expressed in `inputRadix` into `numShares` number of shares, each expressed in `outputRadix`, requiring that `threshold` number of shares be present for reconstructing the `secret`;
 
-* `secret`: String, required: A number string. By default it is assumed to be in hexadecimal format. The radix can be override with `inputRadix`.
+* `secret`: String, required: A number string. By default it is assumed to be in hexadecimal format. The radix can be overridden with `inputRadix` (see below).
 * `numShares`: Number, required: The number of shares to compute. This must be an integer between 2 and 2^bits-1 (see `secrets.init()` below for explanation of `bits`).
 * `threshold`: Number, required: The number of shares required to reconstruct the secret. This must be an integer between 2 and 2^bits-1 (see `secrets.init()` below for explanation of `bits`).
 * `inputRadix`: Number, optional, default `16`: The radix of the `secret`. Must be an integer between 2 and 36. For example, enter `2` for binary strings, `16` for hex strings, and `36` for alpha-numeric strings (Note: `36` uses the numbers 0-9 and letters a-z, NOT differentiating between upper and lower case.)
@@ -97,7 +102,7 @@ Note that using _more_ than the `threshold` number of shares will also result in
 #### secrets.newShare( id, shares, [radix] )
 Create a new share from the input shares.
 
-* `id`: Number or String, required: A Number representing the share id. The id is an integer between 1 and 2^bits-1. It can entered as a Number or a number String expressed in the same base `radix` as the `shares`, i.e. using 10 and "a" (base 16) for `id` will both output the 10th share.
+* `id`: Number or String, required: A Number representing the share id. The id is an integer between 1 and 2^bits-1. It can be entered as a Number or a number String expressed in the same base `radix` as the `shares`, i.e. using 10 and "a" (base 16) for `id` will both output the 10th share.
 * `shares`: Array, required: The array of shares (in the same format as outputted from `secrets.share()`) that can be used to reconstruct the original `secret`. 
 * `radix`: Number, optional: The radix of the `shares` and of the `id`, if the `id` is a String.
 
@@ -109,9 +114,9 @@ Set the number of bits to use for finite field arithmetic and the default radix 
 * `bits`: Number, optional, default `8`: An integer between 3 and 20.
 * `radix`: Number, optional, default `16`: An integer between 2 and 36.
 
-Internally, secrets.js uses finite field arithmetic in binary Galois Fields of size 2^n, where `n` is the number of bits. Multiplication is implemented by the means of log and exponential tables. Before any arithmetic is performed the log and exp tables are pre-computed. Each table contains 2^n entries. 
+Internally, secrets.js uses finite field arithmetic in binary Galois Fields of size 2^bits. Multiplication is implemented by the means of log and exponential tables. Before any arithmetic is performed, the log and exp tables are pre-computed. Each table contains 2^bits entries. 
 
-`bits` is the limiting factor on `numShares` and `threshold`. The maximum number of shares possible for a particular `bits` is (2^bits)-1 (the zeroth share cannot be used as it is the `secret` by definition.). By default, secrets.js uses 8 bits, for a total possible number of shares of 2^8-1 = 255. To compute more shares, a larger field must be used. To compute the number of bits you will need for your `numShares`, compute the log-base2 of (`numShares`+1) and round up, i.e. in javascript: `Math.ceil(Math.log(numShares+1)/Math.log(2))`. 
+`bits` is the limiting factor on `numShares` and `threshold`. The maximum number of shares possible for a particular `bits` is (2^bits)-1 (the zeroth share cannot be used as it is the `secret` by definition.). By default, secrets.js uses 8 bits, for a total possible number of shares of 2^8-1 = 255. To compute more shares, a larger field must be used. To compute the number of bits you will need for your `numShares` or `threshold`, compute the log-base2 of (`numShares`+1) and round up, i.e. in javascript: `Math.ceil(Math.log(numShares+1)/Math.log(2))`. 
 
 Note:
 
@@ -136,7 +141,7 @@ Compute a random `bits`-length string, and output it in hexadecimal format. `bit
 Convert a UTF string `str` into a hexadecimal string, using `bytesPerChar` bytes (octets) for each character. 
 
 * `str`: String, required: A UTF string. 
-* `bytesPerChar`: Number, optional, default `1`. By default `bytesPerChar` is 2. The maximum `bytesPerChar` is 6 to ensure that each character is represented by a number that is below javascript's 2^53 maximum for integers.
+* `bytesPerChar`: Number, optional, default `2`. The maximum `bytesPerChar` is 6 to ensure that each character is represented by a number that is below javascript's 2^53 maximum for integers.
 
 #### secrets.toString( str, [bytesPerChar] )
 Convert a hexadecimal string into a UTF string. Each character of the output string is represented by `bytesPerChar` bytes in the String `str`. See note on `bytesPerChar` under `secrets.toHex()` above.
@@ -149,20 +154,24 @@ Return the radix and number of bits used for the current initialized finite fiel
 
 
 ## Note on security
-Shamir's secret sharing scheme is "information-theoretically secure" and "perfectly secure" in that less than the requisite number of shares provide no information about the secret (i.e. knowing less than the requisite number of shares is the same as knowing none of the shares). However, because the size of each share is the same as the size of the secret, it practically does leak _some_ information, namely the _size_ of the secret. Therefore, if you will be using secrets.js to share _short_ password strings, it would be wise to pad them (for example, with spaces before converting a string to hex, or with zeros if sharing a number string) so that the shares do not leak information about the size of the password. 
+Shamir's secret sharing scheme is "information-theoretically secure" and "perfectly secure" in that less than the requisite number of shares provide no information about the secret (i.e. knowing less than the requisite number of shares is the same as knowing none of the shares). However, because the size of each share is the same as the size of the secret (when using binary Galois fields, as secrets.js does), in practice it does leak _some_ information, namely the _size_ of the secret. Therefore, if you will be using secrets.js to share _short_ password strings (which can be brute-forced much more easily than longer ones), it would be wise to pad them (for example, with spaces before converting a string to hex, or with zeros if sharing a number string) so that the shares do not leak information about the size of the password. 
 
-A very easy way to "expand" the size of a short text password is to use more bytes per character when converting to hex. For example, using 6 bytes per character in the second example would result in a 678-bit password and larger shares. Just be sure to use the same `bytesPerChar` when converting back to a string from the reconstructed secret:
+A very easy way to "expand" the size of a short text string is to use more bytes per character when converting to hex. For example, using 6 bytes per character in the second example would result in a 678-bit password and larger shares. Just be sure to use the same `bytesPerChar` when converting back to a string from the reconstructed secret:
 
-	// convert the text into a hex string, using 6 bytes per character
 	var pw = '<<PassWord123>>';
+	
+	// convert the text into a hex string, using 6 bytes per character
 	var pwHex = secrets.toHex(pw, 6); // => a 678-bit password
 	
-	// split into 5 shares, with a treshold of 3
+	// split into 5 shares, with a threshold of 3
 	var shares = secrets.share(pwHex, 5, 3); // => 678-bit shares
 	
 	// combine 3 shares
 	var comb = secrets.combine( [ shares[1], shares[3], shares[4] ] );
+	
+	// convert back to UTF string, using 6 bytes per character
 	comb = secrets.toString(comb, 6);
+	
 	console.log( comb === pw  ); // => true
 
 
