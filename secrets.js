@@ -6,7 +6,7 @@ var defaults = {
 	minBits: 3,
 	maxBits: 20, // this permits 1,048,575 shares, though going this high is NOT recommended in JS!
 	
-	bytesPerChar: 1,
+	bytesPerChar: 2,
 	maxBytesPerChar: 6, // Math.pow(256,7) > Math.pow(2,53)
 	
 	// Primitive polynomials (in decimal form) for Galois Fields GF(2^n), for 2 <= n <= 30

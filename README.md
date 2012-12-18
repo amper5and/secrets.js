@@ -136,7 +136,7 @@ Compute a random `bits`-length string, and output it in hexadecimal format. `bit
 Convert a UTF string `str` into a hexadecimal string, using `bytesPerChar` bytes (octets) for each character. 
 
 * `str`: String, required: A UTF string. 
-* `bytesPerChar`: Number, optional, default `1`. By default `bytesPerChar` is 1, which should cover most standard English text and control characters. For international text, it might be necessary to go to 2 bytes to cover the necessary characters. The maximum `bytesPerChar` is 7 to ensure that each character is represented by a number that is below javascript's 2^53 maximum for integers.
+* `bytesPerChar`: Number, optional, default `1`. By default `bytesPerChar` is 2. The maximum `bytesPerChar` is 6 to ensure that each character is represented by a number that is below javascript's 2^53 maximum for integers.
 
 #### secrets.toString( str, [bytesPerChar] )
 Convert a hexadecimal string into a UTF string. Each character of the output string is represented by `bytesPerChar` bytes in the String `str`. See note on `bytesPerChar` under `secrets.toHex()` above.
@@ -149,7 +149,7 @@ Return the radix and number of bits used for the current initialized finite fiel
 
 
 ## Note on security
-Shamir's secret sharing scheme is "information-theoretically secure" and "perfectly secure" in that less than the requisite number of shares provide no information about the secret (i.e. knowing less than the requisite number of shares is the same as knowing none of the shares). However, because the size of each share is the same as the size of the secret, it practically does leak _some_ information. Therefore, if you will be using secrets.js to share short password strings, it would be wise to pad them (for example, with spaces before converting to hex, or with zeros if sharing a number string) so that the shares do not leak information about the size of the password. 
+Shamir's secret sharing scheme is "information-theoretically secure" and "perfectly secure" in that less than the requisite number of shares provide no information about the secret (i.e. knowing less than the requisite number of shares is the same as knowing none of the shares). However, because the size of each share is the same as the size of the secret, it practically does leak _some_ information, namely the _size_ of the secret. Therefore, if you will be using secrets.js to share _short_ password strings, it would be wise to pad them (for example, with spaces before converting a string to hex, or with zeros if sharing a number string) so that the shares do not leak information about the size of the password. 
 
 A very easy way to "expand" the size of a short text password is to use more bytes per character when converting to hex. For example, using 6 bytes per character in the second example would result in a 678-bit password and larger shares. Just be sure to use the same `bytesPerChar` when converting back to a string from the reconstructed secret:
 
