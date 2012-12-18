@@ -76,6 +76,17 @@ To use it in the browser, include *secrets.js* or *secrets.min.js* (minified usi
 	<script src="secrets.min.js"></script>
 	
 ## API
+* secrets.share()
+* secrets.combine()
+* secrets.newShare()
+* secrets.init()
+* secrets.setRNG()
+* secrets.random()
+* secrets.toHex()
+* secrets.toString()
+* secrets.convertBase()
+* secrets.getConfig()
+
 
 #### secrets.share( secret, numShares, threshold, [inputRadix, outputRadix] )
 Divide a `secret` expressed in `inputRadix` into `numShares` number of shares, each expressed in `outputRadix`, requiring that `threshold` number of shares be present for reconstructing the `secret`;
