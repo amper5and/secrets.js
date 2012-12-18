@@ -48,8 +48,10 @@ Divide a password containing a mix of numbers, letters, and other characters, re
 	// split into 5 shares, with a threshold of 3
 	var shares = secrets.share(pwHex, 5, 3);
 	
+	
 	// combine 2 shares:
 	var comb = secrets.combine( shares.slice(1,3) );
+	
 	//convert back to UTF string:
 	comb = secrets.toString(comb);
 	console.log( comb === pw  ); // => false
@@ -57,6 +59,7 @@ Divide a password containing a mix of numbers, letters, and other characters, re
 	
 	// combine 3 shares:
 	var comb = secrets.combine( [ shares[1], shares[3], shares[4] ] );
+	
 	//convert back to UTF string:
 	comb = secrets.toString(comb);
 	
@@ -67,7 +70,7 @@ secrets.js is available on [npm](https://npmjs.org/package/secrets.js). Install 
 
 	npm install secrets.js
 
-To use it in node:
+To use it in node.js:
 	
 	var secrets = require('secrets.js');
 
@@ -80,20 +83,21 @@ To use it in the browser, include *secrets.js* or *secrets.min.js* (minified usi
 * secrets.combine()
 * secrets.newShare()
 * secrets.init()
+* secrets.getConfig()
 * secrets.setRNG()
 * secrets.random()
 * secrets.toHex()
 * secrets.toString()
 * secrets.convertBase()
-* secrets.getConfig()
 
 
-#### secrets.share( secret, numShares, threshold, [inputRadix, outputRadix] )
+#### secrets.share( secret, numShares, threshold, [zeroPad, inputRadix, outputRadix] )
 Divide a `secret` expressed in `inputRadix` into `numShares` number of shares, each expressed in `outputRadix`, requiring that `threshold` number of shares be present for reconstructing the `secret`;
 
 * `secret`: String, required: A number string. By default it is assumed to be in hexadecimal format. The radix can be overridden with `inputRadix` (see below).
 * `numShares`: Number, required: The number of shares to compute. This must be an integer between 2 and 2^bits-1 (see `secrets.init()` below for explanation of `bits`).
 * `threshold`: Number, required: The number of shares required to reconstruct the secret. This must be an integer between 2 and 2^bits-1 (see `secrets.init()` below for explanation of `bits`).
+* `zeroPad`: Boolean, optional, default `false`: Whether to zero-pad the secret before creating shares. See "Note on security" below.
 * `inputRadix`: Number, optional, default `16`: The radix of the `secret`. Must be an integer between 2 and 36. For example, enter `2` for binary strings, `16` for hex strings, and `36` for alpha-numeric strings (Note: `36` uses the numbers 0-9 and letters a-z, NOT differentiating between upper and lower case.)
 * `outputRadix`: Number, optional, default `16`: The radix of the output shares. Must be an integer between 2 and 36.
 
@@ -106,7 +110,7 @@ Reconstructs a secret from `shares`.
 * `inputRadix`: Number, optional, default `16`: The radix of the shares. See `outputRadix` in `secrets.share()` above.
 * `outputRadix`: Number, optional, default `16`: The radix of the output reconstructed secret.
 
-The output of `secrets.combine()` is a String representing the reconstructed secret. Note that this function will ALWAYS produce an output String. However, if the number of `shares` that are provided is not the `threshold` number of shares, the output _will not_ be the original `secret`. In order to guarantee that the original secret is reconstructed, the correct `threshold` number of shares must be inputted.
+The output of `secrets.combine()` is a String representing the reconstructed secret. Note that this function will ALWAYS produce an output String. However, if the number of `shares` that are provided is not the `threshold` number of shares, the output _will not_ be the original `secret`. In order to guarantee that the original secret is reconstructed, the correct `threshold` number of shares must be provided.
 
 Note that using _more_ than the `threshold` number of shares will also result in an accurate reconstruction of the secret. However, using more shares adds to computation time.
 
@@ -119,22 +123,26 @@ Create a new share from the input shares.
 
 The output of `secrets.newShare()` is a String of the form 'id-string'. This is the same format for the share that `secrets.share()` outputs. Note that this function ALWAYS produces an output String. However, as for `secrets.combine()`, if the number of `shares` that are entered is not the `threshold` number of shares, the output share _will not_ be a valid share (i.e. _will not_ be useful in reconstructing the original secret). In order to guarantee that the share is valid, the correct `threshold` number of shares must be provided.
 
-#### secrets.init( [bits, radix] )
+#### secrets.init( [bits, radix, padLength] )
 Set the number of bits to use for finite field arithmetic and the default radix to use for inputs and outputs.
 
-* `bits`: Number, optional, default `8`: An integer between 3 and 20.
-* `radix`: Number, optional, default `16`: An integer between 2 and 36.
+* `bits`: Number, optional, default `8`: An integer between 3 and 20. The number of bits to use for the Galois field.
+* `radix`: Number, optional, default `16`: An integer between 2 and 36. The default base for inputs and outputs.
+* `padLength`: Number, optional, default `256`. An integer greater than 1. If zero-padding is enabled when creating shares, before creating the  shares, the secret will be padded with zeros so that its length is a multiple of `padLength`. See "Note on security" below.
 
 Internally, secrets.js uses finite field arithmetic in binary Galois Fields of size 2^bits. Multiplication is implemented by the means of log and exponential tables. Before any arithmetic is performed, the log and exp tables are pre-computed. Each table contains 2^bits entries. 
 
-`bits` is the limiting factor on `numShares` and `threshold`. The maximum number of shares possible for a particular `bits` is (2^bits)-1 (the zeroth share cannot be used as it is the `secret` by definition.). By default, secrets.js uses 8 bits, for a total possible number of shares of 2^8-1 = 255. To compute more shares, a larger field must be used. To compute the number of bits you will need for your `numShares` or `threshold`, compute the log-base2 of (`numShares`+1) and round up, i.e. in javascript: `Math.ceil(Math.log(numShares+1)/Math.log(2))`. 
+`bits` is the limiting factor on `numShares` and `threshold`. The maximum number of shares possible for a particular `bits` is (2^bits)-1 (the zeroth share cannot be used as it is the `secret` by definition.). By default, secrets.js uses 8 bits, for a total 2^8-1 = 255 possible number of shares. To compute more shares, a larger field must be used. To compute the number of bits you will need for your `numShares` or `threshold`, compute the log-base2 of (`numShares`+1) and round up, i.e. in javascript: `Math.ceil(Math.log(numShares+1)/Math.log(2))`. 
 
 Note:
 
 * `secrets.init()` does NOT need to be called if you plan on using the default of 8 bits. It is automatically called on loading the library.
 * The size of the exp and log tables depends on `bits` (each has 2^bits entries). Therefore, using a large number of bits will cause a slightly longer delay to compute the tables.
-* In order to properly reconstruct a secret, the _same_ field size used to compute the shares must be used. If you use a 10-bit field to compute the shares, and an 8-bit field to reconstruct the secret, the secret _will be incorrect_. Because of this, I am considering adding the bit-size to each share, i.e. so each share has the form "id-bits-string". Depending on feedback, a future update may include this format for the shares.
+* In order to properly reconstruct a secret, the _same_ field size used to compute the shares must be used. If you use a 10-bit field to compute the shares, and an 8-bit field to reconstruct the secret, the secret _will be incorrect_. Because of this, I am considering adding the bit-size to each share, i.e. so each share has the form "bits-id-string". Depending on feedback, a future update may include this format for the shares.
 * The _theoretical_ maximum number of bits is 31, as javascript performs bitwise operations on 31-bit numbers. A limit of 20 bits has been hard-coded into secrets.js, which can produce 1,048,575 shares. secrets.js has not been tested with this many shares, and it is not advisable to go this high, as it may be too slow to be of any practical use.
+
+#### secrets.getConfig()
+Return the `padLength`, `radix` and number of `bits` used for the current initialized finite field.
 
 #### secrets.setRNG( function(bits){} )
 Set the pseudo-random number generator used to compute shares.
@@ -144,6 +152,8 @@ secrets.js uses a PRNG in the `secrets.share()` and `secrets.random()` functions
 To supply your own PRNG, use `secrets.setRNG()`. It expects a Function of the form `function(bits){}`. It should compute a random integer between 1 and 2^bits-1. The output must be a String of length `bits` containing random 1's and 0's (cannot be ALL 0's). When `secrets.setRNG()` is called, it tries to check the PRNG to make sure it complies with some of these demands, but obviously it's not possible to run through all possible outputs. So make sure that it works correctly.
 
 If you are just planning on using `secrets.combine()` or `secrets.newShare()`, then no PRNG is required. It is only used by the `secrets.share()` and `secrets.random()` functions.
+
+NOTE: In a near-future version of secrets.js, the requirement for the PRNG function will be less convoluted. It probably will just have to return a random integer between 1 and `max`, or something like that.
 
 #### secrets.random( bits )
 Compute a random `bits`-length string, and output it in hexadecimal format. `bits` must be an integer greater than 1. 
@@ -160,31 +170,35 @@ Convert a hexadecimal string into a UTF string. Each character of the output str
 #### secrets.convertBase( str, inputRadix, outputRadix )
 Convert a number string `str` in base `inputRadix` into a number string in base `outputRadix`
 
-#### secrets.getConfig()
-Return the radix and number of bits used for the current initialized finite field.
-
 
 ## Note on security
-Shamir's secret sharing scheme is "information-theoretically secure" and "perfectly secure" in that less than the requisite number of shares provide no information about the secret (i.e. knowing less than the requisite number of shares is the same as knowing none of the shares). However, because the size of each share is the same as the size of the secret (when using binary Galois fields, as secrets.js does), in practice it does leak _some_ information, namely the _size_ of the secret. Therefore, if you will be using secrets.js to share _short_ password strings (which can be brute-forced much more easily than longer ones), it would be wise to pad them (for example, with spaces before converting a string to hex, or with zeros if sharing a number string) so that the shares do not leak information about the size of the password. 
+Shamir's secret sharing scheme is "information-theoretically secure" and "perfectly secure" in that less than the requisite number of shares provide no information about the secret (i.e. knowing less than the requisite number of shares is the same as knowing none of the shares). However, because the size of each share is the same as the size of the secret (when using binary Galois fields, as secrets.js does), in practice it does leak _some_ information, namely the _size_ of the secret. Therefore, if you will be using secrets.js to share _short_ password strings (which can be brute-forced much more easily than longer ones), it would be wise to zero-pad them so that the shares do not leak information about the size of the password.
 
-A very easy way to "expand" the size of a short text string is to use more bytes per character when converting to hex. For example, using 6 bytes per character in the second example would result in a 678-bit password and larger shares. Just be sure to use the same `bytesPerChar` when converting back to a string from the reconstructed secret:
+When `secrets.share()` is called with `zeroPad=true`, the secret will be padded with zeros so that its bit-length is a multiple of `padLength` (which is set by `secrets.init()`). The second example above can be modified to use zero-padding, producing longer shares:
 
+	// pad to 1024 bits instead of 256, using defaults for field size and radix
+	secrets.init(null, null, 1024);
+	
 	var pw = '<<PassWord123>>';
 	
-	// convert the text into a hex string, using 6 bytes per character
-	var pwHex = secrets.toHex(pw, 6); // => a 678-bit password
+	// convert the text into a hex string
+	var pwHex = secrets.toHex(pw); // => 230-bit password
+
+	// split into 5 shares, with a threshold of 3, WITH zero-padding
+	var shares = secrets.share(pwHex, 5, 3, true); // => 1024-bit shares
 	
-	// split into 5 shares, with a threshold of 3
-	var shares = secrets.share(pwHex, 5, 3); // => 678-bit shares
+	// Print the bit-length of the first share.
+	// It will be within 4 units of 1024, because any leading 0-valued bits are dropped.
+	console.log( 'First share bit-length:', secrets.convertBase(shares[0].split('-')[1], 16, 2).length );
 	
 	// combine 3 shares
 	var comb = secrets.combine( [ shares[1], shares[3], shares[4] ] );
 	
-	// convert back to UTF string, using 6 bytes per character
-	comb = secrets.toString(comb, 6);
+	// convert back to UTF string
+	comb = secrets.toString(comb);
 	
 	console.log( comb === pw  ); // => true
-
+	
 
 ## Dependencies
 There are no external dependencies. secrets.js is bundled with a modified sub-set of Tom Wu's BSD-licensed Javascript BigInteger library [jsbn](http://www-cs-students.stanford.edu/~tjw/jsbn/). This is only used for number string conversion, not arithmetic. See `jsbnLICENSE` for the license.
@@ -195,7 +209,7 @@ secrets.js is released under the MIT License. See `LICENSE`.
 
 
 ## Possible future enhancements
-* A full-featured online demo page
+* A full-featured online demo
 * A strong PRNG for browsers that don't have crypto.getRandomValues()
 * Use just XOR operations for (n,n) sharing
 * Operate on [node.js streams](http://nodejs.org/api/stream.html)

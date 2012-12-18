@@ -9,6 +9,8 @@ var defaults = {
 	bytesPerChar: 2,
 	maxBytesPerChar: 6, // Math.pow(256,7) > Math.pow(2,53)
 	
+	padLength: 256, // if zeroPad enabled, pad so that # of bits in secret is a multiple of this value
+	
 	// Primitive polynomials (in decimal form) for Galois Fields GF(2^n), for 2 <= n <= 30
 	// The index of each term in the array corresponds to the n for that polynomial
 	// i.e. to get the polynomial for n=16, use primitivePolynomials[16]
@@ -21,19 +23,24 @@ var defaults = {
 var config = {};
 
 /** @expose **/
-exports.init = function(bits, radix){
+exports.init = function(bits, radix, padLength){
 	if(bits && (typeof bits !== 'number' || bits%1 !== 0 || bits<defaults.minBits || bits>defaults.maxBits)){
 		throw new Error('Number of bits must be an integer between ' + defaults.minBits + ' and ' + defaults.maxBits + ', inclusive.')
 	}
 	if(radix && (typeof radix !== 'number' || radix%1 !== 0 /*test if integer*/ || radix < 2 || radix > 36)){
 		throw new Error('Radix must be an integer between 2 and 36, inclusive.');
 	}
-		
+	
+	if(padLength && ( typeof padLength !== 'number' || padLength%1 !== 0 || padLength < 2)){
+		throw new Error('Zero pad length must be an integer greater than 1.');
+	}	
+	
 	config.bits = bits || defaults.bits;
 	config.radix = radix || defaults.radix;
+	config.padLength = padLength || defaults.padLength;
 	config.size = Math.pow(2, config.bits);
 	config.max = config.size - 1;
-		
+	
 	// construct the exp and log tables for multiplication		
 	var logs = [], exps = [], x = 1, primitive = defaults.primitivePolynomials[config.bits];;
 	for(var i=0; i<config.size; i++){
@@ -51,7 +58,7 @@ exports.init = function(bits, radix){
 };
 
 function isInited(){
-	if(!config.bits || !config.radix || !config.logs || !config.exps || !config.size || !config.max || config.logs.length !== config.size || config.exps.length !== config.size){
+	if(!config.bits || !config.radix || !config.padLength || !config.logs || !config.exps || !config.size || !config.max || config.logs.length !== config.size || config.exps.length !== config.size){
 		return false;
 	}
 	return true;
@@ -61,7 +68,8 @@ function isInited(){
 exports.getConfig = function(){
 	return {
 		'bits' : config.bits,
-		'radix' : config.radix
+		'radix' : config.radix,
+		'padLength' : config.padLength
 	};
 };
 
@@ -181,7 +189,7 @@ exports.random = function(bits){
 // requiring `threshold` number of shares to reconstruct the secret
 
 /** @expose **/
-exports.share = function(secret, numShares, threshold, inputRadix, outputRadix){
+exports.share = function(secret, numShares, threshold, zeroPad, inputRadix, outputRadix){
 	if(!isInited()){
 		this.init();
 	}
@@ -192,6 +200,7 @@ exports.share = function(secret, numShares, threshold, inputRadix, outputRadix){
 		warn();
 	}
 	
+	zeroPad = !!zeroPad;
 	inputRadix = inputRadix || config.radix;
 	outputRadix = outputRadix || config.radix;
 		
@@ -219,7 +228,7 @@ exports.share = function(secret, numShares, threshold, inputRadix, outputRadix){
 		throw new Error('Threshold number of shares must be an integer between 2 and 2^bits-1 (' + config.max + '), inclusive.  To use a threshold of ' + threshold + ', use at least ' + neededBits + ' bits.');
 	}
 		
-	secret = split(secret, inputRadix);
+	secret = split(secret, inputRadix, zeroPad);
 		
 	var x = new Array(numShares), y = new Array(numShares);
 	for(var i=0, len = secret.length; i<len; i++){
@@ -241,9 +250,11 @@ exports.share = function(secret, numShares, threshold, inputRadix, outputRadix){
 // returns array of integers (each less than 2^bits-1) representing a segment of 
 // the input string from right to left, i.e. outputArray[0] represents the 
 // right-most `bits`-length segment of the input string
-function split(str, radix){
+function split(str, radix, zeroPad){
 	str = new BigInteger(str, radix).toString(2);
-		
+	if(zeroPad){
+		str = padLeft(str, config.padLength)
+	}
 	var parts = [];
 	for(var i=str.length; i>config.bits; i-=config.bits){
 		parts.push(parseInt(str.slice(i-config.bits, i), 2));
