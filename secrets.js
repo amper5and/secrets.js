@@ -451,9 +451,11 @@ exports.toHex = function(str, bytesPerChar){
 		throw new Error('Input must be a character string.');
 	}
 	bytesPerChar = bytesPerChar || defaults.bytesPerChar;
-	if(bytesPerChar > defaults.maxBytesPerChar){
-		throw new Error('Maximum bytes per character is ' + defaults.maxBytesPerChar + '.')
+	
+	if(typeof bytesPerChar !== 'number' || bytesPerChar%1 !== 0 || bytesPerChar<1 || bytesPerChar > defaults.maxBytesPerChar){
+		throw new Error('Bytes per character must be an integer between 1 and ' + defaults.maxBytesPerChar + ', inclusive.')
 	}
+	
 	var hexChars = 2*bytesPerChar
 	var max = Math.pow(16, hexChars) - 1;
 	var out = '', num;
@@ -478,9 +480,11 @@ exports.toString = function(str, bytesPerChar){
 		throw new Error('Input must be a hexadecimal string.');
 	}
 	bytesPerChar = bytesPerChar || defaults.bytesPerChar;
-	if(bytesPerChar > defaults.maxBytesPerChar){
-		throw new Error('Maximum bytes per character is ' + defaults.maxBytesPerChar + '.')
+	
+	if(typeof bytesPerChar !== 'number' || bytesPerChar%1 !== 0 || bytesPerChar<1 || bytesPerChar > defaults.maxBytesPerChar){
+		throw new Error('Bytes per character must be an integer between 1 and ' + defaults.maxBytesPerChar + ', inclusive.')
 	}
+	
 	var hexChars = 2*bytesPerChar;
 	var out = '';
 	str = padLeft(str, hexChars);
