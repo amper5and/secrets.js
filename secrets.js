@@ -42,13 +42,6 @@ exports.init = function(bits, radix, padLength){
 	config.size = Math.pow(2, config.bits);
 	config.max = config.size - 1;
 	
-	// If the tables are already computed, then presumably this 
-	// was a call to init() to change the radix and/or padLength.
-	// Don't need to re-compute the tables in this case.
-	if(config.logs && config.logs.length === config.size && config.exps && config.exps.length){
-		return;
-	}
-	
 	// Construct the exp and log tables for multiplication.	
 	var logs = [], exps = [], x = 1, primitive = defaults.primitivePolynomials[config.bits];;
 	for(var i=0; i<config.size; i++){
