@@ -70,6 +70,11 @@ secrets.js is available on [npm](https://npmjs.org/package/secrets.js). Install 
 
 	npm install secrets.js
 
+The version on npm may not always reflect all the latest changes, especially during times of heavy development. To get the most up-to-date version, download [the current master zip file](https://github.com/amper5and/secrets.js/zipball/master), then run the following code from inside the folder:
+
+	npm install
+
+		
 To use it in node.js:
 	
 	var secrets = require('secrets.js');
@@ -77,6 +82,7 @@ To use it in node.js:
 To use it in the browser, include *secrets.js* or *secrets.min.js* (minified using Google Closure Compiler)
 
 	<script src="secrets.min.js"></script>
+
 	
 ## API
 * secrets.share()
@@ -172,7 +178,7 @@ Convert a number string `str` in base `inputRadix` into a number string in base 
 
 
 ## Note on security
-Shamir's secret sharing scheme is "information-theoretically secure" and "perfectly secure" in that less than the requisite number of shares provide no information about the secret (i.e. knowing less than the requisite number of shares is the same as knowing none of the shares). However, because the size of each share is the same as the size of the secret (when using binary Galois fields, as secrets.js does), in practice it does leak _some_ information, namely the _size_ of the secret. Therefore, if you will be using secrets.js to share _short_ password strings (which can be brute-forced much more easily than longer ones), it would be wise to zero-pad them so that the shares do not leak information about the size of the password.
+Shamir's secret sharing scheme is "information-theoretically secure" and "perfectly secure" in that less than the requisite number of shares provide no information about the secret (i.e. knowing less than the requisite number of shares is the same as knowing none of the shares). However, because the size of each share is the same as the size of the secret (when using binary Galois fields, as secrets.js does), in practice it does leak _some_ information, namely the _size_ of the secret. Therefore, if you will be using secrets.js to share _short_ password strings (which can be brute-forced much more easily than longer ones), it would be wise to zero-pad them so that the shares do not leak information about the size of the secret.
 
 When `secrets.share()` is called with `zeroPad=true`, the secret will be padded with zeros so that its bit-length is a multiple of `padLength` (which is set by `secrets.init()`). The second example above can be modified to use zero-padding, producing longer shares:
 

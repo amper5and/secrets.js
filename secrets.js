@@ -22,6 +22,7 @@ var defaults = {
 // protected settings object
 var config = {};
 
+
 /** @expose **/
 exports.init = function(bits, radix, padLength){
 	if(bits && (typeof bits !== 'number' || bits%1 !== 0 || bits<defaults.minBits || bits>defaults.maxBits)){
@@ -41,7 +42,14 @@ exports.init = function(bits, radix, padLength){
 	config.size = Math.pow(2, config.bits);
 	config.max = config.size - 1;
 	
-	// construct the exp and log tables for multiplication		
+	// If the tables are already computed, then presumably this 
+	// was a call to init() to change the radix and/or padLength.
+	// Don't need to re-compute the tables in this case.
+	if(config.logs && config.logs.length === config.size && config.exps && config.exps.length){
+		return;
+	}
+	
+	// Construct the exp and log tables for multiplication.	
 	var logs = [], exps = [], x = 1, primitive = defaults.primitivePolynomials[config.bits];;
 	for(var i=0; i<config.size; i++){
 		exps[i] = x;
@@ -73,8 +81,8 @@ exports.getConfig = function(){
 	};
 };
 
-// returns a pseudo-random number generator of the form function(bits) 
-// which should output integers between a string of 1's and 0's of length `bits`
+// Returns a pseudo-random number generator of the form function(bits){}
+// which should output a random string of 1's and 0's of length `bits`
 function getRNG(){
 	var randomBits, crypto;
 	
@@ -95,7 +103,7 @@ function getRNG(){
 	}
 	
 	// node.js crypto.randomBytes()
-	if(typeof global['require'] === 'function' && (crypto=global['require']('crypto')) && (randomBits=crypto['randomBytes'])){
+	if(typeof require === 'function' && (crypto=require('crypto')) && (randomBits=crypto['randomBytes'])){
 		return function(bits){
 			var bytes = Math.ceil(bits/8),
 				str = null;
@@ -125,6 +133,7 @@ function getRNG(){
 	}
 
 	// A totally insecure RNG!!! (except in Safari)
+	// Will produce a warning every time it is called.
 	config.unsafePRNG = true;
 	warn();
 	
@@ -143,6 +152,8 @@ function getRNG(){
 	};
 };
 
+// Warn about using insecure rng.
+// Called when Math.random() is being used.
 function warn(){
 	global['console']['warn'](defaults.warning);
 	if(typeof global['alert'] === 'function'){
@@ -150,6 +161,7 @@ function warn(){
 	}
 }
 
+// Set the PRNG to use. If no RNG function is supplied, pick a default using getRNG()
 /** @expose **/
 exports.setRNG = function(rng){
 	if(!isInited()){
@@ -170,6 +182,7 @@ function isSetRNG(){
 	return typeof config.rng === 'function'; 
 };
 
+// Generates a random bits-length number string using the PRNG
 /** @expose **/
 exports.random = function(bits){
 	if(!isSetRNG()){
@@ -184,10 +197,10 @@ exports.random = function(bits){
 	return this.convertBase(config.rng(bits), 2, 16);
 }
 
-// split `secret` expressed in radix `inputRadix` (optional, default 16) 
+// Divides a `secret` number String str expressed in radix `inputRadix` (optional, default 16) 
 // into `numShares` shares, each expressed in radix `outputRadix` (optional, default to `inputRadix`), 
-// requiring `threshold` number of shares to reconstruct the secret
-
+// requiring `threshold` number of shares to reconstruct the secret. 
+// Optionally, zero-pads the secret to a length that is a multiple of config.padLength before sharing.
 /** @expose **/
 exports.share = function(secret, numShares, threshold, zeroPad, inputRadix, outputRadix){
 	if(!isInited()){
@@ -210,7 +223,7 @@ exports.share = function(secret, numShares, threshold, zeroPad, inputRadix, outp
 	if(typeof inputRadix !== 'number' || inputRadix%1 !== 0 /*test if integer*/ || inputRadix < 2 || inputRadix > 36){
 		throw new Error('Input radix must be an integer between 2 and 36, inclusive.');
 	}
-	if(typeof outputRadix !== 'number' || outputRadix%1 !== 0 /*test if integer*/ || outputRadix < 2 || outputRadix > 36){
+	if(typeof outputRadix !== 'number' || outputRadix%1 !== 0 || outputRadix < 2 || outputRadix > 36){
 		throw new Error('Output radix must be an integer between 2 and 36, inclusive.');
 	}
 	if(typeof numShares !== 'number' || numShares%1 !== 0 || numShares < 2){
@@ -232,7 +245,7 @@ exports.share = function(secret, numShares, threshold, zeroPad, inputRadix, outp
 		
 	var x = new Array(numShares), y = new Array(numShares);
 	for(var i=0, len = secret.length; i<len; i++){
-		subShares = getShares(secret[i], numShares, threshold);
+		subShares = this._getShares(secret[i], numShares, threshold);
 		for(var j=0; j<numShares; j++){
 			x[j] = x[j] || subShares[j].x.toString(outputRadix);
 			y[j] = padLeft(subShares[j].y.toString(2)) + (y[j] ? y[j] : '');
@@ -246,10 +259,12 @@ exports.share = function(secret, numShares, threshold, zeroPad, inputRadix, outp
 	return x;
 };
 	
-// splits a number string `str` in radix `radix` into `bits`-length segments
-// returns array of integers (each less than 2^bits-1) representing a segment of 
-// the input string from right to left, i.e. outputArray[0] represents the 
-// right-most `bits`-length segment of the input string
+// Splits a number string `str` in base `radix` into `bits`-length segments, after 
+// first optionally zero-padding it to a length that is a multiple of config.padLength.
+// Returns array of integers (each less than 2^bits-1), with each element
+// representing a `bits`-length segment of the input string from right to left, 
+// i.e. parts[0] represents the right-most `bits`-length segment of the input string.
+
 function split(str, radix, zeroPad){
 	str = new BigInteger(str, radix).toString(2);
 	if(zeroPad){
@@ -264,15 +279,20 @@ function split(str, radix, zeroPad){
 	return parts;
 };
 	
-// pads a string `str` with zeros on the left so that its length is a multiple of `bits`
+// Pads a string `str` with zeros on the left so that its length is a multiple of `bits`
 function padLeft(str, bits){
 	bits = bits || config.bits
 	var missing = str.length % bits;
 	return (missing ? new Array(bits - missing + 1).join('0') : '') + str;
 };
 	
-// get `numShares` `bits`-length shares from a secret that is also of length `bits` with `max` being 2^bits-1
-function getShares(secret, numShares, threshold){
+// This is the basic polynomial generation and evaluation function 
+// for a `bits` length secret (NOT an arbitrary length)
+// This is exposed so it can be used in processing node.js streams.
+// Note: no error-checking! If `secrets` is NOT a NUMBER less than 
+// 2^bits-1, the output will be incorrect!
+/** @expose **/
+exports._getShares = function(secret, numShares, threshold){
 	var shares = [];
 	var coeffs = [secret]; 
 		
@@ -289,7 +309,7 @@ function getShares(secret, numShares, threshold){
 };
 	
 // polynomial evaluation at `x` using Horner's Method
-// TODO: this can be sped up using other methods
+// TODO: this can possibly be sped up using other methods
 // NOTE: fx=fx * x + coeff[i] ->  exp(log(fx) + log(x)) + coeff[i], 
 //       so if fx===0, just set fx to coeff[i] because
 //       (using the exp/log form will result in incorrect value)
@@ -306,10 +326,9 @@ function horner(x, coeffs){
 	return fx;
 };
 	
-// compute a new share with id `id` (a number between 1 and 2^bits-1)
-// using previously computed `shares` with radix `radix`
+// Generate a new share with id `id` (a number between 1 and 2^bits-1)
+// using previously generated `shares` in base `radix`.
 // `id` can be a Number or a String in radix `radix`
-
 /** @expose **/
 exports.newShare = function(id, shares, radix){
 	if(!isInited()){
@@ -339,6 +358,11 @@ function inArray(arr,val){
 	return false;
 };
 
+// Protected method that evaluates the Lagrange interpolation
+// polynomial at x=`at` for individual config.bits-length
+// segments of each share in the `shares` Array.
+// Each share is expressed in base `inputRadix`. The output 
+//is expressed in base `outputRadix'
 function combine(at, shares, inputRadix, outputRadix){
 	var parts = [], x = [], y = [], result = '', idx;	
 	for(var i=0, len = shares.length; i<len; i++){
@@ -374,8 +398,7 @@ function combine(at, shares, inputRadix, outputRadix){
 	return new BigInteger(result, 2).toString(outputRadix);
 };
 
-// combine `shares` Array in radix `radix` into the original secret
-
+// Combine `shares` Array in radix `radix` into the original secret
 /** @expose **/
 exports.combine = function(shares, inputRadix, outputRadix){
 	if(!isInited()){
@@ -395,7 +418,9 @@ exports.combine = function(shares, inputRadix, outputRadix){
 	return combine(0, shares, inputRadix, outputRadix);
 };
 	
-// evaluate the Lagrange Interpolation Polynomial at x = `at`
+// Evaluate the Lagrange interpolation polynomial at x = `at`
+// using x and y Arrays that are of the same length, with
+// corresponding elements constituting a point on the polynomial.
 function lagrange(at, x, y){
 	var sum = 0,
 		product, 
@@ -420,11 +445,13 @@ function lagrange(at, x, y){
 	}
 	return sum;
 };
+
+/** @expose **/
+exports._lagrange = lagrange;
 	
 // Converts a given character string to the HEX representation. 
 // Each character of the input string is represented by 
 // `bytesPerChar` bytes in the output string.
-
 /** @expose **/
 exports.toHex = function(str, bytesPerChar){
 	if(typeof str !== 'string'){
@@ -452,7 +479,6 @@ exports.toHex = function(str, bytesPerChar){
 };
 	
 // Converts a given HEX number string to a character string. 
-
 /** @expose **/
 exports.toString = function(str, bytesPerChar){
 	if(typeof str !== 'string'){
@@ -471,8 +497,7 @@ exports.toString = function(str, bytesPerChar){
 	return out;
 };
 	
-// converts a number string in base `inputRadix` to a number string with base `outputRadix`
-
+// Converts a number string in base `inputRadix` to a number string with base `outputRadix`
 /** @expose **/
 exports.convertBase = function(str, inputRadix, outputRadix){
 	if(typeof str !== 'string'){
@@ -493,7 +518,7 @@ exports.init();
 
 
 
-// Subset of JSBN useful for base conversion of strings of different radices
+// Modified subset of JSBN useful for base conversion of strings of different radices
 // The constructor has been modified to NOT generate primes or random BigIntegers
 
 /*
