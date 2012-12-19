@@ -8,37 +8,31 @@ var defaults = {
 	
 	bytesPerChar: 2,
 	maxBytesPerChar: 6, // Math.pow(256,7) > Math.pow(2,53)
-	
-	padLength: 256, // if zeroPad enabled, pad so that # of bits in secret is a multiple of this value
-	
+		
 	// Primitive polynomials (in decimal form) for Galois Fields GF(2^n), for 2 <= n <= 30
 	// The index of each term in the array corresponds to the n for that polynomial
 	// i.e. to get the polynomial for n=16, use primitivePolynomials[16]
 	primitivePolynomials: [null,null,1,3,3,5,3,3,29,17,9,5,83,27,43,3,45,9,39,39,9,5,3,33,27,9,71,39,9,5,83],
 	
+	// warning for insecure PRNG
 	warning: 'WARNING:\nA secure random number generator was not found.\nUsing Math.random(), which is NOT cryptographically strong!'
 };
 
-// protected settings object
+// Protected settings object
 var config = {};
 
+/** @expose **/
+exports.getConfig = function(){
+	return {'bits': config.bits};
+};
 
 /** @expose **/
-exports.init = function(bits, radix, padLength){
+exports.init = function(bits){
 	if(bits && (typeof bits !== 'number' || bits%1 !== 0 || bits<defaults.minBits || bits>defaults.maxBits)){
 		throw new Error('Number of bits must be an integer between ' + defaults.minBits + ' and ' + defaults.maxBits + ', inclusive.')
 	}
-	if(radix && (typeof radix !== 'number' || radix%1 !== 0 /*test if integer*/ || radix < 2 || radix > 36)){
-		throw new Error('Radix must be an integer between 2 and 36, inclusive.');
-	}
-	
-	if(padLength && ( typeof padLength !== 'number' || padLength%1 !== 0 || padLength < 2)){
-		throw new Error('Zero pad length must be an integer greater than 1.');
-	}	
-	
+
 	config.bits = bits || defaults.bits;
-	config.radix = radix || defaults.radix;
-	config.padLength = padLength || defaults.padLength;
 	config.size = Math.pow(2, config.bits);
 	config.max = config.size - 1;
 	
@@ -59,19 +53,10 @@ exports.init = function(bits, radix, padLength){
 };
 
 function isInited(){
-	if(!config.bits || !config.radix || !config.padLength || !config.logs || !config.exps || !config.size || !config.max || config.logs.length !== config.size || config.exps.length !== config.size){
+	if(!config.bits || !config.size || !config.max  || !config.logs || !config.exps || config.logs.length !== config.size || config.exps.length !== config.size){
 		return false;
 	}
 	return true;
-};
-
-/** @expose **/
-exports.getConfig = function(){
-	return {
-		'bits' : config.bits,
-		'radix' : config.radix,
-		'padLength' : config.padLength
-	};
 };
 
 // Returns a pseudo-random number generator of the form function(bits){}
@@ -195,7 +180,7 @@ exports.random = function(bits){
 // requiring `threshold` number of shares to reconstruct the secret. 
 // Optionally, zero-pads the secret to a length that is a multiple of config.padLength before sharing.
 /** @expose **/
-exports.share = function(secret, numShares, threshold, zeroPad, inputRadix, outputRadix){
+exports.share = function(secret, numShares, threshold, inputRadix, outputRadix, padLength){
 	if(!isInited()){
 		this.init();
 	}
@@ -206,9 +191,9 @@ exports.share = function(secret, numShares, threshold, zeroPad, inputRadix, outp
 		warn();
 	}
 	
-	zeroPad = !!zeroPad;
-	inputRadix = inputRadix || config.radix;
-	outputRadix = outputRadix || config.radix;
+	padLength =  padLength || 0;
+	inputRadix = inputRadix || defaults.radix;
+	outputRadix = outputRadix || defaults.radix;
 		
 	if(typeof secret !== 'string'){
 		throw new Error('Secret must be a string.');
@@ -233,8 +218,11 @@ exports.share = function(secret, numShares, threshold, zeroPad, inputRadix, outp
 		var neededBits = Math.ceil(Math.log(threshold +1)/Math.log(2));
 		throw new Error('Threshold number of shares must be an integer between 2 and 2^bits-1 (' + config.max + '), inclusive.  To use a threshold of ' + threshold + ', use at least ' + neededBits + ' bits.');
 	}
-		
-	secret = split(secret, inputRadix, zeroPad);
+	if(typeof padLength !== 'number' || padLength%1 !== 0 ){
+		throw new Error('Zero-pad length must be an integer greater than 1.');
+	}
+	
+	secret = split(secret, inputRadix, padLength);
 		
 	var x = new Array(numShares), y = new Array(numShares);
 	for(var i=0, len = secret.length; i<len; i++){
@@ -258,10 +246,10 @@ exports.share = function(secret, numShares, threshold, zeroPad, inputRadix, outp
 // representing a `bits`-length segment of the input string from right to left, 
 // i.e. parts[0] represents the right-most `bits`-length segment of the input string.
 
-function split(str, radix, zeroPad){
+function split(str, radix, padLength){
 	str = new BigInteger(str, radix).toString(2);
-	if(zeroPad){
-		str = padLeft(str, config.padLength)
+	if(padLength){
+		str = padLeft(str, padLength)
 	}
 	var parts = [];
 	for(var i=str.length; i>config.bits; i-=config.bits){
@@ -327,7 +315,7 @@ exports.newShare = function(id, shares, radix){
 	if(!isInited()){
 		this.init();
 	}	
-	radix = radix || config.radix;
+	radix = radix || defaults.radix;
 		
 	if(typeof radix !== 'number' || radix%1 !== 0 /*test if integer*/ || radix < 2 || radix > 36){
 		throw new Error('Radix must be an integer between 2 and 36, inclusive.');
@@ -398,8 +386,8 @@ exports.combine = function(shares, inputRadix, outputRadix){
 		this.init();
 	}
 	
-	inputRadix = inputRadix || config.radix;
-	outputRadix = outputRadix || config.radix;
+	inputRadix = inputRadix || defaults.radix;
+	outputRadix = outputRadix || defaults.radix;
 	
 	if(typeof inputRadix !== 'number' || inputRadix%1 !== 0 /*test if integer*/ || inputRadix < 2 || inputRadix > 36){
 		throw new Error('Input radix must be an integer between 2 and 36, inclusive.');
