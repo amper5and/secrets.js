@@ -455,7 +455,7 @@ exports.toHex = function(str, bytesPerChar){
 			var neededBytes = Math.ceil(Math.log(num+1)/Math.log(256));
 			throw new Error('Invalid character code (' + num +'). Maximum allowable is 256^bytes-1 (' + max + '). To convert this character, use at least ' + neededBytes + ' bytes.')
 		}else{
-			out += padLeft(num.toString(16), hexChars);
+			out = padLeft(num.toString(16), hexChars) + out;
 		}
 	}
 	return out;
@@ -477,7 +477,7 @@ exports.toString = function(str, bytesPerChar){
 	var out = '';
 	str = padLeft(str, hexChars);
 	for(var i=0, len = str.length; i<len; i+=hexChars){
-		out += String.fromCharCode(parseInt(str.slice(i, i+hexChars),16));
+		out = String.fromCharCode(parseInt(str.slice(i, i+hexChars),16)) + out;
 	}
 	return out;
 };
