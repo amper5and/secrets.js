@@ -200,7 +200,11 @@ When `secrets.share()` is called with a `padLength`, the `secret` is zero-padded
 	comb = secrets.toString(comb);
 	
 	console.log( comb === pw  ); // => true
+
 	
+## Note on sharing binary strings
+Currently, any leading zero's of the secret are dropped. This is because secrets.js uses jsbn to convert the inputs. Normally, this is not a huge deal, but can be important in some applications. I am looking for an efficient base-conversion library that will retain these zeros. Suggestions on this point are welcome.
+
 
 ## Dependencies
 There are no external dependencies. secrets.js is bundled with a modified sub-set of Tom Wu's BSD-licensed Javascript BigInteger library [jsbn](http://www-cs-students.stanford.edu/~tjw/jsbn/). This is only used for number string conversion, not arithmetic. See `jsbnLICENSE` for the license.
