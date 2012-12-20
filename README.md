@@ -202,7 +202,7 @@ When `secrets.share()` is called with a `padLength`, the `secret` is zero-padded
 	console.log( comb === pw  ); // => true
 
 	
-## Note on sharing binary strings
+## Note on leading zeros
 Currently, any leading zero's of the secret are dropped. This is because secrets.js uses jsbn to convert the inputs. Normally, this is not a huge deal, but can be important in some applications. I am looking for an efficient base-conversion library that will retain these zeros. Suggestions on this point are welcome.
 
 
