@@ -1,6 +1,6 @@
 {
   "author" : "Alexander Stetsyuk <alexstets@gmail.com>",
-  "description" : "Share secrets using Shamir's threshold sharing scheme.",
+  "description" : "Shamir's threshold secret sharing scheme for javascript.",
   "homepage" : "https://github.com/amper5and/secrets.js",
   "main" : "./secrets.js",
   "name" : "secrets.js",
@@ -8,5 +8,5 @@
     "type" : "git",
     "url" : "git://github.com/amper5and/secrets.js.git"
   },
-  "version" : "0.1.3"
+  "version" : "0.1.4"
 }

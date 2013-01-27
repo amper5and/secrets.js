@@ -26,8 +26,7 @@ exports.getConfig = function(){
 	return {'bits': config.bits};
 };
 
-/** @expose **/
-exports.init = function(bits){
+function init(bits){
 	if(bits && (typeof bits !== 'number' || bits%1 !== 0 || bits<defaults.minBits || bits>defaults.maxBits)){
 		throw new Error('Number of bits must be an integer between ' + defaults.minBits + ' and ' + defaults.maxBits + ', inclusive.')
 	}
@@ -37,7 +36,7 @@ exports.init = function(bits){
 	config.max = config.size - 1;
 	
 	// Construct the exp and log tables for multiplication.	
-	var logs = [], exps = [], x = 1, primitive = defaults.primitivePolynomials[config.bits];;
+	var logs = [], exps = [], x = 1, primitive = defaults.primitivePolynomials[config.bits];
 	for(var i=0; i<config.size; i++){
 		exps[i] = x;
 		logs[x] = i;
@@ -51,6 +50,9 @@ exports.init = function(bits){
 	config.logs = logs;
 	config.exps = exps;
 };
+
+/** @expose **/
+exports.init = init;
 
 function isInited(){
 	if(!config.bits || !config.size || !config.max  || !config.logs || !config.exps || config.logs.length !== config.size || config.exps.length !== config.size){
@@ -166,11 +168,13 @@ exports.random = function(bits){
 	if(!isSetRNG()){
 		this.setRNG();
 	}
-	if(config.unsafePRNG){
-		warn();
-	}
+	
 	if(typeof bits !== 'number' || bits%1 !== 0 || bits < 2){
 		throw new Error('Number of bits must be an integer greater than 1.')
+	}
+	
+	if(config.unsafePRNG){
+		warn();
 	}
 	return this.convertBase(config.rng(bits), 2, 16);
 }
@@ -178,7 +182,7 @@ exports.random = function(bits){
 // Divides a `secret` number String str expressed in radix `inputRadix` (optional, default 16) 
 // into `numShares` shares, each expressed in radix `outputRadix` (optional, default to `inputRadix`), 
 // requiring `threshold` number of shares to reconstruct the secret. 
-// Optionally, zero-pads the secret to a length that is a multiple of config.padLength before sharing.
+// Optionally, zero-pads the secret to a length that is a multiple of padLength before sharing.
 /** @expose **/
 exports.share = function(secret, numShares, threshold, inputRadix, outputRadix, padLength){
 	if(!isInited()){
@@ -186,9 +190,6 @@ exports.share = function(secret, numShares, threshold, inputRadix, outputRadix, 
 	}
 	if(!isSetRNG()){
 		this.setRNG();
-	}
-	if(config.unsafePRNG){
-		warn();
 	}
 	
 	padLength =  padLength || 0;
@@ -222,26 +223,29 @@ exports.share = function(secret, numShares, threshold, inputRadix, outputRadix, 
 		throw new Error('Zero-pad length must be an integer greater than 1.');
 	}
 	
-	secret = split(secret, inputRadix, padLength);
-		
+	if(config.unsafePRNG){
+		warn();
+	}
+	
+	secret = split(secret, inputRadix, padLength);	
 	var x = new Array(numShares), y = new Array(numShares);
 	for(var i=0, len = secret.length; i<len; i++){
-		subShares = this._getShares(secret[i], numShares, threshold);
+		var subShares = this._getShares(secret[i], numShares, threshold);
 		for(var j=0; j<numShares; j++){
 			x[j] = x[j] || subShares[j].x.toString(outputRadix);
 			y[j] = padLeft(subShares[j].y.toString(2)) + (y[j] ? y[j] : '');
 		}
 	}
-		
+	var padding = config.max.toString(outputRadix).length;
 	for(var i=0; i<numShares; i++){
-		x[i] = x[i] + '-' + new BigInteger(y[i], 2).toString(outputRadix);
+		x[i] = config.bits.toString(36) + padLeft(x[i],padding) + new BigInteger(y[i], 2).toString(outputRadix);
 	}
 		
 	return x;
 };
 	
 // Splits a number string `str` in base `radix` into `bits`-length segments, after 
-// first optionally zero-padding it to a length that is a multiple of config.padLength.
+// first optionally zero-padding it to a length that is a multiple of padLength.
 // Returns array of integers (each less than 2^bits-1), with each element
 // representing a `bits`-length segment of the input string from right to left, 
 // i.e. parts[0] represents the right-most `bits`-length segment of the input string.
@@ -269,11 +273,10 @@ function padLeft(str, bits){
 	
 // This is the basic polynomial generation and evaluation function 
 // for a `bits` length secret (NOT an arbitrary length)
-// This is exposed so it can be used in processing node.js streams.
 // Note: no error-checking! If `secrets` is NOT a NUMBER less than 
 // 2^bits-1, the output will be incorrect!
 /** @expose **/
-exports._getShares = function(secret, numShares, threshold){
+exports._getShares = function(secret, numShares, threshold){	
 	var shares = [];
 	var coeffs = [secret]; 
 		
@@ -312,22 +315,24 @@ function horner(x, coeffs){
 // `id` can be a Number or a String in radix `radix`
 /** @expose **/
 exports.newShare = function(id, shares, radix){
-	if(!isInited()){
-		this.init();
-	}	
 	radix = radix || defaults.radix;
-		
+	
 	if(typeof radix !== 'number' || radix%1 !== 0 /*test if integer*/ || radix < 2 || radix > 36){
 		throw new Error('Radix must be an integer between 2 and 36, inclusive.');
 	}
 	if(typeof id === 'string'){
 		id = parseInt(id, radix);	
 	}
-	if(typeof id !== 'number' || id%1 !== 0 || id<1 || id>config.max){
+	
+	var share = processShare(shares[0], radix);
+	var max = Math.pow(2, share.bits) - 1;
+	
+	if(typeof id !== 'number' || id%1 !== 0 || id<1 || id>max){
 		throw new Error('Share id must be an integer between 1 and ' + config.max + ', inclusive.');
 	}
-		
-	return id.toString(radix) + '-' + combine(id, shares, radix, radix);
+
+	var padding = max.toString(radix).length;
+	return config.bits.toString(36) + padLeft(id.toString(radix), padding) + combine(id, shares, radix, radix);
 };
 
 function inArray(arr,val){
@@ -339,37 +344,65 @@ function inArray(arr,val){
 	return false;
 };
 
+
+function processShare(share, radix){
+	radix = radix || defaults.radix;
+	
+	var bits = parseInt(share[0], 36);
+	if(bits && (typeof bits !== 'number' || bits%1 !== 0 || bits<defaults.minBits || bits>defaults.maxBits)){
+		throw new Error('Number of bits must be an integer between ' + defaults.minBits + ' and ' + defaults.maxBits + ', inclusive.')
+	}
+	
+	var max = Math.pow(2, bits) - 1;
+	var idLength = max.toString(radix).length;
+	
+	var id = parseInt(share.substr(1, idLength), radix);
+	if(typeof id !== 'number' || id%1 !== 0 || id<1 || id>max){
+		throw new Error('Share id must be an integer between 1 and ' + config.max + ', inclusive.');
+	}
+	share = share.substr(idLength + 1);
+	if(!share.length){
+		throw new Error('Invalid share: zero-length share.')
+	}
+	return {
+		bits: bits,
+		id: id,
+		share: share
+	};
+};
+
+/** @expose **/
+secrets._processShare = processShare;
+
 // Protected method that evaluates the Lagrange interpolation
 // polynomial at x=`at` for individual config.bits-length
 // segments of each share in the `shares` Array.
 // Each share is expressed in base `inputRadix`. The output 
-//is expressed in base `outputRadix'
+// is expressed in base `outputRadix'
 function combine(at, shares, inputRadix, outputRadix){
-	var parts = [], x = [], y = [], result = '', idx;	
+	var setBits, share, x = [], y = [], result = '', idx;	
+	
 	for(var i=0, len = shares.length; i<len; i++){
-		if(typeof shares[i] === 'string'){
-			parts = shares[i].split('-');
-			if(parts.length !== 2){
-				throw new Error('Invalid share:\n' + shares[i]);
-			}
-		}else if(typeof shares[i] === 'object'){
-			parts[0] = shares[i].id.toString();
-			parts[1] = shares[i].share.toString();
-		}else{
-			throw new Error('Unknown share type:\n' + shares[i]);
+		share = processShare(shares[i], inputRadix);
+		if(typeof setBits === 'undefined'){
+			setBits = share.bits;
+		}else if(share.bits !== setBits){
+			throw new Error('Mismatched shares: Different bit settings.')
 		}
-	
-		parts[0] = parseInt(parts[0], inputRadix);
-	
-		if(inArray(x, parts[0])){ //repeated x value?
+		
+		if(config.bits !== setBits){
+			init(setBits);
+		}
+		
+		if(inArray(x, share.id)){ // repeated x value?
 			continue;
 		}
 	
-		idx = x.push(parts[0]) - 1;
-		parts[1] = split(parts[1], inputRadix);
-		for(var j=0, len2 = parts[1].length; j<len2; j++){
+		idx = x.push(share.id) - 1;
+		share = split(share.share, inputRadix);
+		for(var j=0, len2 = share.length; j<len2; j++){
 			y[j] = y[j] || [];
-			y[j][idx] = parts[1][j];
+			y[j][idx] = share[j];
 		}
 	}
 	
@@ -382,10 +415,6 @@ function combine(at, shares, inputRadix, outputRadix){
 // Combine `shares` Array in radix `radix` into the original secret
 /** @expose **/
 exports.combine = function(shares, inputRadix, outputRadix){
-	if(!isInited()){
-		this.init();
-	}
-	
 	inputRadix = inputRadix || defaults.radix;
 	outputRadix = outputRadix || defaults.radix;
 	
@@ -925,4 +954,9 @@ function nbv(i) { var r = nbi(); r.fromInt(i); return r; }
 
 BigInteger.ZERO = nbv(0);
 BigInteger.ONE = nbv(1);
+
+
+function convert(str, inputRadix, outputRadix){
+	var pow = Math.log(inputRadix)/Math.log(2);
+}
 })(typeof module !== 'undefined' && module['exports'] ? module['exports'] : (window['secrets'] = {}), typeof GLOBAL !== 'undefined' ? GLOBAL : window );
