@@ -106,7 +106,7 @@
 								<a id="splitButton" class="btn btn-primary btn-large btn-block btnCustom">SPLIT SECRET</a>
 							</div>
 							<div id="PRNGwarning" style="display: none;" class="alert alert-block alert-warning"><h4>Security Notice</h4> A cryptographically-strong random number generator was not found in your browser. Consider switching to a new browser. The computed shares will not be as secure as possible.</div>
-							<div id="split-result" style="display:none;" class="alert alert-block alert-success"><h4>Secret shares</h4>One share per line<pre id="shares"></pre></div>
+							<div id="split-result" style="display:none;" class="alert alert-block alert-success fade in"><button type="button" class="close" data-dismiss="alert">&times;</button><h4>Secret shares</h4>One share per line<pre id="shares"></pre></div>
 							<div id="mismatchWarning" style="display: none;" class="alert alert-block alert-warning"><h4>Notice</h4> The number of generated shares is less than the threshold and will not be enough to reconstruct the secret.</div>
 							<div class="alert alert-block alert-info"><h4>Security Note</h4> All computations are performed in your browser. Your secret and the computed shares are never transmitted back to our servers.</div>	
 						</form>
@@ -161,7 +161,7 @@
 							<div class="control-group">
 								<a id="reconButton" class="btn btn-primary btn-block btn-large btnCustom">RECONSTRUCT SECRET</a>
 							</div>
-							<div id="recon-result" style="display:none;" class="alert alert-block alert-success"><h4>Reconstructed secret</h4><pre id="reconstruction"></pre></div>
+							<div id="recon-result" style="display:none;" class="alert alert-block alert-success fade in"><button type="button" class="close" data-dismiss="alert">&times;</button><h4>Reconstructed secret</h4><pre id="reconstruction"></pre></div>
 							<div class="alert alert-block alert-info"><h4>Security Note</h4> All computations are performed in your browser. Your shares and the reconstructed secret are never transmitted back to our servers.</div>
 						</form>
 					</div>
