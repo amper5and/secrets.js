@@ -1,7 +1,7 @@
 secrets.js
 ==========
 
-http://amper5and.github.com/secrets.js
+http://passguardian.com
 
 - [What is it?](#what-is-it)
 - [Examples](#examples)
