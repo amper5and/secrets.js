@@ -1,0 +1,142 @@
+@font-face {
+  font-family: 'Days One';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Days One'), local('DaysOne-Regular'), url(daysOne.ttf) format('truetype');
+}
+
+body{
+	background-image: url(hixs_pattern_evolution.png); zoom: 1; background-repeat: repeat repeat; background-attachment: fixed;
+}
+#masthead{
+	padding-top: 50px;
+	padding-bottom: 50px;
+}
+
+#marketing{
+	background: #eee; 
+	padding-top: 30px;
+	margin-top: 20px;
+	margin-bottom: 90px;
+	-webkit-border-radius: 6px;
+	-moz-border-radius: 6px
+}
+.lead{
+	padding: 15px;
+}
+.titleContainer{
+	display: inline-block;
+	font-weight: bold;
+	color: #ccc;
+	cursor: default;
+}
+.title{
+	margin-top: 20px;
+	margin-bottom: 0px;
+	font-size:300%;
+	display: inline-block;
+}
+.Pass {
+	font-family: 'Days One';
+	color: #2066B9;
+	cursor: default;
+}
+.Guardian {
+	font-family: 'Days One';
+	color: #cc1111;
+	cursor: default;
+}
+.strokeLogo span{
+	text-shadow:
+		-1px -1px 0 #fff,  
+	    1px -1px 0 #fff,
+	    -1px 1px 0 #fff,
+	     1px 1px 0 #fff;
+}
+.reg{
+	font-size: 30%;
+	cursor: default;
+}
+.subtitle {
+	font-family: Times;
+	float: right;
+	font-size: 140%;
+	padding-top: 4px;
+	padding-right: 21px;
+	font-style: italic;
+}
+.center{
+	text-align: center;
+}
+.clear{
+	clear: both;
+}
+.jumbo{
+	font-size: 220%;
+}
+section{
+	background: #fff;
+	padding-left: 5px;
+	padding-right: 5px;
+	margin-bottom: 70px;
+	border: 2px solid #2066B9;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px
+}
+section>h3{
+	font-family: 'Days One';
+	background: #ddd;
+	color: #2066B9;
+	padding-left: 10px;
+	margin-left: -5px;
+	margin-right: -5px;
+	margin-top: 0px;
+	border-bottom: 2px solid #2066B9;
+	
+}
+.toTop{
+	margin: 6px;
+}
+form{
+	padding: 10px;
+}
+.btnCustom{
+	font-family: 'Days One';
+}
+#shares,#reconstruction{
+	padding: 2px;
+	padding-left: 4px;
+	overflow-x: auto;
+	background: white;
+	margin-left: -14px;
+	margin-right: -35px;
+	margin-top: 10px;
+	margin-bottom: -14px;
+}
+#shares{
+	white-space: nowrap;
+}
+#reconstruction{
+	white-space: pre;
+}
+#shares div{
+	margin-bottom: 1px;
+}
+
+#reconShares{
+	white-space: nowrap;
+	font-family: Monaco,Menlo,Consolas,"Courier New",monospace;
+}
+
+.shareInput{
+	margin-top: 4px;
+}
+
+.footer{
+	padding: 10px;
+	text-align: center;
+	background: #ddd;
+	margin-bottom: 20px;
+	-webkit-border-radius: 6px;
+	-moz-border-radius: 6px
+}
