@@ -47,7 +47,7 @@ $(document).on('click', '#splitButton', function(ev){
 		radix = 10;
 	}
 	if(!$('#shares').length){
-		$(this).parent().after('<div id="split-result" style="display:none;" class="alert alert-block alert-success fade in"><button type="button" class="close" data-dismiss="alert">&times;</button><h4>Reconstructed secret</h4><pre id="shares"></pre></div>');
+		$(this).parent().after('<div id="split-result" style="display:none;" class="alert alert-block alert-success fade in"><button type="button" class="close" data-dismiss="alert">&times;</button><h4>Secret shares</h4>One share per line<pre id="shares"></pre></div>');
 	}
 	try{
 		var shares = secrets.share(string, numShares, threshold, radix);
