@@ -1,13 +1,15 @@
 secrets.js
 ==========
 
+http://amper5and.github.com/secrets.js
+
 - [What is it?](#what-is-it)
 - [Examples](#examples)
 - [Installation and usage](#installation-and-usage)
 - [API](#api)
 - [Share format](#share-format)
 - [Note on security](#note-on-security)
-- [Note on leading zeros in the secret](#note-on-leading-zeros-in-the-secrets)
+- [Note on leading zeros in the secret](#note-on-leading-zeros-in-the-secret)
 - [Dependencies](#dependencies)
 - [License](#license)
 - [Changelog](#changelog)
@@ -233,10 +235,10 @@ There are no external dependencies. secrets.js is bundled with a modified sub-se
 secrets.js is released under the MIT License. See `LICENSE`.
 
 ## Changelog
+0.1.5: getConfig() returns information about PRNG
 0.1.4: new share format
 
 ## Possible future enhancements
-* A full-featured online demo
 * A strong PRNG for browsers that don't have crypto.getRandomValues()
 * Operate on [node.js streams](http://nodejs.org/api/stream.html)
 * [Cheater-detection](http://h.web.umkc.edu/harnl/papers/J68.pdf)
