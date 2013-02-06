@@ -26,7 +26,7 @@ $(document).on('click', '#splitButton', function(ev){
 	}
 	var threshold = $('#threshold').val() * 1;
 	if(typeof threshold !== 'number' || isNaN(threshold) || threshold < 2 || threshold > 255){
-		return error('this', 'Threshold must be an integer between 2 and 255, inclusive.', '#split-result')
+		return error(this, 'Threshold must be an integer between 2 and 255, inclusive.', '#split-result')
 	}
 	
 	var radix = 16;
@@ -58,7 +58,7 @@ $(document).on('click', '#splitButton', function(ev){
 		secrets.getConfig().unsafePRNG ? $('#PRNGwarning').show() : $('#PRNGwarning').hide();
 		numShares<threshold ? $('#mismatchWarning').show() : $('#mismatchWarning').hide();
 	}catch(e){
-		return error('this', e, '#split-result')
+		return error(this, e, '#split-result')
 	}	
 })
 
