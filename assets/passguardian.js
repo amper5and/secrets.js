@@ -46,6 +46,9 @@ $(document).on('click', '#splitButton', function(ev){
 		}
 		radix = 10;
 	}
+	if(!$('#shares').length){
+		$(this).parent().after('<div id="split-result" style="display:none;" class="alert alert-block alert-success fade in"><button type="button" class="close" data-dismiss="alert">&times;</button><h4>Reconstructed secret</h4><pre id="shares"></pre></div>');
+	}
 	try{
 		var shares = secrets.share(string, numShares, threshold, radix);
 		var textarea = $('#shares');
@@ -79,6 +82,9 @@ $(document).on('click', '#reconButton', function(ev){
 	var radix = 16;
 	if(type==='dec'){
 		radix = 10;
+	}
+	if(!$('#reconstruction').length){
+		$(this).parent().after('<div id="recon-result" style="display:none;" class="alert alert-block alert-success fade in"><button type="button" class="close" data-dismiss="alert">&times;</button><h4>Reconstructed secret</h4><pre id="reconstruction"></pre></div>');
 	}
 	try{
 		var recon = secrets.combine(shares,null,radix);
