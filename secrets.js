@@ -1,4 +1,4 @@
-// secrets.js - Copyright (c) 2012 Alexander Stetsyuk
+// secrets.js - by Alexander Stetsyuk - released under MIT License
 (function(exports, global){
 var defaults = {
 	bits: 8, // default number of bits
@@ -23,7 +23,10 @@ var config = {};
 
 /** @expose **/
 exports.getConfig = function(){
-	return {'bits': config.bits};
+	return {
+		'bits': config.bits,
+		'unsafePRNG': config.unsafePRNG
+	};
 };
 
 function init(bits){
@@ -136,14 +139,14 @@ function getRNG(){
 // Called when Math.random() is being used.
 function warn(){
 	global['console']['warn'](defaults.warning);
-	if(typeof global['alert'] === 'function'){
+	if(typeof global['alert'] === 'function' && config.alert){
 		global['alert'](defaults.warning);
 	}
 }
 
 // Set the PRNG to use. If no RNG function is supplied, pick a default using getRNG()
 /** @expose **/
-exports.setRNG = function(rng){
+exports.setRNG = function(rng, alert){
 	if(!isInited()){
 		this.init();
 	}
@@ -156,6 +159,9 @@ exports.setRNG = function(rng){
 	}else{
 		config.rng = rng;
 	}
+	config.alert = !!alert;
+	
+	return !!config.unsafeRNG;
 };
 
 function isSetRNG(){

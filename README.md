@@ -143,7 +143,7 @@ Create a new share from the input shares.
 The output of `secrets.newShare()` is a String. This is the same format for the share that `secrets.share()` outputs. Note that this function ALWAYS produces an output String. However, as for `secrets.combine()`, if the number of `shares` that are entered is not the `threshold` number of shares, the output share _will not_ be a valid share (i.e. _will not_ be useful in reconstructing the original secret). In order to guarantee that the share is valid, the correct `threshold` number of shares must be provided.
 
 #### secrets.init( [bits] )
-Set the number of bits to use for finite field arithmetic and the default radix to use for inputs and outputs.
+Set the number of bits to use for finite field arithmetic.
 
 * `bits`: Number, optional, default `8`: An integer between 3 and 20. The number of bits to use for the Galois field.
 
@@ -156,9 +156,12 @@ Note:
 * `secrets.init()` does NOT need to be called if you plan on using the default of 8 bits. It is automatically called on loading the library.
 * The size of the exp and log tables depends on `bits` (each has 2^bits entries). Therefore, using a large number of bits will cause a slightly longer delay to compute the tables.
 * The _theoretical_ maximum number of bits is 31, as javascript performs bitwise operations on 31-bit numbers. A limit of 20 bits has been hard-coded into secrets.js, which can produce 1,048,575 shares. secrets.js has not been tested with this many shares, and it is not advisable to go this high, as it may be too slow to be of any practical use.
+* The Galois Field may be re-initialized to a new setting when `secrets.newShare()` or `secrets.combine()` are called with shares that are from a different Galois Field than the currently initialized one. For this reason, use `secrets.getConfig()` (see below) to check what the current bit-setting is.
 
 #### secrets.getConfig()
-Returns the number of `bits` used for the current initialized finite field.
+Returns an Object with the current configuration. Has the following properties:
+* `bits`: [Number] The number of bits used for the current initialized finite field
+* `unsafePRNG`: [Boolean]: Is `true` when `Math.random()` is being used as the PRNG
 
 #### secrets.setRNG( function(bits){} )
 Set the pseudo-random number generator used to compute shares.
@@ -237,7 +240,7 @@ secrets.js is released under the MIT License. See `LICENSE`.
 * A strong PRNG for browsers that don't have crypto.getRandomValues()
 * Operate on [node.js streams](http://nodejs.org/api/stream.html)
 * [Cheater-detection](http://h.web.umkc.edu/harnl/papers/J68.pdf)
-* [Dynamic threshold](http://itcs.tsinghua.edu.cn/~ctartary/Dynamic_Threshold_INSCRYPT2006.pdf)
+* [Dynamic threshold](http://www1.spms.ntu.edu.sg/~ctartary/Dynamic_Threshold_INSCRYPT2006.pdf)
 * Possible speed enhancements in polynomial evaluation and polynomial interpolation
 * Investigate other sharing schemes that might be faster
 * Compatibility with other secret sharing programs, such as [ssss-split](http://point-at-infinity.org/ssss/) and [SecretSplitter](https://github.com/moserware/SecretSplitter)
