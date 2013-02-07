@@ -83,7 +83,7 @@
 							<div class="control-group">
 								<textarea class="input-block-level" id="string" type="text" rows="3" placeholder="Secret to share"></textarea>
 								<div>
-								<a id="clearButton" class="btn pull-right"><i class="icon-trash"></i>Clear</a>
+									<a id="clearButton" class="btn pull-right"><i class="icon-trash"></i>Clear</a>
 								</div>
 							</div>
 							<div class="control-group">
@@ -139,10 +139,9 @@
 					</div>
 					<div class="tab-pane" id="recon-tab">
 						<form class="form-horizontal">
-							<div>Enter your shares:</div>
 							<div id="inputShares" class="control-group">
-								<input type="text" class="input-block-level shareInput" placeholder="One share">
-								<input type="text" class="input-block-level shareInput" placeholder="One share">
+								<input type="text" class="input-block-level shareInput" placeholder="Enter one share">
+								<input type="text" class="input-block-level shareInput" placeholder="Enter one share">
 							</div>
 							<div class="control-group">
 								<div class="btn-group pull-right">
@@ -179,7 +178,7 @@
 			<p>The process of splitting a secret results in a specified number of shares of the secret. Each share is a random number that by itself provides no information about the secret. The secret can be reconstructed only when a sufficient number (threshold) of shares are combined. During the splitting process, one can select the number of shares to create and the threshold needed to reconstruct the secret.
 			
 			<h4>A proven cryptographic algorithm</h4>
-			<p>The secret sharing method that <span class="Pass">Pass</span><span class="Guardian">Guardian</span> employs is based on <a href="http://en.wikipedia.org/wiki/Shamir's_Secret_Sharing" target="_blank">Shamir's secret threshold sharing scheme</a>, named after its discoverer <a href="http://en.wikipedia.org/wiki/Adi_Shamir" target="_blank">Adi Shamir</a>. Shamir's landmark paper, "How to Share a Secret", published in 1979, provides the background for this threshold sharing scheme. One of the most useful properties of Shamir's sharing scheme is that it is <a href="http://en.wikipedia.org/wiki/Information_theoretic_security" target="_blank">"information-theoretically secure"</a> and "perfectly secure", in that less than the requisite number of shares provide no information about the secret (i.e. knowing less than the requisite number of shares is the same as knowing none of the shares).
+			<p>The secret sharing method that <span class="Pass">Pass</span><span class="Guardian">Guardian</span> employs is based on <a href="http://en.wikipedia.org/wiki/Shamir's_Secret_Sharing" target="_blank">Shamir's threshold secret sharing scheme</a>, named after its discoverer <a href="http://en.wikipedia.org/wiki/Adi_Shamir" target="_blank">Adi Shamir</a>. His 1979 landmark paper, "How to Share a Secret" [<a href="assets/1979_HowToShareASecret_Shamir.pdf" target="_blank">PDF</a>, 70kb], provides the background for this threshold sharing scheme. One of the most useful properties of Shamir's sharing scheme is that it is <a href="http://en.wikipedia.org/wiki/Information_theoretic_security" target="_blank">"information-theoretically secure"</a> and "perfectly secure", in that less than the requisite number of shares provide no information about the secret (i.e. knowing less than the requisite number of shares is the same as knowing none of the shares).
 			
 			<h4>Open-source, verifiable implementation</h4>
 			<p><span class="Pass">Pass</span><span class="Guardian">Guardian</span> is built on <a href="https://github.com/amper5and/secrets.js/" target="_blank">secrets.js</a>, an open-source implementation of Shamir's sharing scheme. While secrets.js permits Galois Fields up to 20 bits in size, <span class="Pass">Pass</span><span class="Guardian">Guardian</span> uses an 8-bit binary finite field for computations. The share format is described at the <a href="https://github.com/amper5and/secrets.js/#share-format" target="_blank">secrets.js</a> page. 

@@ -99,7 +99,7 @@ $(document).on('click', '#reconButton', function(ev){
 })
 
 $(document).on('click', '#addShareButton', function(ev){
-	$('#inputShares').append('<input type="text" class="input-block-level shareInput" placeholder="One share">')
+	$('#inputShares').append('<input type="text" class="input-block-level shareInput" placeholder="Enter one share">')
 })
 
 $(document).on('click','#clearButton', function(ev){
@@ -110,4 +110,19 @@ $(document).on('click','#clearAllButton', function(ev){
 	$('.shareInput').each(function(){
 		$(this).val('');
 	})
+})
+
+$(document).on('click','.inputType[data-inputType=dec],.inputType[data-inputType=hex]', function(ev){
+	var string = $('#string');
+	var val = string.val().replace(/\n/g,'');
+	if(string.is('textarea')){
+		string.replaceWith('<input class="input-block-level" id="string" type="text" placeholder="Secret to share" value="'+val+'">')
+	}
+})
+$(document).on('click','.inputType[data-inputType=text]', function(ev){
+	var string = $('#string');
+	var val = string.val();
+	if(string.is('input')){
+		string.replaceWith('<textarea class="input-block-level" id="string" type="text" rows="3" placeholder="Secret to share">'+val+'</textarea>')
+	}
 })
