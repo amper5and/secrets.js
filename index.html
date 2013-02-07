@@ -62,7 +62,7 @@
 					<div class="tab-pane active" id="split-explanation">
 						<ol>
 						<li><strong>Enter your secret.</strong>
-							<br>It can be text or a number in decimal or hexadecimal format. Support for other formats (files, QR codes) coming soon!</li>
+							<br>It can be text or a number in hexadecimal format. Support for other formats (files, QR codes) coming soon!</li>
 						<li><strong>Select the number of <span class="word">shares</span> (pieces) to create.</strong>
 							<br>Each computed share will be random. Each time you compute the shares, they will be different. 
 							The minimum number of shares is 2, and the maximum is 255.
@@ -89,7 +89,6 @@
 								<label class="control-label" for="secret-type">Secret type:&nbsp;&nbsp;</label>
 								<div id="secret-type" class="btn-group" data-toggle="buttons-radio">
 									<button type="button" class="inputType btn active" data-inputType="text">Text</button>
-									<button type="button" class="inputType btn" data-inputType="dec">Decimal</button>
 									<button type="button" class="inputType btn" data-inputType="hex">Hexadecimal</button>
 								</div>
 							</div>
@@ -102,10 +101,15 @@
 								<input id="threshold" type="number" class="span2" step="1" value="2" min="2" max="255" style="margin-right: 50px;">
 							</div>
 							<div class="control-group">
-								<a id="splitButton" class="btn btn-primary btn-large btn-block btnCustom">SPLIT SECRET</a>
+								<a id="resetSplitForm" class="btn btn-danger btn-large pull-left">Reset</a>
+								<a id="splitButton" class="btn btn-primary btn-large pull-right">Split</a>
 							</div>
 							<div id="PRNGwarning" style="display: none;" class="alert alert-block alert-warning"><h4>Security Notice</h4> A cryptographically-strong random number generator was not found in your browser. Consider switching to a new browser. The computed shares will not be as secure as possible.</div>
-							<div id="split-result" style="display:none;" class="alert alert-block alert-success fade in"><button type="button" class="close" data-dismiss="alert">&times;</button><h4>Secret shares</h4>One share per line<pre id="shares"></pre></div>
+							<div id="split-result" style="display:none;" class="alert alert-block alert-success fade in"><button type="button" class="close" data-dismiss="alert">&times;</button>
+								<h4>Secret shares</h4>
+								One share per line:
+								<pre id="shares"></pre>
+							</div>
 							<div id="mismatchWarning" style="display: none;" class="alert alert-block alert-warning"><h4>Notice</h4> The number of generated shares is less than the threshold and will not be enough to reconstruct the secret.</div>
 							<div class="alert alert-block alert-info"><h4>Security Note</h4> All computations are performed in your browser. Your secret and the computed shares are never transmitted back to our servers.</div>	
 						</form>
@@ -129,7 +133,7 @@
 						<li><strong>Enter your shares.</strong>
 							<br>Enter one share in each input box. Make sure you enter at least the threshold number of shares.</li>
 						<li><strong>Select secret type.</strong>
-							<br>The reconstructed secret can be a text string or a number in decimal or hexadecimal form.
+							<br>The reconstructed secret can be a text string or a number in hexadecimal form.
 							<br><br>
 							<a href="#about" class="btn">Read about the theory</a></li>
 						</ol>
@@ -139,6 +143,7 @@
 					<div class="tab-pane" id="recon-tab">
 						<form class="form-horizontal">
 							<div id="inputShares" class="control-group">
+								Enter your shares:
 								<input type="text" class="input-block-level shareInput" placeholder="Enter one share">
 								<input type="text" class="input-block-level shareInput" placeholder="Enter one share">
 							</div>
@@ -147,19 +152,22 @@
 									<button id="clearAllButton" type="button" class="btn"><i class="icon-trash"></i> Clear all</button>
 									<button id="addShareButton" type="button" class="btn"><i class="icon-plus"></i> Add share</button>
 								</div>
-							</div>
+							</div>	
 							<div class="control-group">
 								<span>Secret type:&nbsp;&nbsp;</span>
 								<div id="recon-type" class="btn-group" data-toggle="buttons-radio">
 									<button type="button" class="reconType btn active" data-inputType="text">Text</button>
-									<button type="button" class="reconType btn" data-inputType="dec">Decimal</button>
 									<button type="button" class="reconType btn" data-inputType="hex">Hexadecimal</button>
 								</div>
 							</div>
 							<div class="control-group">
-								<a id="reconButton" class="btn btn-primary btn-block btn-large btnCustom">RECONSTRUCT SECRET</a>
+								<a id="resetReconForm" class="btn btn-danger btn-large pull-left">Reset</a>
+								<a id="reconButton" class="btn btn-primary btn-large pull-right">Reconstruct</a>
 							</div>
-							<div id="recon-result" style="display:none;" class="alert alert-block alert-success fade in"><button type="button" class="close" data-dismiss="alert">&times;</button><h4>Reconstructed secret</h4><pre id="reconstruction"></pre></div>
+							<div id="recon-result" style="display:none;" class="alert alert-block alert-success fade in"><button type="button" class="close" data-dismiss="alert">&times;</button>
+								<h4>Reconstructed secret</h4>
+								<pre id="reconstruction"></pre>
+							</div>
 							<div class="alert alert-block alert-info"><h4>Security Note</h4> All computations are performed in your browser. Your shares and the reconstructed secret are never transmitted back to our servers.</div>
 						</form>
 					</div>
@@ -175,6 +183,7 @@
 			<h4>Configurable levels of confidentiality and reliability</h4>
 			<p><a href="http://en.wikipedia.org/wiki/Secret_sharing" target="_blank">Secret sharing</a> is a method for distributing a secret among participants or locations. A secret can consist of any data; for example, a password, a message, an account number, an ecnryption key, missile launch codes, or a Bitcoin private key all represent highly sensitive and important secrets. Traditionally, when guarding highly sensitive information, one would have to choose between keeping a single copy of the secret in one location for maximum secrecy, or keeping multiple copies of the secret in different locations for greater reliability. By increasing storage locations or entrusted parties, reliability is increased at the expense of secrecy. Secret sharing addresses this problem by allowing arbitrarily high levels of confidentiality and reliability. 
 			<p>The process of splitting a secret results in a specified number of shares of the secret. Each share is a random number that by itself provides no information about the secret. The secret can be reconstructed only when a sufficient number (threshold) of shares are combined. During the splitting process, one can select the number of shares to create and the threshold needed to reconstruct the secret.
+			<p>Note that during the reconstruction process, a reconstruction is computed for any number of shares. If the number of shares is less than the threshold, this reconstruction of the secret will be INCORRECT.
 			
 			<h4>A proven cryptographic algorithm</h4>
 			<p>The secret sharing method that <span class="Pass">Pass</span><span class="Guardian">Guardian</span> employs is based on <a href="http://en.wikipedia.org/wiki/Shamir's_Secret_Sharing" target="_blank">Shamir's threshold secret sharing scheme</a>, named after its discoverer <a href="http://en.wikipedia.org/wiki/Adi_Shamir" target="_blank">Adi Shamir</a>. His 1979 landmark paper, "How to Share a Secret" [<a href="assets/1979_HowToShareASecret_Shamir.pdf" target="_blank">PDF</a>, 70kb], provides the background for this threshold sharing scheme. One of the most useful properties of Shamir's sharing scheme is that it is <a href="http://en.wikipedia.org/wiki/Information_theoretic_security" target="_blank">"information-theoretically secure"</a> and "perfectly secure", in that less than the requisite number of shares provide no information about the secret (i.e. knowing less than the requisite number of shares is the same as knowing none of the shares).
@@ -210,7 +219,7 @@
 		
 		<div class="footer">
 			Powered by <a href="https://github.com/amper5and/secrets.js" target="_blank">secrets.js</a>
-			&nbsp;&nbsp;&nbsp;&nbsp; &copy; 2013 Alexander Stetsyuk &lt;alexstets AT gmail DOT com&gt;
+			<br>&copy; 2013 Alexander Stetsyuk &lt;alexstets AT gmail DOT com&gt;
 		</div>
     </div>
 	<script type="text/javascript">

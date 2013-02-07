@@ -108,26 +108,34 @@ section>h3{
 }
 form{
 	padding: 10px;
+	padding-bottom: 0px;
 }
 .btnCustom{
 	font-family: 'Days One';
 }
-#shares,#reconstruction{
+#shares,
+#reconstruction,
+#split-hmac,
+#recon-hmac{
 	padding: 2px;
 	padding-left: 4px;
 	overflow-x: auto;
 	background: white;
 	margin-left: -14px;
 	margin-right: -35px;
-	margin-top: 10px;
-	margin-bottom: -14px;
+	margin-bottom:-14px;
+	margin-top: 4px;
+	max-height: 300px;
 }
-#shares{
+#shares,
+#split-hmac,
+#recon-hmac{
 	white-space: nowrap;
 }
 #reconstruction{
 	white-space: pre;
 }
+
 #shares div{
 	margin-bottom: 1px;
 }
