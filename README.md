@@ -217,10 +217,11 @@ secrets.js is released under the MIT License. See `LICENSE`.
 
 
 ## Changelog
+
 * 0.1.6: 
-** Removed JSBN dependency, support for arbitrary radices, and the `convertBase()` function, with attendant 50% file size reduction. 
-** Fixed bug where leading zeros were dropped.
-** Renamed string conversion functions.
+	* Removed JSBN dependency, support for arbitrary radices, and the `convertBase()` function, with attendant 50% file size reduction. 
+	* Fixed bug where leading zeros were dropped.
+	* Renamed string conversion functions.
 * 0.1.5: getConfig() returns information about PRNG
 * 0.1.4: new share format
 
