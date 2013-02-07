@@ -1,7 +1,7 @@
 secrets.js
 ==========
 
-http://passguardian.com
+See it in action at http://passguardian.com
 
 - [What is it?](#what-is-it)
 - [Examples](#examples)
@@ -9,8 +9,6 @@ http://passguardian.com
 - [API](#api)
 - [Share format](#share-format)
 - [Note on security](#note-on-security)
-- [Note on leading zeros in the secret](#note-on-leading-zeros-in-the-secret)
-- [Dependencies](#dependencies)
 - [License](#license)
 - [Changelog](#changelog)
 - [Possible future enhancements](#possible-future-enhancements)
@@ -57,7 +55,7 @@ Divide a password containing a mix of numbers, letters, and other characters, re
 	var pw = '<<PassWord123>>';
 	
 	// convert the text into a hex string
-	var pwHex = secrets.toHex(pw); // => hex string
+	var pwHex = secrets.str2hex(pw); // => hex string
 	
 	// split into 5 shares, with a threshold of 3
 	var shares = secrets.share(pwHex, 5, 3);
@@ -67,7 +65,7 @@ Divide a password containing a mix of numbers, letters, and other characters, re
 	var comb = secrets.combine( shares.slice(1,3) );
 	
 	//convert back to UTF string:
-	comb = secrets.toString(comb);
+	comb = secrets.hex2str(comb);
 	console.log( comb === pw  ); // => false
 	
 	
@@ -75,7 +73,7 @@ Divide a password containing a mix of numbers, letters, and other characters, re
 	var comb = secrets.combine( [ shares[1], shares[3], shares[4] ] );
 	
 	//convert back to UTF string:
-	comb = secrets.toString(comb);
+	comb = secrets.hex2str(comb);
 	
 	console.log( comb === pw  ); // => true
 
@@ -107,40 +105,34 @@ To use it in the browser, include *secrets.js* or *secrets.min.js* (minified usi
 * secrets.getConfig()
 * secrets.setRNG()
 * secrets.random()
-* secrets.toHex()
-* secrets.toString()
-* secrets.convertBase()
+* secrets.str2hex()
+* secrets.hex2str()
 
 
-#### secrets.share( secret, numShares, threshold, [inputRadix, outputRadix, padLength] )
-Divide a `secret` expressed in `inputRadix` into `numShares` number of shares, each expressed in `outputRadix`, requiring that `threshold` number of shares be present for reconstructing the `secret`;
+#### secrets.share( secret, numShares, threshold, [padLength] )
+Divide a `secret` expressed in hexadecimal form into `numShares` number of shares, requiring that `threshold` number of shares be present for reconstructing the `secret`;
 
-* `secret`: String, required: A number string. By default it is assumed to be in hexadecimal format. The radix can be overridden with `inputRadix` (see below).
+* `secret`: String, required: A hexadecimal string.
 * `numShares`: Number, required: The number of shares to compute. This must be an integer between 2 and 2^bits-1 (see `secrets.init()` below for explanation of `bits`).
 * `threshold`: Number, required: The number of shares required to reconstruct the secret. This must be an integer between 2 and 2^bits-1 (see `secrets.init()` below for explanation of `bits`).
-* `inputRadix`: Number, optional, default `16`: The radix of the `secret`. Must be an integer between 2 and 36. For example, enter `2` for binary strings, `16` for hex strings, and `36` for alpha-numeric strings (Note: `36` uses the numbers 0-9 and letters a-z, NOT differentiating between upper and lower case.)
-* `outputRadix`: Number, optional, default `16`: The radix of the output shares. Must be an integer between 2 and 36.
 * `padLength`: Number, optional, default `0`: How much to zero-pad the binary representation of `secret`. This ensures a minimum length for each share. See "Note on security" below.
 
 The output of `secrets.share()` is an Array of length `numShares`. Each item in the array is a String. See `Share format` below for information on the format.
 
-#### secrets.combine( shares, [inputRadix, outputRadix] )
+#### secrets.combine( shares )
 Reconstructs a secret from `shares`.
 
 * `shares`: Array, required: An Array of shares. The form is equivalent to the output from `secrets.share()`.
-* `inputRadix`: Number, optional, default `16`: The radix of the shares. See `outputRadix` in `secrets.share()` above.
-* `outputRadix`: Number, optional, default `16`: The radix of the output reconstructed secret.
 
 The output of `secrets.combine()` is a String representing the reconstructed secret. Note that this function will ALWAYS produce an output String. However, if the number of `shares` that are provided is not the `threshold` number of shares, the output _will not_ be the original `secret`. In order to guarantee that the original secret is reconstructed, the correct `threshold` number of shares must be provided.
 
 Note that using _more_ than the `threshold` number of shares will also result in an accurate reconstruction of the secret. However, using more shares adds to computation time.
 
-#### secrets.newShare( id, shares, [radix] )
+#### secrets.newShare( id, shares )
 Create a new share from the input shares.
 
-* `id`: Number or String, required: A Number representing the share id. The id is an integer between 1 and 2^bits-1. It can be entered as a Number or a number String expressed in the same base `radix` as the `shares`, i.e. using 10 and "a" (base 16) for `id` will both output the 10th share.
+* `id`: Number or String, required: A Number representing the share id. The id is an integer between 1 and 2^bits-1. It can be entered as a Number or a number String expressed in hexadecimal form.
 * `shares`: Array, required: The array of shares (in the same format as outputted from `secrets.share()`) that can be used to reconstruct the original `secret`. 
-* `radix`: Number, optional: The radix of the `shares` and of the `id`, if the `id` is a String.
 
 The output of `secrets.newShare()` is a String. This is the same format for the share that `secrets.share()` outputs. Note that this function ALWAYS produces an output String. However, as for `secrets.combine()`, if the number of `shares` that are entered is not the `threshold` number of shares, the output share _will not_ be a valid share (i.e. _will not_ be useful in reconstructing the original secret). In order to guarantee that the share is valid, the correct `threshold` number of shares must be provided.
 
@@ -151,7 +143,7 @@ Set the number of bits to use for finite field arithmetic.
 
 Internally, secrets.js uses finite field arithmetic in binary Galois Fields of size 2^bits. Multiplication is implemented by the means of log and exponential tables. Before any arithmetic is performed, the log and exp tables are pre-computed. Each table contains 2^bits entries. 
 
-`bits` is the limiting factor on `numShares` and `threshold`. The maximum number of shares possible for a particular `bits` is (2^bits)-1 (the zeroth share cannot be used as it is the `secret` by definition.). By default, secrets.js uses 8 bits, for a total 2^8-1 = 255 possible number of shares. To compute more shares, a larger field must be used. To compute the number of bits you will need for your `numShares` or `threshold`, compute the log-base2 of (`numShares`+1) and round up, i.e. in javascript: `Math.ceil(Math.log(numShares+1)/Math.log(2))`. 
+`bits` is the limiting factor on `numShares` and `threshold`. The maximum number of shares possible for a particular `bits` is (2^bits)-1 (the zeroth share cannot be used as it is the `secret` by definition.). By default, secrets.js uses 8 bits, for a total 2^8-1 = 255 possible number of shares. To compute more shares, a larger field must be used. To compute the number of bits you will need for your `numShares` or `threshold`, compute the log-base2 of (`numShares`+1) and round up, i.e. in javascript: `Math.ceil(Math.log(numShares+1)/Math.LN2)`. 
 
 Note:
 
@@ -179,17 +171,14 @@ NOTE: In a near-future version of secrets.js, the requirement for the PRNG funct
 #### secrets.random( bits )
 Generate a random `bits`-length string, and output it in hexadecimal format. `bits` must be an integer greater than 1. 
 
-#### secrets.toHex( str, [bytesPerChar] )
+#### secrets.str2hex( str, [bytesPerChar] )
 Convert a UTF string `str` into a hexadecimal string, using `bytesPerChar` bytes (octets) for each character. 
 
 * `str`: String, required: A UTF string. 
 * `bytesPerChar`: Number, optional, default `2`. The maximum `bytesPerChar` is 6 to ensure that each character is represented by a number that is below javascript's 2^53 maximum for integers.
 
-#### secrets.toString( str, [bytesPerChar] )
-Convert a hexadecimal string into a UTF string. Each character of the output string is represented by `bytesPerChar` bytes in the String `str`. See note on `bytesPerChar` under `secrets.toHex()` above.
-
-#### secrets.convertBase( str, inputRadix, outputRadix )
-Convert a number string `str` in base `inputRadix` into a number string in base `outputRadix`
+#### secrets.hex2str( str, [bytesPerChar] )
+Convert a hexadecimal string into a UTF string. Each character of the output string is represented by `bytesPerChar` bytes in the String `str`. See note on `bytesPerChar` under `secrets.str2hex()` above.
 
 
 ## Share format
@@ -197,8 +186,8 @@ Convert a number string `str` in base `inputRadix` into a number string in base 
 Each share is a string in the format `<bits><id><value>`. Each part of the string is described below:
 
 * `bits`: The first character, expressed in base-36 format, is the number of bits used for the Galois Field. This number must be between 3 and 20, expressed by the characters [3-9, a-k].
-* `id`: The id of the share. This is a number between 1 and 2^bits-1, expressed in the user-specified radix (default is 16, hexadecimal). The number of characters used to represent the id is the character-length of the representation of the maximum id (2^bits-1) in the particular radix: `(Math.pow(2,bits)-1).toString(radix).length`.
-* `value`: The value of the share, expressed in the user-specified radix (default is 16, hexadecimal). The length of this string depends on the length of the secret. 
+* `id`: The id of the share. This is a number between 1 and 2^bits-1, expressed in hexadecimal form. The number of characters used to represent the id is the character-length of the representation of the maximum id (2^bits-1) in hexadecimal: `(Math.pow(2,bits)-1).toString(16).length`.
+* `value`: The value of the share, expressed in hexadecimal form. The length of this string depends on the length of the secret. 
 
 
 ## Note on security
@@ -209,40 +198,36 @@ When `secrets.share()` is called with a `padLength`, the `secret` is zero-padded
 	var pw = '<<PassWord123>>';
 	
 	// convert the text into a hex string
-	var pwHex = secrets.toHex(pw); // => 240-bit password
+	var pwHex = secrets.str2hex(pw); // => 240-bit password
 
 	// split into 5 shares, with a threshold of 3, WITH zero-padding
-	var shares = secrets.share(pwHex, 5, 3, null, null, 1024); // => 1024-bit shares
+	var shares = secrets.share(pwHex, 5, 3, 1024); // => 1024-bit shares
 	
 	// combine 3 shares
 	var comb = secrets.combine( [ shares[1], shares[3], shares[4] ] );
 	
 	// convert back to UTF string
-	comb = secrets.toString(comb);
+	comb = secrets.hex2str(comb);
 	
 	console.log( comb === pw  ); // => true
-
-	
-## Note on leading zeros in the secret
-Currently, any leading zeros of the secret are dropped. This is because secrets.js uses [jsbn](http://www-cs-students.stanford.edu/~tjw/jsbn/) to convert the inputs, which understandably drops zeros. Normally, this is not a huge deal, but can be important in some applications. I am looking for an efficient base-conversion library that will retain these zeros. Suggestions on this point are welcome.
-
-
-## Dependencies
-There are no external dependencies. secrets.js is bundled with a modified sub-set of Tom Wu's BSD-licensed Javascript BigInteger library [jsbn](http://www-cs-students.stanford.edu/~tjw/jsbn/). This is only used for number string conversion, not arithmetic. See `jsbnLICENSE` for the license.
 
 
 ## License
 secrets.js is released under the MIT License. See `LICENSE`.
 
+
 ## Changelog
-0.1.5: getConfig() returns information about PRNG
-0.1.4: new share format
+* 0.1.6: 
+** Removed JSBN dependency, support for arbitrary radices, and the `convertBase()` function, with attendant 50% file size reduction. 
+** Fixed bug where leading zeros were dropped.
+** Renamed string conversion functions.
+* 0.1.5: getConfig() returns information about PRNG
+* 0.1.4: new share format
+
 
 ## Possible future enhancements
 * A strong PRNG for browsers that don't have crypto.getRandomValues()
 * Operate on [node.js streams](http://nodejs.org/api/stream.html)
 * [Cheater-detection](http://h.web.umkc.edu/harnl/papers/J68.pdf)
 * [Dynamic threshold](http://www1.spms.ntu.edu.sg/~ctartary/Dynamic_Threshold_INSCRYPT2006.pdf)
-* Possible speed enhancements in polynomial evaluation and polynomial interpolation
-* Investigate other sharing schemes that might be faster
-* Compatibility with other secret sharing programs, such as [ssss-split](http://point-at-infinity.org/ssss/) and [SecretSplitter](https://github.com/moserware/SecretSplitter)
+* Investigate speed enhancements in polynomial evaluation and polynomial interpolation
