@@ -7,6 +7,7 @@
 
 body{
 	background-image: url(hixs_pattern_evolution.png); zoom: 1; background-repeat: repeat repeat; background-attachment: fixed;
+	cursor: default;
 }
 #masthead{
 	padding-top: 50px;
@@ -14,12 +15,21 @@ body{
 }
 
 #marketing{
-	background: #eee; 
+	background: rgba(238, 238, 238, 0.9);
+	color: black;
 	padding-top: 30px;
 	margin-top: 20px;
 	margin-bottom: 90px;
 	-webkit-border-radius: 6px;
 	-moz-border-radius: 6px
+}
+.customLink{
+	opacity: 1;
+	color: #cc1111;
+}
+.customLink:hover{
+	color: #cc1111;
+	text-decoration: underline;
 }
 .lead{
 	padding: 15px;
@@ -27,7 +37,6 @@ body{
 .titleContainer{
 	display: inline-block;
 	color: #ccc;
-	cursor: default;
 }
 .title{
 	margin-top: 20px;
