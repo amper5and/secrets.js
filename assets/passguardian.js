@@ -101,14 +101,17 @@ $(document).on('click','.inputType[data-inputType=hex]', function(ev){
 $(document).on('click','.inputType[data-inputType=text]', function(ev){
 	var string = $('#string');
 	var val = string.val();
-	if(string.is('input')){
+	if(!string.is('textarea')){
 		string.replaceWith('<textarea class="input-block-level" id="string" type="text" rows="3" placeholder="Secret to share">'+val+'</textarea>')
 	}
 })
 
 $(document).on('click','#resetSplitForm', function(ev){
 	$('#split-tab .popupError').remove();
-	$('#string').val('');
+	var string = $('#string').val('');
+	if(!string.is('textarea')){
+		string.replaceWith('<textarea class="input-block-level" id="string" type="text" rows="3" placeholder="Secret to share"></textarea>')
+	}
 	$('#numShares').val(2);
 	$('#threshold').val(2);
 	var activeType = $('.inputType.active');
