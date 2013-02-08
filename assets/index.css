@@ -133,6 +133,8 @@ form{
 	white-space: nowrap;
 }
 #reconstruction{
+	word-wrap: normal;
+	word-break: normal;
 	white-space: pre;
 }
 
