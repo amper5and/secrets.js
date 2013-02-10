@@ -65,7 +65,8 @@
 					<div class="tab-pane active" id="split-explanation">
 						<ol>
 						<li><strong>Enter your secret.</strong>
-							<br>It can be text or a number in hexadecimal format. Support for other formats (files, QR codes) coming soon!</li>
+							<br>It can be text or a number in hexadecimal format. You can also generate a random secret in hexadecimal form using the "Generate" button.
+							<br>Support for other formats (files, QR codes) coming soon!</li>
 						<li><strong>Select the number of <span class="word">shares</span> (pieces) to create.</strong>
 							<br>Each computed share will be random. Each time you compute the shares, they will be different. 
 							The minimum number of shares is 2, and the maximum is 255.
@@ -84,9 +85,18 @@
 						<form class="form-horizontal">
 							<div class="control-group">
 								<textarea class="input-block-level" id="string" type="text" rows="3" placeholder="Secret to share"></textarea>
-								<div>
-									<a id="clearButton" class="btn pull-right"><i class="icon-trash"></i>Clear</a>
-								</div>
+								<div class="btn-group pull-right">
+									<a id="clearButton" class="btn"><i class="icon-trash"></i>Clear</a>
+									<a class="btn dropdown-toggle" data-toggle="dropdown">Generate <span class="caret"></span></a>
+									<ul class="dropdown-menu">
+										<li><a class="generate" data-bits="64">64 bit</a></li>
+										<li><a class="generate" data-bits="128">128 bit</a></li>
+										<li><a class="generate" data-bits="256">256 bit</a></li>
+										<li><a class="generate" data-bits="512">512 bit</a></li>
+										<li><a class="generate" data-bits="1024">1024 bit</a></li>
+										<li><a class="generate" data-bits="2048">2048 bit</a></li>
+									</ul>	
+								</div>	
 							</div>
 							<div class="control-group">
 								<label class="control-label" for="secret-type">Secret type:&nbsp;&nbsp;</label>
@@ -141,7 +151,8 @@
 					<div class="tab-pane active" id="recon-explanation">
 						<ol>
 						<li><strong>Enter your shares.</strong>
-							<br>Enter one share in each input box. Make sure you enter at least the threshold number of shares.</li>
+							<br>Enter one share in each input box. Make sure you enter at least the threshold number of shares.
+							<br>Support for files and QR codes is in development.</li>
 						<li><strong>Enter your SHA3 hash (optional).</strong>
 							<br>If you enter the hash of the original secret, it will be compared to the hash of the reconstruction to make sure that the correct secret was reconstructed.</li>
 						<li><strong>Select secret type.</strong>
