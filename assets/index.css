@@ -115,8 +115,8 @@ form{
 }
 #shares,
 #reconstruction,
-#split-hmac,
-#recon-hmac{
+#split-hash,
+#recon-hash{
 	padding: 2px;
 	padding-left: 4px;
 	overflow-x: auto;
@@ -128,8 +128,8 @@ form{
 	max-height: 300px;
 }
 #shares,
-#split-hmac,
-#recon-hmac{
+#split-hash,
+#recon-hash{
 	white-space: nowrap;
 }
 #reconstruction{

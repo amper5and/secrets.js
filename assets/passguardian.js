@@ -17,6 +17,7 @@ $(document).on('click', '#splitButton', function(ev){
 	if(string === ''){
 		return error(this, 'Input cannot be empty.', '#split-result')
 	}
+	var hash = CryptoJS.SHA3(string);
 	var type = $('.inputType.active').attr('data-inputType');
 	var numShares = $('#numShares').val() * 1;
 	if(typeof numShares !== 'number' || isNaN(numShares) || numShares < 2 || numShares > 255){
@@ -38,6 +39,7 @@ $(document).on('click', '#splitButton', function(ev){
 		var textarea = $('#shares');
 		shares = shares.join('<br>');
 		textarea.html(shares);
+		$('#split-hash').text(hash)
 		$('#split-result').show();
 		secrets.getConfig().unsafePRNG ? $('#PRNGwarning').show() : $('#PRNGwarning').hide();
 		numShares<threshold ? $('#mismatchWarning').show() : $('#mismatchWarning').hide();
@@ -48,6 +50,8 @@ $(document).on('click', '#splitButton', function(ev){
 
 $(document).on('click', '#reconButton', function(ev){
 	$('#recon-tab .popupError').remove();
+	$('#hashMismatchError').hide();
+	var inputHash = $('#inputhash').val();
 	var shares = [];
 	$('.shareInput').each(function(){
 		var share = $.trim($(this).val());
@@ -70,8 +74,13 @@ $(document).on('click', '#reconButton', function(ev){
 		if(type === 'text'){
 			recon = secrets.hex2str(recon);
 		}
+		var hash = CryptoJS.SHA3(recon).toString();
 		$('#reconstruction').text(recon);
+		$('#recon-hash').text(hash);
 		$('#recon-result').show();
+		if(inputHash && $.trim(inputHash) !== hash){
+			$('#hashMismatchError').show();
+		}
 	}catch(e){
 		return error(this, 'Reconstruction ' + e, '#recon-result')
 	}
@@ -121,6 +130,7 @@ $(document).on('click','#resetSplitForm', function(ev){
 	}
 	$('#split-result').hide();
 	$('#shares').empty();
+  	$('#split-hash').empty();
 })
 
 $(document).on('click','#resetReconForm', function(ev){
@@ -140,7 +150,9 @@ $(document).on('click','#resetReconForm', function(ev){
 		activeType.removeClass('active');
 		$('.reconType[data-inputType=text]').addClass('active')
 	}
+	$('#inputhash').val('');
 	$('#recon-result').hide();
 	$('#reconstruction').empty();
-	$('#recon-hmac').empty();
+	$('hashMismatchError').empty();
+	$('#recon-hash').empty();
 })
