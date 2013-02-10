@@ -98,6 +98,7 @@ $(document).on('click', '#reconButton', function(ev){
 })
 
 $(document).on('click', '.generate', function(ev){
+	ev.preventDefault();
 	var rnd = secrets.random($(this).attr('data-bits') * 1);
 	$('#string').replaceWith('<input class="input-block-level" id="string" type="text" placeholder="Secret to share" value="'+rnd+'">')
 	$('.inputType[data-inputType=text]').removeClass('active')
