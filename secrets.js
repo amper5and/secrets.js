@@ -151,7 +151,7 @@ exports.setRNG = function(rng, alert){
 	if(!isInited()){
 		this.init();
 	}
-	
+	config.unsafePRNG=false;
 	rng = rng || getRNG();
 	
 	// test the RNG (5 times)
@@ -162,7 +162,7 @@ exports.setRNG = function(rng, alert){
 	}
 	config.alert = !!alert;
 	
-	return !!config.unsafeRNG;
+	return !!config.unsafePRNG;
 };
 
 function isSetRNG(){
