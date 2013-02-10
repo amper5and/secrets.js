@@ -1,4 +1,15 @@
 secrets.setRNG(null, false);
+
+if(secrets.getConfig().unsafePRNG){
+	secrets.setRNG(function(bits){
+		str = '';
+		while(str.length < bits || (str.match(/0/g)||[]).length === str.length){
+			str += isaac.random().toString(2).substr(2);
+		}
+		return str.slice(0,bits)
+	}, false)
+}
+
 var pw = 'PassGuardian';
 
 function error(location, message, hide){
