@@ -12,7 +12,7 @@
 	<link href="assets/index.css" rel="stylesheet">
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
 	<script src="bootstrap/js/bootstrap.min.js"></script>
-	<script src="assets/sha3.js"></script>
+	<script src="assets/SHA3-512.js"></script>
 	<script src="assets/isaac.js"></script>
 	<script src="assets/secrets.min.js"></script>
 	<script src="assets/passguardian.js"></script>
@@ -126,7 +126,7 @@
 								</div>
 								<div class="alert alert-block alert-success fade in"><button type="button" class="close" data-dismiss="alert">&times;</button>
 									<h4>Secret hash</h4>
-									This is the SHA3 hash of your secret. It can be used to verify that a reconstruction matches the original secret.
+									This is the SHA3-512 hash of your secret. It can be used to verify that a reconstruction matches the original secret.
 									<pre id="split-hash"></pre>
 								</div>
 							</div>
@@ -153,7 +153,7 @@
 						<li><strong>Enter your shares.</strong>
 							<br>Enter one share in each input box. Make sure you enter at least the threshold number of shares.
 							<br>Support for files and QR codes is in development.</li>
-						<li><strong>Enter your SHA3 hash (optional).</strong>
+						<li><strong>Enter your SHA3-512 hash (optional).</strong>
 							<br>If you enter the hash of the original secret, it will be compared to the hash of the reconstruction to make sure that the correct secret was reconstructed.</li>
 						<li><strong>Select secret type.</strong>
 							<br>The reconstructed secret can be a text string or a number in hexadecimal form.
@@ -177,7 +177,7 @@
 								</div>
 							</div>
 							<div class="control-group">
-								Enter your SHA3 hash (optional):
+								Enter your SHA3-512 hash (optional):
 								<input id="inputhash" type="text" class="input-block-level" placeholder="hash">
 							</div>	
 							<div class="control-group">
@@ -193,7 +193,7 @@
 							</div>
 							<div id="recon-result" style="display:none;">
 								<div id="hashMismatchError" style="display:none;" class="alert alert-block alert-error">
-									<h4>SHA3 Hash Mismatch Error</h4>
+									<h4>SHA3-512 Hash Mismatch Error</h4>
 									The hash of the reconstructed secret does not match the entered hash. This could be because:
 									<ol>
 										<li>The hash or one or more shares were entered incorrectly.</li>
@@ -207,7 +207,7 @@
 								</div>
 								<div class="alert alert-block alert-success fade in"><button type="button" class="close" data-dismiss="alert">&times;</button>
 									<h4>Reconstruction hash</h4>
-									This is the SHA3 hash of the reconstructed secret. This hash should match the hash of the secret.
+									This is the SHA3-512 hash of the reconstructed secret. This hash should match the hash of the secret.
 									<pre id="recon-hash"></pre>
 								</div>
 							</div>
@@ -227,7 +227,7 @@
 			<p><a href="http://en.wikipedia.org/wiki/Secret_sharing" target="_blank">Secret sharing</a> is a method for distributing a secret among participants or locations. A secret can consist of any data; for example, a password, a message, an account number, an ecnryption key, missile launch codes, or a Bitcoin private key all represent highly sensitive and important secrets. Traditionally, when guarding highly sensitive information, one would have to choose between keeping a single copy of the secret in one location for maximum secrecy, or keeping multiple copies of the secret in different locations for greater reliability. By increasing storage locations or entrusted parties, reliability is increased at the expense of secrecy. Secret sharing addresses this problem by allowing arbitrarily high levels of confidentiality and reliability. 
 			<p>The process of splitting a secret results in a specified number of shares of the secret. Each share is a random number that by itself provides no information about the secret. The secret can be reconstructed only when a sufficient number (threshold) of shares are combined. During the splitting process, one can select the number of shares to create and the threshold needed to reconstruct the secret.
 			<p>Note that during the reconstruction process, a reconstruction is computed for any number of shares. If the number of shares is less than the threshold, this reconstruction of the secret will be INCORRECT.
-			<p>During the share-creation process, <span class="Pass">Pass</span><span class="Guardian">Guardian</span> also computes a <a href="http://en.wikipedia.org/wiki/SHA-3" target="_blank">SHA3 cryptographic hash</a> of the secret. This is a unique hash that can be used to verify the authenticity of any reconstructed secret, as the hash of the reconstruction should match the hash of the secret. The secret cannot be derived from the hash. Distribution of this hash is optional, and should only be used to aid in verifying message integrity.
+			<p>During the share-creation process, <span class="Pass">Pass</span><span class="Guardian">Guardian</span> also computes a <a href="http://en.wikipedia.org/wiki/SHA-3" target="_blank">SHA3-512 cryptographic hash</a> of the secret. This is a unique hash that can be used to verify the authenticity of any reconstructed secret, as the hash of the reconstruction should match the hash of the secret. The secret cannot be derived from the hash. Distribution of this hash is optional, and should only be used to aid in verifying message integrity.
 			
 			<h4>A proven cryptographic algorithm</h4>
 			<p>The secret sharing method that <span class="Pass">Pass</span><span class="Guardian">Guardian</span> employs is based on <a href="http://en.wikipedia.org/wiki/Shamir's_Secret_Sharing" target="_blank">Shamir's threshold secret sharing scheme</a>, named after its discoverer <a href="http://en.wikipedia.org/wiki/Adi_Shamir" target="_blank">Adi Shamir</a>. His 1979 landmark paper, "How to Share a Secret" [<a href="assets/1979_HowToShareASecret_Shamir.pdf" target="_blank">PDF</a>, 70kb], provides the background for this threshold sharing scheme. One of the most useful properties of Shamir's sharing scheme is that it is <a href="http://en.wikipedia.org/wiki/Information_theoretic_security" target="_blank">"information-theoretically secure"</a> and "perfectly secure", in that less than the requisite number of shares provide no information about the secret (i.e. knowing less than the requisite number of shares is the same as knowing none of the shares).

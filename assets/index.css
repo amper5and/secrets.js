@@ -69,9 +69,10 @@ body{
 .subtitle {
 	font-family: Monospace;
 	float: right;
-	font-size: 122%;
-	padding-top: 4px;
-	padding-right: 22px;
+	font-size: 120%;
+	padding-top: 0px;
+	margin-top: 0px;
+	padding-right: 17px;
 	font-style: italic;
 }
 .center{
