@@ -18,7 +18,8 @@ function error(location, message, hide){
 		$(hide).hide();
 	}
 }
-$(document).on('click', '#splitButton', function(ev){
+$(document).on('click', '#splitButton', splitSecret);
+function splitSecret(ev){
 	if(secrets.getConfig().bits !== 8){
 		secrets.init(8);
 	}
@@ -57,7 +58,7 @@ $(document).on('click', '#splitButton', function(ev){
 	}catch(e){
 		return error(this, e, '#split-result')
 	}	
-})
+}
 
 $(document).on('click', '#reconButton', function(ev){
 	$('#recon-tab .popupError').remove();
@@ -142,11 +143,8 @@ $(document).on('click','#resetSplitForm', function(ev){
 	}
 	$('#numShares').val(2);
 	$('#threshold').val(2);
-	var activeType = $('.inputType.active');
-	if(!activeType.attr('text')){
-		activeType.removeClass('active');
-		$('.inputType[data-inputType=text]').addClass('active')
-	}
+	$('.inputType.active').removeClass('active');
+	$('.inputType[data-inputType=text]').addClass('active');
 	$('#split-result').hide();
 	$('#shares').empty();
   	$('#split-hash').empty();
@@ -164,14 +162,30 @@ $(document).on('click','#resetReconForm', function(ev){
 	$('#string').val('');
 	$('#numShares').val(2);
 	$('#threshold').val(2);
-	var activeType = $('.reconType.active');
-	if(!activeType.attr('text')){
-		activeType.removeClass('active');
-		$('.reconType[data-inputType=text]').addClass('active')
-	}
+	$('.reconType.active').removeClass('active');
+	$('.reconType[data-inputType=text]').addClass('active');
 	$('#inputhash').val('');
 	$('#recon-result').hide();
 	$('#reconstruction').empty();
 	$('hashMismatchError').empty();
 	$('#recon-hash').empty();
 })
+
+$(document).on('click', '#split-simple', function(ev){
+	$('#split .advancedElement').hide();
+	$('.reconType.active').removeClass('active');
+	$('.reconType[data-inputType=text]').addClass('active');
+});
+
+$(document).on('click', '#split-advanced', function(ev){
+	$('#split .advancedElement').show();
+})
+$(document).on('click', '#recon-advanced', function(ev){
+	$('#reconstruct .advancedElement').show();
+})
+
+$(document).on('click', '#recon-simple', function(ev){
+	$('#reconstruct .advancedElement').hide();
+	$('.reconType.active').removeClass('active');
+	$('.reconType[data-inputType=text]').addClass('active');
+});

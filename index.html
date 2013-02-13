@@ -65,8 +65,8 @@
 					<div class="tab-pane active" id="split-explanation">
 						<ol>
 						<li><strong>Enter your secret.</strong>
-							<br>It can be text or a number in hexadecimal format. You can also generate a random secret in hexadecimal form using the "Generate" button.
-							<br>Support for other formats (files, QR codes) coming soon!</li>
+							<br>For now text is supported. Support for other formats (files, QR codes) coming soon!
+						</li>
 						<li><strong>Select the number of <span class="word">shares</span> (pieces) to create.</strong>
 							<br>Each computed share will be random. Each time you compute the shares, they will be different. 
 							The minimum number of shares is 2, and the maximum is 255.
@@ -74,20 +74,47 @@
 						<li><strong>Select the <span class="word">threshold</span> number of shares that will be needed to reconstruct the original secret.</strong>
 							<br>The original secret can only be reconstructed when at least the threshold number of shares is present. 
 							The minimum threshold is 2, and the maximum is 255.
-							<br><br>
-							<a href="#about" class="btn">Read about the theory</a>
 						</li>
 						</ol>
-
-						<br><br>
+						<div class="accordion" id="accordion1" style="margin:0px 20px;">
+						  <div class="accordion-group">
+						    <div class="accordion-heading">
+						      <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion1" href="#collapseOne">
+						        Advanced mode
+						      </a>
+						    </div>
+						    <div id="collapseOne" class="accordion-body collapse">
+						      <div class="accordion-inner">
+						       	In simple mode, the secret is always considered to be text. In advanced mode, the secret can be a number in hexadecimal format. You can also generate a random secret in hexadecimal form using the "Generate" button.
+						      </div>
+						    </div>
+						  </div>
+						</div>
+						<a style="margin:20px;" href="#about" class="btn">Read about the theory</a>
 					</div>
 					<div class="tab-pane" id="split-tab">
 						<form class="form-horizontal">
+							<div class="control-group" >
+								<div class="btn-group pull-right" data-toggle="buttons-radio">
+									<button id="split-simple" type="button" class="btn btn-small active"><span class="text-info"><b>Simple</b></span></button>
+									<button id="split-advanced" type="button" class="btn btn-small"><span class="text-success"><b>Advanced</b></span></button>
+								</div>
+							</div>
 							<div class="control-group">
 								<textarea class="input-block-level" id="string" type="text" rows="3" placeholder="Secret to share"></textarea>
 								<div class="btn-group pull-right">
-									<a id="clearButton" class="btn"><i class="icon-trash"></i>Clear</a>
-									<a class="btn dropdown-toggle" data-toggle="dropdown">Generate <span class="caret"></span></a>
+									<a id="clearButton" class="btn"><i class="icon-trash"></i>Clear</a>	
+								</div>	
+							</div>
+							
+							<div class="control-group advancedElement">
+								<label class="control-label" for="secret-type">Secret type:&nbsp;&nbsp;</label>
+								<div id="secret-type" class="btn-group" data-toggle="buttons-radio">
+									<button type="button" class="inputType btn active" data-inputType="text">Text</button>
+									<button type="button" class="inputType btn" data-inputType="hex">Hexadecimal</button>
+								</div>
+									<div class="btn-group">
+									<button class="btn dropdown-toggle advancedElement" data-toggle="dropdown">Generate <span class="caret"></span></button>
 									<ul class="dropdown-menu">
 										<li><a href="#" class="generate" data-bits="64">64 bit</a></li>
 										<li><a href="#" class="generate" data-bits="128">128 bit</a></li>
@@ -95,15 +122,8 @@
 										<li><a href="#" class="generate" data-bits="512">512 bit</a></li>
 										<li><a href="#" class="generate" data-bits="1024">1024 bit</a></li>
 										<li><a href="#" class="generate" data-bits="2048">2048 bit</a></li>
-									</ul>	
-								</div>	
-							</div>
-							<div class="control-group">
-								<label class="control-label" for="secret-type">Secret type:&nbsp;&nbsp;</label>
-								<div id="secret-type" class="btn-group" data-toggle="buttons-radio">
-									<button type="button" class="inputType btn active" data-inputType="text">Text</button>
-									<button type="button" class="inputType btn" data-inputType="hex">Hexadecimal</button>
-								</div>
+									</ul>
+									</div>
 							</div>
 							<div class="control-group">
 								<label class="control-label" for="numShares">Number of shares:&nbsp;</label>
@@ -124,7 +144,7 @@
 									One share per line:
 									<pre id="shares"></pre>
 								</div>
-								<div class="alert alert-block alert-success fade in"><button type="button" class="close" data-dismiss="alert">&times;</button>
+								<div class="alert alert-block alert-success fade in advancedElement"><button type="button" class="close" data-dismiss="alert">&times;</button>
 									<h4>Secret hash</h4>
 									This is the SHA3-512 hash of your secret. It can be used to verify that a reconstruction matches the original secret.
 									<pre id="split-hash"></pre>
@@ -150,21 +170,44 @@
 				<div class="tab-content">
 					<div class="tab-pane active" id="recon-explanation">
 						<ol>
-						<li><strong>Enter your shares.</strong>
-							<br>Enter one share in each input box. Make sure you enter at least the threshold number of shares.
-							<br>Support for files and QR codes is in development.</li>
-						<li><strong>Enter your SHA3-512 hash (optional).</strong>
-							<br>If you enter the hash of the original secret, it will be compared to the hash of the reconstruction to make sure that the correct secret was reconstructed.</li>
-						<li><strong>Select secret type.</strong>
-							<br>The reconstructed secret can be a text string or a number in hexadecimal form.
-							<br><br>
-							<a href="#about" class="btn">Read about the theory</a></li>
+							<li><strong>Enter your shares.</strong>
+								<br>Enter one share in each input box. Make sure you enter at least the threshold number of shares.
+								<br>Support for files and QR codes is in development.</li>
+							<li><strong>Click reconstruct</strong>
+								<br>If the threshold number of shares was entered, the reconstructed secret is correct. Otherwise, the reconstruction will be incorrect.
+							</li>
 						</ol>
-
-						<br><br>
+						<div class="accordion" id="accordion2" style="margin:0px 20px;">
+						  <div class="accordion-group">
+						    <div class="accordion-heading">
+						      <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo">
+						        Advanced mode
+						      </a>
+						    </div>
+						    <div id="collapseTwo" class="accordion-body collapse">
+						      <div class="accordion-inner">
+								<ul>
+									<li><strong>Enter your SHA3-512 hash of the original secret.</strong>
+										<br>If you enter the hash of the original secret, it will be compared to the hash of the reconstruction to make sure that the correct secret was reconstructed.</li>
+									<li><strong>Select secret type.</strong>
+										<br>In simple mode, the reconstructed secret is always text. In advanced mode, the reconstruction can be a number in hexadecimal form.
+								</ul>
+						      </div>
+						    </div>
+						  </div>
+						</div>
+						
+						<a href="#about" class="btn" style="margin: 20px;">Read about the theory</a>
 					</div>
 					<div class="tab-pane" id="recon-tab">
 						<form class="form-horizontal">
+							<div class="control-group">
+								<div class="btn-group pull-right" data-toggle="buttons-radio">
+									<button id="recon-simple" type="button" class="btn btn-small active"><span class="text-info"><b>Simple</b></span></button>
+									<button id="recon-advanced" type="button" class="btn btn-small"><span class="text-success"><b>Advanced</b></span></button>
+								</div>
+							</div>
+							
 							<div id="inputShares" class="control-group">
 								Enter your shares:
 								<input type="text" class="input-block-level shareInput" placeholder="Enter one share">
@@ -176,11 +219,11 @@
 									<button id="addShareButton" type="button" class="btn"><i class="icon-plus"></i> Add share</button>
 								</div>
 							</div>
-							<div class="control-group">
+							<div class="control-group advancedElement">
 								Enter your SHA3-512 hash (optional):
 								<input id="inputhash" type="text" class="input-block-level" placeholder="hash">
 							</div>	
-							<div class="control-group">
+							<div class="control-group advancedElement">
 								<span>Secret type:&nbsp;&nbsp;</span>
 								<div id="recon-type" class="btn-group" data-toggle="buttons-radio">
 									<button type="button" class="reconType btn active" data-inputType="text">Text</button>
@@ -192,20 +235,22 @@
 								<a id="reconButton" class="btn btn-primary btn-large pull-right">Reconstruct</a>
 							</div>
 							<div id="recon-result" style="display:none;">
-								<div id="hashMismatchError" style="display:none;" class="alert alert-block alert-error">
-									<h4>SHA3-512 Hash Mismatch Error</h4>
-									The hash of the reconstructed secret does not match the entered hash. This could be because:
-									<ol>
-										<li>The hash or one or more shares were entered incorrectly.</li>
-										<li>Less than the threshold number of shares were entered.</li>
-										<li>One or more shares have been tampered with.</li>
-									</ol>
+								<div class="advancedElement">
+									<div id="hashMismatchError" style="display:none;" class="alert alert-block alert-error">
+										<h4>SHA3-512 Hash Mismatch Error</h4>
+										The hash of the reconstructed secret does not match the entered hash. This could be because:
+										<ol>
+											<li>The hash or one or more shares were entered incorrectly.</li>
+											<li>Less than the threshold number of shares were entered.</li>
+											<li>One or more shares have been tampered with.</li>
+										</ol>
+									</div>
 								</div>
 								<div class="alert alert-block alert-success fade in"><button type="button" class="close" data-dismiss="alert">&times;</button>
 									<h4>Reconstructed secret</h4>
 									<pre id="reconstruction"></pre>
 								</div>
-								<div class="alert alert-block alert-success fade in"><button type="button" class="close" data-dismiss="alert">&times;</button>
+								<div class="alert alert-block alert-success fade in advancedElement"><button type="button" class="close" data-dismiss="alert">&times;</button>
 									<h4>Reconstruction hash</h4>
 									This is the SHA3-512 hash of the reconstructed secret. This hash should match the hash of the original secret.
 									<pre id="recon-hash"></pre>
@@ -227,7 +272,7 @@
 			<p><a href="http://en.wikipedia.org/wiki/Secret_sharing" target="_blank">Secret sharing</a> is a method for distributing a secret among participants or locations. A secret can consist of any data; for example, a password, a message, an account number, an ecnryption key, missile launch codes, or a Bitcoin private key all represent highly sensitive and important secrets. Traditionally, when guarding highly sensitive information, one would have to choose between keeping a single copy of the secret in one location for maximum secrecy, or keeping multiple copies of the secret in different locations for greater reliability. By increasing storage locations or entrusted parties, reliability is increased at the expense of secrecy. Secret sharing addresses this problem by allowing arbitrarily high levels of confidentiality and reliability. 
 			<p>The process of splitting a secret results in a specified number of shares of the secret. Each share is a random number that by itself provides no information about the secret. The secret can be reconstructed only when a sufficient number (threshold) of shares are combined. During the splitting process, one can select the number of shares to create and the threshold needed to reconstruct the secret.
 			<p>Note that during the reconstruction process, a reconstruction is computed for any number of shares. If the number of shares is less than the threshold, this reconstruction of the secret will be INCORRECT.
-			<p>During the share-creation process, <span class="Pass">Pass</span><span class="Guardian">Guardian</span> also computes a <a href="http://en.wikipedia.org/wiki/SHA-3" target="_blank">SHA3-512 cryptographic hash</a> of the secret. This is a unique hash that can be used to verify the authenticity of any reconstructed secret, as the hash of the reconstruction should match the hash of the secret. The secret cannot be derived from the hash. Distribution of this hash is optional, and should only be used to aid in verifying message integrity.
+			<p>During the share-creation process, <span class="Pass">Pass</span><span class="Guardian">Guardian</span> also computes a <a href="http://en.wikipedia.org/wiki/SHA-3" target="_blank">SHA3-512 cryptographic hash</a> of the secret. This is a unique hash that can be used to verify the authenticity of any reconstructed secret, as the hash of the reconstruction should match the hash of the secret. The secret cannot be derived from the hash. Distribution of this hash is optional, and should only be used to aid in verifying data integrity.
 			
 			<h4>A proven cryptographic algorithm</h4>
 			<p>The secret sharing method that <span class="Pass">Pass</span><span class="Guardian">Guardian</span> employs is based on <a href="http://en.wikipedia.org/wiki/Shamir's_Secret_Sharing" target="_blank">Shamir's threshold secret sharing scheme</a>, named after its discoverer <a href="http://en.wikipedia.org/wiki/Adi_Shamir" target="_blank">Adi Shamir</a>. His 1979 landmark paper, "How to Share a Secret" [<a href="assets/1979_HowToShareASecret_Shamir.pdf" target="_blank">PDF</a>, 70kb], provides the background for this threshold sharing scheme. One of the most useful properties of Shamir's sharing scheme is that it is <a href="http://en.wikipedia.org/wiki/Information_theoretic_security" target="_blank">"information-theoretically secure"</a> and "perfectly secure", in that less than the requisite number of shares provide no information about the secret (i.e. knowing less than the requisite number of shares is the same as knowing none of the shares).
@@ -238,7 +283,7 @@
 			<h4>Privacy and security</h4>
 			<p>All computations are done in your browser. No secrets or secret shares are ever transmitted back to our servers. Once the <span class="Pass">Pass</span><span class="Guardian">Guardian</span> page is loaded in your browser, it can be run offline. For maximum security, it is recommended that you perform computations offline. 
 			<p>Like most website operators, <span class="Pass">Pass</span><span class="Guardian">Guardian</span> collects non-personally-identifying analytics information of the sort that web browsers and servers typically make available, such as the browser type, language preference, referring site, and the date and time of each visitor request. <span class="Pass">Pass</span><span class="Guardian">Guardian</span>'s purpose in collecting non-personally identifying information is to better understand how visitors use its website.
-			<p><span class="Pass">Pass</span><span class="Guardian">Guardian</span> requires the availability of a <a href="http://en.wikipedia.org/wiki/Cryptographically_secure_pseudorandom_number_generator" target="_blank">cryptographically-strong pseudo-random number generator (PRNG)</a> during the secret splitting phase only. If a strong PRNG is not found during run-time, <span class="Pass">Pass</span><span class="Guardian">Guardian</span> will use the <a href="http://en.wikipedia.org/wiki/ISAAC_(cipher)" target="_blank">ISAAC CSPRNG</a>, from the open-source <a href="https://github.com/rubycon/isaac.js" target="_blank">isaac.js</a> implementation. Consider upgrading to a newer browser that supports <a href="http://www.w3.org/TR/WebCryptoAPI/#RandomSource-method-getRandomValues" target="_blank">crypto.getRandomValues()</a> to take advantage of the increased security that this PRNG provides. Other CSPRNGs will be built-in in the future for browsers that need it.
+			<p><span class="Pass">Pass</span><span class="Guardian">Guardian</span> requires the availability of a <a href="http://en.wikipedia.org/wiki/Cryptographically_secure_pseudorandom_number_generator" target="_blank">cryptographically-strong pseudo-random number generator (CSPRNG)</a> during the secret splitting phase only. If a strong PRNG is not found during run-time, <span class="Pass">Pass</span><span class="Guardian">Guardian</span> will use the <a href="http://en.wikipedia.org/wiki/ISAAC_(cipher)" target="_blank">ISAAC CSPRNG</a>, from the open-source <a href="https://github.com/rubycon/isaac.js" target="_blank">isaac.js</a> implementation. Consider upgrading to a newer browser that supports <a href="http://www.w3.org/TR/WebCryptoAPI/#RandomSource-method-getRandomValues" target="_blank">crypto.getRandomValues()</a> to take advantage of the increased security that this PRNG provides. Other CSPRNGs will be built-in in the future for browsers that need it.
 
 			<h4>Roadmap</h4>
 			<p>Planned future enhancements of <span class="Pass">Pass</span><span class="Guardian">Guardian</span> include a standalone offline program, a command line program, and support for files and QR codes. Mobile versions are being investigated also. If you are interested in becoming involved, contact the author at the email listed at the bottom of this page.

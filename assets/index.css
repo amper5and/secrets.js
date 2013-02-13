@@ -110,6 +110,7 @@ section>h3{
 form{
 	padding: 10px;
 	padding-bottom: 0px;
+	padding-top: 0px;
 }
 .btnCustom{
 	font-family: 'Days One';
@@ -160,4 +161,15 @@ form{
 	margin-bottom: 20px;
 	-webkit-border-radius: 6px;
 	-moz-border-radius: 6px
+}
+
+.nav{
+	margin-bottom: 10px;
+}
+
+#inputShares{
+	margin-bottom: 5px;
+}
+.advancedElement{
+	display: none;
 }
