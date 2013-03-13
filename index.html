@@ -518,10 +518,8 @@
 	$(document).on('click', '#splitButton', function(ev){
 		var el = $(this)
 		if(el.hasClass('disabled')){
-			console.log('disabled')
 			return;
 		}else{
-			console.log('adding')
 			el.addClass('disabled');
 		}
 	
@@ -985,11 +983,14 @@
 				<h4>Executing wills</h4>
 					<p>Distribute shares of your passwords, account numbers, etc to trusted parties or family members. All of the parties must be present to gain access to your accounts and private data.
 		</section>
-
+		
 		<div class="footer">
 			Powered by <a href="https://github.com/amper5and/secrets.js" target="_blank">secrets.js</a>
 			<br>The sha-256 hash of the source can always be found at <a href="https://github.com/amper5and/secrets.js/tree/gh-pages" target="_blank">the github repository</a>
 			<br>&copy; 2013 Alexander Stetsyuk &lt;alex AT passguardian.com&gt;
+			
+			<br><br>Bitcoin donations are welcome at <strong>1J6Z9DDxRPz6CRVvcphVY98yAWsay9em2D</strong>.
+			<br>Initial donations will go toward purchasing an SSL certificate so that PassGuardian can be delivered to you securely.
 		</div>
     </div>
 	<script type="text/javascript">
