@@ -34,14 +34,6 @@
  * ISAAC succesfully passed TestU01
  *
  * ----------------------------------------------------------------------
- *
- * Usage:
- *   <script src="isaac.js"></script>
- *   var random_number = isaac.random();
- *
- * Output: [ 0x00000000; 0xffffffff]
- *         [-2147483648; 2147483647]
- *
  */
 
 

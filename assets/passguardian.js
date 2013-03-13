@@ -17,9 +17,18 @@ function error(location, message, hide){
 	if(hide){
 		$(hide).hide();
 	}
+	$(location).removeClass('disabled');
 }
-$(document).on('click', '#splitButton', splitSecret);
-function splitSecret(ev){
+$(document).on('click', '#splitButton', function(ev){
+	var el = $(this)
+	if(el.hasClass('disabled')){
+		console.log('disabled')
+		return;
+	}else{
+		console.log('adding')
+		el.addClass('disabled');
+	}
+	
 	if(secrets.getConfig().bits !== 8){
 		secrets.init(8);
 	}
@@ -57,8 +66,9 @@ function splitSecret(ev){
 		numShares<threshold ? $('#mismatchWarning').show() : $('#mismatchWarning').hide();
 	}catch(e){
 		return error(this, e, '#split-result')
-	}	
-}
+	}
+	el.removeClass('disabled');	
+});
 
 $(document).on('click', '#reconButton', function(ev){
 	$('#recon-tab .popupError').remove();
