@@ -590,16 +590,24 @@
 			if(type === 'text'){
 				recon = secrets.hex2str(recon);
 			}
-			var hash = CryptoJS.SHA3(recon).toString();
 			$('#reconstruction').text(recon);
-			$('#recon-hash').text(hash);
-			$('#recon-result').show();
-			if(inputHash && $.trim(inputHash) !== hash){
-				$('#hashMismatchError').show();
+			
+			try{
+				var hash = CryptoJS.SHA3(recon).toString();
+				$('#recon-hash').text(hash);
+				if(inputHash && $.trim(inputHash) !== hash){
+					$('#hashMismatchError').show();
+				}	
+			}catch(e){
+				if($('#recon-advanced').hasClass('active')){
+					error(this,'SHA3-512 Hash ' + e, '#recon-result');	
+				}		
 			}
+			$('#recon-result').show();
 		}catch(e){
 			return error(this, 'Reconstruction ' + e, '#recon-result')
 		}
+		
 	})
 
 	$(document).on('click', '.generate', function(ev){
