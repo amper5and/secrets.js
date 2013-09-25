@@ -217,6 +217,7 @@ secrets.js is released under the MIT License. See `LICENSE`.
 
 
 ## Changelog
+* 0.1.8: bugfix release
 * 0.1.7: added config.unsafePRNG reset when supplying a new PRNG
 * 0.1.6: 
 	* Removed JSBN dependency, support for arbitrary radices, and the `convertBase()` function, with attendant 50% file size reduction. 

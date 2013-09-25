@@ -191,7 +191,7 @@ exports.random = function(bits){
 // requiring `threshold` number of shares to reconstruct the secret. 
 // Optionally, zero-pads the secret to a length that is a multiple of padLength before sharing.
 /** @expose **/
-exports.share = function(secret, numShares, threshold, padLength){
+exports.share = function(secret, numShares, threshold, padLength, withoutPrefix){
 	if(!isInited()){
 		this.init();
 	}
@@ -237,10 +237,16 @@ exports.share = function(secret, numShares, threshold, padLength){
 		}
 	}
 	var padding = config.max.toString(config.radix).length;
-	for(var i=0; i<numShares; i++){
-		x[i] = config.bits.toString(36) + padLeft(x[i],padding) + bin2hex(y[i]);
+	if(withoutPrefix){
+		for(var i=0; i<numShares; i++){
+			x[i] = bin2hex(y[i]);
+		}
+	}else{
+		for(var i=0; i<numShares; i++){
+			x[i] = config.bits.toString(36).toUpperCase() + padLeft(x[i],padding) + bin2hex(y[i]);
+		}
 	}
-		
+	
 	return x;
 };
 
@@ -318,7 +324,7 @@ function processShare(share){
 };
 
 /** @expose **/
-secrets._processShare = processShare;
+exports._processShare = processShare;
 
 // Protected method that evaluates the Lagrange interpolation
 // polynomial at x=`at` for individual config.bits-length
@@ -386,7 +392,7 @@ exports.newShare = function(id, shares){
 	}
 
 	var padding = max.toString(config.radix).length;
-	return config.bits.toString(36) + padLeft(id.toString(config.radix), padding) + combine(id, shares);
+	return config.bits.toString(36).toUpperCase() + padLeft(id.toString(config.radix), padding) + combine(id, shares);
 };
 	
 // Evaluate the Lagrange interpolation polynomial at x = `at`
