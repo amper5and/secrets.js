@@ -94,7 +94,10 @@ To use it in node.js:
 To use it in the browser, include *secrets.js* or *secrets.min.js* (minified using Google Closure Compiler)
 
 	<script src="secrets.min.js"></script>
+	
+To create stand-alone HTML files that each contain one share of a secret, plus a form with an in-line copy of secrets.js to recover the secret:
 
+	make-secret-shares.sh
 	
 ## API
 

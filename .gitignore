@@ -4,3 +4,7 @@ node_modules
 test
 .c9revisions
 index.html
+*~
+secret-gen.js
+shares.txt
+*-share.html
