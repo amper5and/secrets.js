@@ -20,7 +20,7 @@
             primitivePolynomials: [null, null, 1, 3, 3, 5, 3, 3, 29, 17, 9, 5, 83, 27, 43, 3, 45, 9, 39, 39, 9, 5, 3, 33, 27, 9, 71, 39, 9, 5, 83],
 
             // warning for insecure PRNG
-            warning: 'WARNING:\nA secure random number generator was not found.\nUsing Math.random(), which is NOT cryptographically strong!'
+            warning: "WARNING:\nA secure random number generator was not found.\nUsing Math.random(), which is NOT cryptographically strong!"
         },
         config = {}; // Protected settings object
 
@@ -31,8 +31,8 @@
             primitive,
             i;
 
-        if (bits && (typeof bits !== 'number' || bits % 1 !== 0 || bits < defaults.minBits || bits > defaults.maxBits)) {
-            throw new Error('Number of bits must be an integer between ' + defaults.minBits + ' and ' + defaults.maxBits + ', inclusive.');
+        if (bits && (typeof bits !== "number" || bits % 1 !== 0 || bits < defaults.minBits || bits > defaults.maxBits)) {
+            throw new Error("Number of bits must be an integer between " + defaults.minBits + " and " + defaults.maxBits + ", inclusive.");
         }
 
         config.radix = defaults.radix;
@@ -66,11 +66,11 @@
 
         bits = bits || config.bits;
         missing = str.length % bits;
-        return (missing ? new Array(bits - missing + 1).join('0') : '') + str;
+        return (missing ? new Array(bits - missing + 1).join("0") : "") + str;
     }
 
     function hex2bin(str) {
-        var bin = '',
+        var bin = "",
             num,
             i;
 
@@ -78,7 +78,7 @@
             num = parseInt(str[i], 16);
 
             if (isNaN(num)) {
-                throw new Error('Invalid hex character.');
+                throw new Error("Invalid hex character.");
             }
 
             bin = padLeft(num.toString(2), 4) + bin;
@@ -87,7 +87,7 @@
     }
 
     function bin2hex(str) {
-        var hex = '',
+        var hex = "",
             num,
             i;
 
@@ -96,7 +96,7 @@
         for (i = str.length; i >= 4; i -= 4) {
             num = parseInt(str.slice(i - 4, i), 2);
             if (isNaN(num)) {
-                throw new Error('Invalid binary character.');
+                throw new Error("Invalid binary character.");
             }
             hex = num.toString(16) + hex;
         }
@@ -108,7 +108,7 @@
     // Called when Math.random() is being used.
     function warn() {
         global.console.warn(defaults.warning);
-        if (typeof global.alert === 'function' && config.alert) {
+        if (typeof global.alert === "function" && config.alert) {
             global.alert(defaults.warning);
         }
     }
@@ -129,7 +129,7 @@
             max = Math.pow(2, bitsPerNum) - 1;
 
         function construct(bits, arr, radix, size) {
-            var str = '',
+            var str = "",
                 i = 0,
                 len = arr.length - 1;
 
@@ -148,20 +148,20 @@
         }
 
         // node.js crypto.randomBytes()
-        if (typeof require === 'function' && (crypto = require('crypto')) && (randomBits = crypto.randomBytes)) {
+        if (typeof require === "function" && (crypto = require("crypto")) && (randomBits = crypto.randomBytes)) {
             return function (bits) {
                 var bytes = Math.ceil(bits / 8),
                     str = null;
 
                 while (str === null) {
-                    str = construct(bits, randomBits(bytes).toString('hex'), 16, 4);
+                    str = construct(bits, randomBits(bytes).toString("hex"), 16, 4);
                 }
                 return str;
             };
         }
 
         // browsers with window.crypto.getRandomValues()
-        if (global.crypto && typeof global.crypto.getRandomValues === 'function' && typeof global.Uint32Array === 'function') {
+        if (global.crypto && typeof global.crypto.getRandomValues === "function" && typeof global.Uint32Array === "function") {
             crypto = global.crypto;
             return function (bits) {
                 var elems = Math.ceil(bits / 32),
@@ -199,7 +199,7 @@
     }
 
     function isSetRNG() {
-        return typeof config.rng === 'function';
+        return typeof config.rng === "function";
     }
 
     // Splits a number string `bits`-length segments, after first
@@ -263,28 +263,28 @@
             idLength,
             id;
 
-        if (bits && (typeof bits !== 'number' || bits % 1 !== 0 || bits < defaults.minBits || bits > defaults.maxBits)) {
-            throw new Error('Number of bits must be an integer between ' + defaults.minBits + ' and ' + defaults.maxBits + ', inclusive.');
+        if (bits && (typeof bits !== "number" || bits % 1 !== 0 || bits < defaults.minBits || bits > defaults.maxBits)) {
+            throw new Error("Number of bits must be an integer between " + defaults.minBits + " and " + defaults.maxBits + ", inclusive.");
         }
 
         max = Math.pow(2, bits) - 1;
         idLength = max.toString(config.radix).length;
         id = parseInt(share.substr(1, idLength), config.radix);
 
-        if (typeof id !== 'number' || id % 1 !== 0 || id < 1 || id > max) {
-            throw new Error('Share id must be an integer between 1 and ' + config.max + ', inclusive.');
+        if (typeof id !== "number" || id % 1 !== 0 || id < 1 || id > max) {
+            throw new Error("Share id must be an integer between 1 and " + config.max + ", inclusive.");
         }
 
         share = share.substr(idLength + 1);
 
         if (!share.length) {
-            throw new Error('Invalid share: zero-length share.');
+            throw new Error("Invalid share: zero-length share.");
         }
 
         return {
-            'bits': bits,
-            'id': id,
-            'value': share
+            "bits": bits,
+            "id": id,
+            "value": share
         };
     }
 
@@ -333,7 +333,7 @@
             share,
             x = [],
             y = [],
-            result = '',
+            result = "",
             idx,
             i,
             len,
@@ -345,7 +345,7 @@
             if (setBits === undefined) {
                 setBits = share.bits;
             } else if (share.bits !== setBits) {
-                throw new Error('Mismatched shares: Different bit settings.');
+                throw new Error("Mismatched shares: Different bit settings.");
             }
 
             if (config.bits !== setBits) {
@@ -371,7 +371,7 @@
         // reconstructing the secret
         if (at === 0) {
             //find the first 1
-            idx = result.indexOf('1');
+            idx = result.indexOf("1");
             return bin2hex(result.slice(idx + 1));
         }
 
@@ -382,8 +382,8 @@
     /** @expose **/
     exports.getConfig = function () {
         return {
-            'bits': config.bits,
-            'unsafePRNG': config.unsafePRNG
+            "bits": config.bits,
+            "unsafePRNG": config.unsafePRNG
         };
     };
 
@@ -397,7 +397,7 @@
         rng = rng || getRNG();
 
         // test the RNG (5 times)
-        if (typeof rng !== 'function' || typeof rng(config.bits) !== 'string' || !parseInt(rng(config.bits), 2) || rng(config.bits).length > config.bits || rng(config.bits).length < config.bits) {
+        if (typeof rng !== "function" || typeof rng(config.bits) !== "string" || !parseInt(rng(config.bits), 2) || rng(config.bits).length > config.bits || rng(config.bits).length < config.bits) {
             throw new Error("Random number generator is invalid. Supply an RNG of the form function(bits){} that returns a string containing 'bits' number of random 1's and 0's.");
         }
 
@@ -414,19 +414,19 @@
     exports.str2hex = function (str, bytesPerChar) {
         var hexChars,
             max,
-            out = '',
+            out = "",
             neededBytes,
             num,
             i,
             len;
 
-        if (typeof str !== 'string') {
-            throw new Error('Input must be a character string.');
+        if (typeof str !== "string") {
+            throw new Error("Input must be a character string.");
         }
         bytesPerChar = bytesPerChar || defaults.bytesPerChar;
 
-        if (typeof bytesPerChar !== 'number' || bytesPerChar % 1 !== 0 || bytesPerChar < 1 || bytesPerChar > defaults.maxBytesPerChar) {
-            throw new Error('Bytes per character must be an integer between 1 and ' + defaults.maxBytesPerChar + ', inclusive.');
+        if (typeof bytesPerChar !== "number" || bytesPerChar % 1 !== 0 || bytesPerChar < 1 || bytesPerChar > defaults.maxBytesPerChar) {
+            throw new Error("Bytes per character must be an integer between 1 and " + defaults.maxBytesPerChar + ", inclusive.");
         }
 
         hexChars = 2 * bytesPerChar;
@@ -436,12 +436,12 @@
             num = str[i].charCodeAt();
 
             if (isNaN(num)) {
-                throw new Error('Invalid character: ' + str[i]);
+                throw new Error("Invalid character: " + str[i]);
             }
 
             if (num > max) {
                 neededBytes = Math.ceil(Math.log(num + 1) / Math.log(256));
-                throw new Error('Invalid character code (' + num + '). Maximum allowable is 256^bytes-1 (' + max + '). To convert this character, use at least ' + neededBytes + ' bytes.');
+                throw new Error("Invalid character code (" + num + "). Maximum allowable is 256^bytes-1 (" + max + "). To convert this character, use at least " + neededBytes + " bytes.");
             }
 
             out = padLeft(num.toString(16), hexChars) + out;
@@ -453,17 +453,17 @@
     /** @expose **/
     exports.hex2str = function (str, bytesPerChar) {
         var hexChars,
-            out = '',
+            out = "",
             i,
             len;
 
-        if (typeof str !== 'string') {
-            throw new Error('Input must be a hexadecimal string.');
+        if (typeof str !== "string") {
+            throw new Error("Input must be a hexadecimal string.");
         }
         bytesPerChar = bytesPerChar || defaults.bytesPerChar;
 
-        if (typeof bytesPerChar !== 'number' || bytesPerChar % 1 !== 0 || bytesPerChar < 1 || bytesPerChar > defaults.maxBytesPerChar) {
-            throw new Error('Bytes per character must be an integer between 1 and ' + defaults.maxBytesPerChar + ', inclusive.');
+        if (typeof bytesPerChar !== "number" || bytesPerChar % 1 !== 0 || bytesPerChar < 1 || bytesPerChar > defaults.maxBytesPerChar) {
+            throw new Error("Bytes per character must be an integer between 1 and " + defaults.maxBytesPerChar + ", inclusive.");
         }
 
         hexChars = 2 * bytesPerChar;
@@ -484,8 +484,8 @@
             this.setRNG();
         }
 
-        if (typeof bits !== 'number' || bits % 1 !== 0 || bits < 2) {
-            throw new Error('Number of bits must be an integer greater than 1.');
+        if (typeof bits !== "number" || bits % 1 !== 0 || bits < 2) {
+            throw new Error("Number of bits must be an integer greater than 1.");
         }
 
         if (config.unsafePRNG) {
@@ -519,44 +519,44 @@
 
         padLength = padLength || 0;
 
-        if (typeof secret !== 'string') {
-            throw new Error('Secret must be a string.');
+        if (typeof secret !== "string") {
+            throw new Error("Secret must be a string.");
         }
 
-        if (typeof numShares !== 'number' || numShares % 1 !== 0 || numShares < 2) {
-            throw new Error('Number of shares must be an integer between 2 and 2^bits-1 (' + config.max + '), inclusive.');
+        if (typeof numShares !== "number" || numShares % 1 !== 0 || numShares < 2) {
+            throw new Error("Number of shares must be an integer between 2 and 2^bits-1 (" + config.max + "), inclusive.");
         }
 
         if (numShares > config.max) {
             neededBits = Math.ceil(Math.log(numShares + 1) / Math.LN2);
-            throw new Error('Number of shares must be an integer between 2 and 2^bits-1 (' + config.max + '), inclusive. To create ' + numShares + ' shares, use at least ' + neededBits + ' bits.');
+            throw new Error("Number of shares must be an integer between 2 and 2^bits-1 (" + config.max + "), inclusive. To create " + numShares + " shares, use at least " + neededBits + " bits.");
         }
 
-        if (typeof threshold !== 'number' || threshold % 1 !== 0 || threshold < 2) {
-            throw new Error('Threshold number of shares must be an integer between 2 and 2^bits-1 (' + config.max + '), inclusive.');
+        if (typeof threshold !== "number" || threshold % 1 !== 0 || threshold < 2) {
+            throw new Error("Threshold number of shares must be an integer between 2 and 2^bits-1 (" + config.max + "), inclusive.");
         }
 
         if (threshold > config.max) {
             neededBits = Math.ceil(Math.log(threshold + 1) / Math.LN2);
-            throw new Error('Threshold number of shares must be an integer between 2 and 2^bits-1 (' + config.max + '), inclusive.  To use a threshold of ' + threshold + ', use at least ' + neededBits + ' bits.');
+            throw new Error("Threshold number of shares must be an integer between 2 and 2^bits-1 (" + config.max + "), inclusive.  To use a threshold of " + threshold + ", use at least " + neededBits + " bits.");
         }
 
-        if (typeof padLength !== 'number' || padLength % 1 !== 0) {
-            throw new Error('Zero-pad length must be an integer greater than 1.');
+        if (typeof padLength !== "number" || padLength % 1 !== 0) {
+            throw new Error("Zero-pad length must be an integer greater than 1.");
         }
 
         if (config.unsafePRNG) {
             warn();
         }
 
-        secret = '1' + hex2bin(secret); // append a 1 so that we can preserve the correct number of leading zeros in our secret
+        secret = "1" + hex2bin(secret); // append a 1 so that we can preserve the correct number of leading zeros in our secret
         secret = split(secret, padLength);
 
         for (i = 0, len = secret.length; i < len; i++) {
             subShares = this._getShares(secret[i], numShares, threshold);
             for (j = 0; j < numShares; j++) {
                 x[j] = x[j] || subShares[j].x.toString(config.radix);
-                y[j] = padLeft(subShares[j].y.toString(2)) + (y[j] || '');
+                y[j] = padLeft(subShares[j].y.toString(2)) + (y[j] || "");
             }
         }
 
@@ -614,15 +614,15 @@
             max,
             padding;
 
-        if (typeof id === 'string') {
+        if (typeof id === "string") {
             id = parseInt(id, config.radix);
         }
 
         share = processShare(shares[0]);
         max = Math.pow(2, share.bits) - 1;
 
-        if (typeof id !== 'number' || id % 1 !== 0 || id < 1 || id > max) {
-            throw new Error('Share id must be an integer between 1 and ' + config.max + ', inclusive.');
+        if (typeof id !== "number" || id % 1 !== 0 || id < 1 || id > max) {
+            throw new Error("Share id must be an integer between 1 and " + config.max + ", inclusive.");
         }
 
         padding = max.toString(config.radix).length;
@@ -632,4 +632,4 @@
     // by default, initialize without an RNG
     exports.init();
 
-})(typeof module !== 'undefined' && module.exports ? module.exports : (window.secrets = {}), typeof GLOBAL !== 'undefined' ? GLOBAL : window);
+})(typeof module !== "undefined" && module.exports ? module.exports : (window.secrets = {}), typeof GLOBAL !== "undefined" ? GLOBAL : window);
