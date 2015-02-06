@@ -16,10 +16,8 @@
 
         // warning for insecure PRNG
         warning: 'WARNING:\nA secure random number generator was not found.\nUsing Math.random(), which is NOT cryptographically strong!'
-    };
-
-    // Protected settings object
-    var config = {};
+    },
+    config = {}; // Protected settings object
 
     /** @expose **/
     exports.getConfig = function () {
@@ -31,7 +29,7 @@
 
     function init(bits) {
         if (bits && (typeof bits !== 'number' || bits % 1 !== 0 || bits < defaults.minBits || bits > defaults.maxBits)) {
-            throw new Error('Number of bits must be an integer between ' + defaults.minBits + ' and ' + defaults.maxBits + ', inclusive.')
+            throw new Error('Number of bits must be an integer between ' + defaults.minBits + ' and ' + defaults.maxBits + ', inclusive.');
         }
 
         config.radix = defaults.radix;
@@ -56,7 +54,7 @@
 
         config.logs = logs;
         config.exps = exps;
-    };
+    }
 
     /** @expose **/
     exports.init = init;
@@ -66,22 +64,28 @@
             return false;
         }
         return true;
-    };
+    }
 
     // Returns a pseudo-random number generator of the form function(bits){}
     // which should output a random string of 1's and 0's of length `bits`
     function getRNG() {
-        var randomBits, crypto;
+        var randomBits,
+            crypto,
+            bitsPerNum = 32,
+            max = Math.pow(2, bitsPerNum) - 1;
 
         function construct(bits, arr, radix, size) {
             var str = '',
                 i = 0,
                 len = arr.length - 1;
+
             while (i < len || (str.length < bits)) {
                 str += padLeft(parseInt(arr[i], radix).toString(2), size);
                 i++;
             }
+
             str = str.substr(-bits);
+
             if ((str.match(/0/g) || []).length === str.length) { // all zeros?
                 return null;
             } else {
@@ -90,7 +94,7 @@
         }
 
         // node.js crypto.randomBytes()
-        if (typeof require === 'function' && (crypto = require('crypto')) && (randomBits = crypto['randomBytes'])) {
+        if (typeof require === 'function' && (crypto = require('crypto')) && (randomBits = crypto.randomBytes)) {
             return function (bits) {
                 var bytes = Math.ceil(bits / 8),
                     str = null;
@@ -99,24 +103,24 @@
                     str = construct(bits, randomBits(bytes).toString('hex'), 16, 4);
                 }
                 return str;
-            }
+            };
         }
 
         // browsers with window.crypto.getRandomValues()
-        if (global['crypto'] && typeof global['crypto']['getRandomValues'] === 'function' && typeof global['Uint32Array'] === 'function') {
-            crypto = global['crypto'];
+        if (global.crypto && typeof global.crypto.getRandomValues === 'function' && typeof global.Uint32Array === 'function') {
+            crypto = global.crypto;
             return function (bits) {
                 var elems = Math.ceil(bits / 32),
                     str = null,
-                    arr = new global['Uint32Array'](elems);
+                    arr = new global.Uint32Array(elems);
 
                 while (str === null) {
-                    crypto['getRandomValues'](arr);
+                    crypto.getRandomValues(arr);
                     str = construct(bits, arr, 10, 32);
                 }
 
                 return str;
-            }
+            };
         }
 
         // A totally insecure RNG!!! (except in Safari)
@@ -124,8 +128,6 @@
         config.unsafePRNG = true;
         warn();
 
-        var bitsPerNum = 32;
-        var max = Math.pow(2, bitsPerNum) - 1;
         return function (bits) {
             var elems = Math.ceil(bits / bitsPerNum);
             var arr = [],
@@ -138,14 +140,14 @@
             }
             return str;
         };
-    };
+    }
 
     // Warn about using insecure rng.
     // Called when Math.random() is being used.
     function warn() {
-        global['console']['warn'](defaults.warning);
-        if (typeof global['alert'] === 'function' && config.alert) {
-            global['alert'](defaults.warning);
+        global.console.warn(defaults.warning);
+        if (typeof global.alert === 'function' && config.alert) {
+            global.alert(defaults.warning);
         }
     }
 
@@ -160,7 +162,7 @@
 
         // test the RNG (5 times)
         if (typeof rng !== 'function' || typeof rng(config.bits) !== 'string' || !parseInt(rng(config.bits), 2) || rng(config.bits).length > config.bits || rng(config.bits).length < config.bits) {
-            throw new Error("Random number generator is invalid. Supply an RNG of the form function(bits){} that returns a string containing 'bits' number of random 1's and 0's.")
+            throw new Error("Random number generator is invalid. Supply an RNG of the form function(bits){} that returns a string containing 'bits' number of random 1's and 0's.");
         } else {
             config.rng = rng;
         }
@@ -171,7 +173,7 @@
 
     function isSetRNG() {
         return typeof config.rng === 'function';
-    };
+    }
 
     // Generates a random bits-length number string using the PRNG
     /** @expose **/
@@ -181,14 +183,14 @@
         }
 
         if (typeof bits !== 'number' || bits % 1 !== 0 || bits < 2) {
-            throw new Error('Number of bits must be an integer greater than 1.')
+            throw new Error('Number of bits must be an integer greater than 1.');
         }
 
         if (config.unsafePRNG) {
             warn();
         }
         return bin2hex(config.rng(bits));
-    }
+    };
 
     // Divides a `secret` number String str expressed in radix `inputRadix` (optional, default 16)
     // into `numShares` shares, each expressed in radix `outputRadix` (optional, default to `inputRadix`),
@@ -196,9 +198,19 @@
     // Optionally, zero-pads the secret to a length that is a multiple of padLength before sharing.
     /** @expose **/
     exports.share = function (secret, numShares, threshold, padLength, withoutPrefix) {
+        var neededBits,
+            padding,
+            subShares,
+            x = new Array(numShares),
+            y = new Array(numShares),
+            i,
+            j,
+            len;
+
         if (!isInited()) {
             this.init();
         }
+
         if (!isSetRNG()) {
             this.setRNG();
         }
@@ -208,20 +220,25 @@
         if (typeof secret !== 'string') {
             throw new Error('Secret must be a string.');
         }
+
         if (typeof numShares !== 'number' || numShares % 1 !== 0 || numShares < 2) {
-            throw new Error('Number of shares must be an integer between 2 and 2^bits-1 (' + config.max + '), inclusive.')
+            throw new Error('Number of shares must be an integer between 2 and 2^bits-1 (' + config.max + '), inclusive.');
         }
+
         if (numShares > config.max) {
-            var neededBits = Math.ceil(Math.log(numShares + 1) / Math.LN2);
-            throw new Error('Number of shares must be an integer between 2 and 2^bits-1 (' + config.max + '), inclusive. To create ' + numShares + ' shares, use at least ' + neededBits + ' bits.')
+            neededBits = Math.ceil(Math.log(numShares + 1) / Math.LN2);
+            throw new Error('Number of shares must be an integer between 2 and 2^bits-1 (' + config.max + '), inclusive. To create ' + numShares + ' shares, use at least ' + neededBits + ' bits.');
         }
+
         if (typeof threshold !== 'number' || threshold % 1 !== 0 || threshold < 2) {
             throw new Error('Threshold number of shares must be an integer between 2 and 2^bits-1 (' + config.max + '), inclusive.');
         }
+
         if (threshold > config.max) {
-            var neededBits = Math.ceil(Math.log(threshold + 1) / Math.LN2);
+            neededBits = Math.ceil(Math.log(threshold + 1) / Math.LN2);
             throw new Error('Threshold number of shares must be an integer between 2 and 2^bits-1 (' + config.max + '), inclusive.  To use a threshold of ' + threshold + ', use at least ' + neededBits + ' bits.');
         }
+
         if (typeof padLength !== 'number' || padLength % 1 !== 0) {
             throw new Error('Zero-pad length must be an integer greater than 1.');
         }
@@ -232,22 +249,23 @@
 
         secret = '1' + hex2bin(secret); // append a 1 so that we can preserve the correct number of leading zeros in our secret
         secret = split(secret, padLength);
-        var x = new Array(numShares),
-            y = new Array(numShares);
-        for (var i = 0, len = secret.length; i < len; i++) {
-            var subShares = this._getShares(secret[i], numShares, threshold);
-            for (var j = 0; j < numShares; j++) {
+
+        for (i = 0, len = secret.length; i < len; i++) {
+            subShares = this._getShares(secret[i], numShares, threshold);
+            for (j = 0; j < numShares; j++) {
                 x[j] = x[j] || subShares[j].x.toString(config.radix);
                 y[j] = padLeft(subShares[j].y.toString(2)) + (y[j] ? y[j] : '');
             }
         }
-        var padding = config.max.toString(config.radix).length;
+
+        padding = config.max.toString(config.radix).length;
+
         if (withoutPrefix) {
-            for (var i = 0; i < numShares; i++) {
+            for (i = 0; i < numShares; i++) {
                 x[i] = bin2hex(y[i]);
             }
         } else {
-            for (var i = 0; i < numShares; i++) {
+            for (i = 0; i < numShares; i++) {
                 x[i] = config.bits.toString(36).toUpperCase() + padLeft(x[i], padding) + bin2hex(y[i]);
             }
         }
@@ -262,17 +280,21 @@
     /** @expose **/
     exports._getShares = function (secret, numShares, threshold) {
         var shares = [];
-        var coeffs = [secret];
+        var coeffs = [secret],
+        i,
+        len;
 
-        for (var i = 1; i < threshold; i++) {
+        for (i = 1; i < threshold; i++) {
             coeffs[i] = parseInt(config.rng(config.bits), 2);
         }
-        for (var i = 1, len = numShares + 1; i < len; i++) {
+
+        for (i = 1, len = numShares + 1; i < len; i++) {
             shares[i - 1] = {
                 x: i,
                 y: horner(i, coeffs)
-            }
+            };
         }
+
         return shares;
     };
 
@@ -282,9 +304,11 @@
     //       so if fx===0, just set fx to coeff[i] because
     //       using the exp/log form will result in incorrect value
     function horner(x, coeffs) {
-        var logx = config.logs[x];
-        var fx = 0;
-        for (var i = coeffs.length - 1; i >= 0; i--) {
+        var logx = config.logs[x],
+        fx = 0,
+        i;
+
+        for (i = coeffs.length - 1; i >= 0; i--) {
             if (fx === 0) {
                 fx = coeffs[i];
                 continue;
@@ -292,41 +316,50 @@
             fx = config.exps[(logx + config.logs[fx]) % config.max] ^ coeffs[i];
         }
         return fx;
-    };
+    }
 
     function inArray(arr, val) {
-        for (var i = 0, len = arr.length; i < len; i++) {
+        var i,
+            len;
+
+        for (i = 0, len = arr.length; i < len; i++) {
             if (arr[i] === val) {
                 return true;
             }
         }
         return false;
-    };
+    }
 
     function processShare(share) {
+        var bits = parseInt(share[0], 36),
+            max,
+            idLength,
+            id;
 
-        var bits = parseInt(share[0], 36);
         if (bits && (typeof bits !== 'number' || bits % 1 !== 0 || bits < defaults.minBits || bits > defaults.maxBits)) {
-            throw new Error('Number of bits must be an integer between ' + defaults.minBits + ' and ' + defaults.maxBits + ', inclusive.')
+            throw new Error('Number of bits must be an integer between ' + defaults.minBits + ' and ' + defaults.maxBits + ', inclusive.');
         }
 
-        var max = Math.pow(2, bits) - 1;
-        var idLength = max.toString(config.radix).length;
+        max = Math.pow(2, bits) - 1;
+        idLength = max.toString(config.radix).length;
+        id = parseInt(share.substr(1, idLength), config.radix);
 
-        var id = parseInt(share.substr(1, idLength), config.radix);
         if (typeof id !== 'number' || id % 1 !== 0 || id < 1 || id > max) {
             throw new Error('Share id must be an integer between 1 and ' + config.max + ', inclusive.');
         }
+
         share = share.substr(idLength + 1);
+
         if (!share.length) {
-            throw new Error('Invalid share: zero-length share.')
+            throw new Error('Invalid share: zero-length share.');
         }
+
         return {
             'bits': bits,
             'id': id,
             'value': share
         };
-    };
+    }
 
     /** @expose **/
     exports._processShare = processShare;
@@ -337,46 +370,49 @@
     // Each share is expressed in base `inputRadix`. The output
     // is expressed in base `outputRadix'
     function combine(at, shares) {
-        var setBits, share, x = [],
+        var setBits,
+            share, x = [],
             y = [],
             result = '',
-            idx;
+            idx,
+            i,
+            len;
 
-        for (var i = 0, len = shares.length; i < len; i++) {
+        for (i = 0, len = shares.length; i < len; i++) {
             share = processShare(shares[i]);
             if (typeof setBits === 'undefined') {
-                setBits = share['bits'];
-            } else if (share['bits'] !== setBits) {
-                throw new Error('Mismatched shares: Different bit settings.')
+                setBits = share.bits;
+            } else if (share.bits !== setBits) {
+                throw new Error('Mismatched shares: Different bit settings.');
             }
 
             if (config.bits !== setBits) {
                 init(setBits);
             }
 
-            if (inArray(x, share['id'])) { // repeated x value?
+            if (inArray(x, share.id)) { // repeated x value?
                 continue;
             }
 
-            idx = x.push(share['id']) - 1;
-            share = split(hex2bin(share['value']));
+            idx = x.push(share.id) - 1;
+            share = split(hex2bin(share.value));
             for (var j = 0, len2 = share.length; j < len2; j++) {
                 y[j] = y[j] || [];
                 y[j][idx] = share[j];
             }
         }
 
-        for (var i = 0, len = y.length; i < len; i++) {
+        for (i = 0, len = y.length; i < len; i++) {
             result = padLeft(lagrange(at, x, y[i]).toString(2)) + result;
         }
 
         if (at === 0) { // reconstructing the secret
-            var idx = result.indexOf('1'); //find the first 1
+            idx = result.indexOf('1'); //find the first 1
             return bin2hex(result.slice(idx + 1));
         } else { // generating a new share
             return bin2hex(result);
         }
-    };
+    }
 
     // Combine `shares` Array into the original secret
     /** @expose **/
@@ -388,18 +424,22 @@
     // `id` can be a Number or a String in the default radix (16)
     /** @expose **/
     exports.newShare = function (id, shares) {
+        var share,
+            max,
+            padding;
+
         if (typeof id === 'string') {
             id = parseInt(id, config.radix);
         }
 
-        var share = processShare(shares[0]);
-        var max = Math.pow(2, share['bits']) - 1;
+        share = processShare(shares[0]);
+        max = Math.pow(2, share.bits) - 1;
 
         if (typeof id !== 'number' || id % 1 !== 0 || id < 1 || id > max) {
             throw new Error('Share id must be an integer between 1 and ' + config.max + ', inclusive.');
         }
 
-        var padding = max.toString(config.radix).length;
+        padding = max.toString(config.radix).length;
         return config.bits.toString(36).toUpperCase() + padLeft(id.toString(config.radix), padding) + combine(id, shares);
     };
 
@@ -408,8 +448,7 @@
     // corresponding elements constituting points on the polynomial.
     function lagrange(at, x, y) {
         var sum = 0,
-            product,
-            i, j;
+            product;
 
         for (var i = 0, len = x.length; i < len; i++) {
             if (!y[i]) {
@@ -417,6 +456,7 @@
             }
 
             product = config.logs[y[i]];
+
             for (var j = 0; j < len; j++) {
                 if (i === j) {
                     continue;
@@ -431,7 +471,7 @@
             sum = product === -1 ? sum : sum ^ config.exps[product]; // though exps[-1]= undefined and undefined ^ anything = anything in chrome, this behavior may not hold everywhere, so do the check
         }
         return sum;
-    };
+    }
 
     /** @expose **/
     exports._lagrange = lagrange;
@@ -442,32 +482,43 @@
     // representing a `bits`-length segment of the input string from right to left,
     // i.e. parts[0] represents the right-most `bits`-length segment of the input string.
     function split(str, padLength) {
+        var parts = [],
+            i;
+
         if (padLength) {
-            str = padLeft(str, padLength)
+            str = padLeft(str, padLength);
         }
-        var parts = [];
-        for (var i = str.length; i > config.bits; i -= config.bits) {
+
+        for (i = str.length; i > config.bits; i -= config.bits) {
             parts.push(parseInt(str.slice(i - config.bits, i), 2));
         }
+
         parts.push(parseInt(str.slice(0, i), 2));
+
         return parts;
-    };
+    }
 
     // Pads a string `str` with zeros on the left so that its length is a multiple of `bits`
     function padLeft(str, bits) {
-        bits = bits || config.bits
-        var missing = str.length % bits;
+        var missing;
+
+        bits = bits || config.bits;
+        missing = str.length % bits;
         return (missing ? new Array(bits - missing + 1).join('0') : '') + str;
-    };
+    }
 
     function hex2bin(str) {
         var bin = '',
-            num;
-        for (var i = str.length - 1; i >= 0; i--) {
-            num = parseInt(str[i], 16)
+            num,
+            i;
+
+        for (i = str.length - 1; i >= 0; i--) {
+            num = parseInt(str[i], 16);
+
             if (isNaN(num)) {
-                throw new Error('Invalid hex character.')
+                throw new Error('Invalid hex character.');
             }
+
             bin = padLeft(num.toString(2), 4) + bin;
         }
         return bin;
@@ -475,15 +526,19 @@
 
     function bin2hex(str) {
         var hex = '',
-            num;
+            num,
+            i;
+
         str = padLeft(str, 4);
-        for (var i = str.length; i >= 4; i -= 4) {
+
+        for (i = str.length; i >= 4; i -= 4) {
             num = parseInt(str.slice(i - 4, i), 2);
             if (isNaN(num)) {
-                throw new Error('Invalid binary character.')
+                throw new Error('Invalid binary character.');
             }
             hex = num.toString(16) + hex;
         }
+
         return hex;
     }
 
@@ -492,26 +547,33 @@
     // `bytesPerChar` bytes in the output string.
     /** @expose **/
     exports.str2hex = function (str, bytesPerChar) {
+        var hexChars,
+            max,
+            out = '',
+            neededBytes,
+            num,
+            i,
+            len;
+
         if (typeof str !== 'string') {
             throw new Error('Input must be a character string.');
         }
         bytesPerChar = bytesPerChar || defaults.bytesPerChar;
 
         if (typeof bytesPerChar !== 'number' || bytesPerChar % 1 !== 0 || bytesPerChar < 1 || bytesPerChar > defaults.maxBytesPerChar) {
-            throw new Error('Bytes per character must be an integer between 1 and ' + defaults.maxBytesPerChar + ', inclusive.')
+            throw new Error('Bytes per character must be an integer between 1 and ' + defaults.maxBytesPerChar + ', inclusive.');
         }
 
-        var hexChars = 2 * bytesPerChar;
-        var max = Math.pow(16, hexChars) - 1;
-        var out = '',
-            num;
-        for (var i = 0, len = str.length; i < len; i++) {
+        hexChars = 2 * bytesPerChar;
+        max = Math.pow(16, hexChars) - 1;
+
+        for (i = 0, len = str.length; i < len; i++) {
             num = str[i].charCodeAt();
             if (isNaN(num)) {
                 throw new Error('Invalid character: ' + str[i]);
             } else if (num > max) {
-                var neededBytes = Math.ceil(Math.log(num + 1) / Math.log(256));
-                throw new Error('Invalid character code (' + num + '). Maximum allowable is 256^bytes-1 (' + max + '). To convert this character, use at least ' + neededBytes + ' bytes.')
+                neededBytes = Math.ceil(Math.log(num + 1) / Math.log(256));
+                throw new Error('Invalid character code (' + num + '). Maximum allowable is 256^bytes-1 (' + max + '). To convert this character, use at least ' + neededBytes + ' bytes.');
             } else {
                 out = padLeft(num.toString(16), hexChars) + out;
             }
@@ -522,24 +584,32 @@
     // Converts a given HEX number string to a UTF16 character string.
     /** @expose **/
     exports.hex2str = function (str, bytesPerChar) {
+        var hexChars,
+            out = '',
+            i,
+            len;
+
         if (typeof str !== 'string') {
             throw new Error('Input must be a hexadecimal string.');
         }
         bytesPerChar = bytesPerChar || defaults.bytesPerChar;
 
         if (typeof bytesPerChar !== 'number' || bytesPerChar % 1 !== 0 || bytesPerChar < 1 || bytesPerChar > defaults.maxBytesPerChar) {
-            throw new Error('Bytes per character must be an integer between 1 and ' + defaults.maxBytesPerChar + ', inclusive.')
+            throw new Error('Bytes per character must be an integer between 1 and ' + defaults.maxBytesPerChar + ', inclusive.');
         }
 
-        var hexChars = 2 * bytesPerChar;
-        var out = '';
+        hexChars = 2 * bytesPerChar;
+
         str = padLeft(str, hexChars);
-        for (var i = 0, len = str.length; i < len; i += hexChars) {
+
+        for (i = 0, len = str.length; i < len; i += hexChars) {
             out = String.fromCharCode(parseInt(str.slice(i, i + hexChars), 16)) + out;
         }
+
         return out;
     };
 
     // by default, initialize without an RNG
     exports.init();
-})(typeof module !== 'undefined' && module['exports'] ? module['exports'] : (window['secrets'] = {}), typeof GLOBAL !== 'undefined' ? GLOBAL : window);
+
+})(typeof module !== 'undefined' && module.exports ? module.exports : (window.secrets = {}), typeof GLOBAL !== 'undefined' ? GLOBAL : window);
