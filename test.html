@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+
+  <body>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js"></script>
+    <script src="secrets.js"></script>
+
+    <script>
+      var all_results = [];
+
+      // generate a 512-bit key
+      var key = secrets.random(512); // => key is a hex string
+
+      // split into 10 shares with a threshold of 5
+      var shares = secrets.share(key, 10, 5);
+      // => shares = ['801xxx...xxx','802xxx...xxx','803xxx...xxx','804xxx...xxx','805xxx...xxx']
+
+      // combine 4 shares
+      var comb = secrets.combine(shares.slice(0, 4));
+      all_results.push(comb === key); // => false
+
+      // combine 5 shares
+      var comb = secrets.combine(shares.slice(4, 9));
+      all_results.push(comb === key); // => true
+
+      // combine ALL shares
+      var comb = secrets.combine(shares);
+      all_results.push(comb === key); // => true
+
+      // create another share with id 8
+      var newShare = secrets.newShare(8, shares); // => newShare = '808xxx...xxx'
+
+      // reconstruct using 4 original shares and the new share:
+      var comb = secrets.combine(shares.slice(1, 5).concat(newShare));
+      all_results.push(comb === key); // => true
+
+      // SECOND TEST
+
+      var pw = '<<PassWord123>>';
+
+      // convert the text into a hex string
+      var pwHex = secrets.str2hex(pw); // => hex string
+
+      // split into 5 shares, with a threshold of 3
+      var shares = secrets.share(pwHex, 5, 3);
+
+      // combine 2 shares:
+      var comb = secrets.combine(shares.slice(1, 3));
+
+      //convert back to UTF string:
+      comb = secrets.hex2str(comb);
+      all_results.push(comb === pw); // => false
+
+      // combine 3 shares:
+      var comb = secrets.combine([shares[1], shares[3], shares[4]]);
+
+      //convert back to UTF string:
+      comb = secrets.hex2str(comb);
+      all_results.push(comb === pw); // => true
+
+      // console.log(all_results);
+      if (_.isEqual(all_results, [false, true, true, true, false, true])) {
+        document.write("All tests passed!");
+      } else {
+        document.write("FAIL : All tests did not have expected results.");
+      }
+
+    </script>
+
+  </body>
+
+</html>
