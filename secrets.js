@@ -235,12 +235,13 @@
             i;
 
         for (i = coeffs.length - 1; i >= 0; i--) {
-            if (fx === 0) {
+            if (fx !== 0) {
+                fx = config.exps[(logx + config.logs[fx]) % config.max] ^ coeffs[i];
+            } else {
                 fx = coeffs[i];
-                continue;
             }
-            fx = config.exps[(logx + config.logs[fx]) % config.max] ^ coeffs[i];
         }
+
         return fx;
     }
 
@@ -298,27 +299,27 @@
             j;
 
         for (i = 0, len = x.length; i < len; i++) {
-            if (!y[i]) {
-                continue;
+            if (y[i]) {
+
+                product = config.logs[y[i]];
+
+                for (j = 0; j < len; j++) {
+                    if (i !== j) {
+                        if (at === x[j]) { // happens when computing a share that is in the list of shares used to compute it
+                            product = -1; // fix for a zero product term, after which the sum should be sum^0 = sum, not sum^1
+                            break;
+                        }
+                        product = (product + config.logs[at ^ x[j]] - config.logs[x[i] ^ x[j]] + config.max) % config.max; // to make sure it's not negative
+                    }
+                }
+
+                // though exps[-1]= undefined and undefined ^ anything = anything in
+                // chrome, this behavior may not hold everywhere, so do the check
+                sum = product === -1 ? sum : sum ^ config.exps[product];
             }
 
-            product = config.logs[y[i]];
-
-            for (j = 0; j < len; j++) {
-                if (i === j) {
-                    continue;
-                }
-                if (at === x[j]) { // happens when computing a share that is in the list of shares used to compute it
-                    product = -1; // fix for a zero product term, after which the sum should be sum^0 = sum, not sum^1
-                    break;
-                }
-                product = (product + config.logs[at ^ x[j]] - config.logs[x[i] ^ x[j]] + config.max) % config.max; // to make sure it's not negative
-            }
-
-            // though exps[-1]= undefined and undefined ^ anything = anything in
-            // chrome, this behavior may not hold everywhere, so do the check
-            sum = product === -1 ? sum : sum ^ config.exps[product];
         }
+
         return sum;
     }
 
@@ -351,17 +352,16 @@
                 init(setBits);
             }
 
-            if (inArray(x, share.id)) { // repeated x value?
-                continue;
+            if (!inArray(x, share.id)) {
+                idx = x.push(share.id) - 1;
+                share = split(hex2bin(share.value));
+
+                for (j = 0, len2 = share.length; j < len2; j++) {
+                    y[j] = y[j] || [];
+                    y[j][idx] = share[j];
+                }
             }
 
-            idx = x.push(share.id) - 1;
-            share = split(hex2bin(share.value));
-
-            for (j = 0, len2 = share.length; j < len2; j++) {
-                y[j] = y[j] || [];
-                y[j][idx] = share[j];
-            }
         }
 
         for (i = 0, len = y.length; i < len; i++) {
