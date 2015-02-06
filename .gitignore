@@ -1,6 +1,2 @@
 *.DS_Store
-*.log
 node_modules
-test
-.c9revisions
-index.html
