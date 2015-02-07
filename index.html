@@ -751,7 +751,7 @@
 					<div class="tab-pane active" id="split-explanation">
 						<ol>
 						<li><strong>Enter your secret.</strong>
-							<br>For now text is supported. Support for other formats (files, QR codes) coming soon!
+							<br>For now text is supported.
 						</li>
 						<li><strong>Select the number of <span class="word">shares</span> (pieces) to create.</strong>
 							<br>Each computed share will be random. Each time you compute the shares, they will be different. 
@@ -858,7 +858,7 @@
 						<ol>
 							<li><strong>Enter your shares.</strong>
 								<br>Enter one share in each input box. Make sure you enter at least the threshold number of shares.
-								<br>Support for files and QR codes is in development.</li>
+							</li>
 							<li><strong>Click reconstruct</strong>
 								<br>If the threshold number of shares was entered, the reconstructed secret is correct. Otherwise, the reconstruction will be incorrect.
 							</li>
@@ -970,10 +970,6 @@
 			<p>All computations are done in your browser. No secrets or secret shares are ever transmitted back to our servers. Once the <span class="Pass">Pass</span><span class="Guardian">Guardian</span> page is loaded in your browser, it can be run offline. For maximum security, it is recommended that you perform computations offline. 
 			<p>Like most website operators, <span class="Pass">Pass</span><span class="Guardian">Guardian</span> collects non-personally-identifying analytics information of the sort that web browsers and servers typically make available, such as the browser type, language preference, referring site, and the date and time of each visitor request. <span class="Pass">Pass</span><span class="Guardian">Guardian</span>'s purpose in collecting non-personally identifying information is to better understand how visitors use its website.
 			<p><span class="Pass">Pass</span><span class="Guardian">Guardian</span> requires the availability of a <a href="http://en.wikipedia.org/wiki/Cryptographically_secure_pseudorandom_number_generator" target="_blank">cryptographically-strong pseudo-random number generator (CSPRNG)</a> during the secret splitting phase only. If a strong PRNG is not found during run-time, <span class="Pass">Pass</span><span class="Guardian">Guardian</span> will use the <a href="http://en.wikipedia.org/wiki/ISAAC_(cipher)" target="_blank">ISAAC CSPRNG</a>, from the open-source <a href="https://github.com/rubycon/isaac.js" target="_blank">isaac.js</a> implementation. Consider upgrading to a newer browser that supports <a href="http://www.w3.org/TR/WebCryptoAPI/#RandomSource-method-getRandomValues" target="_blank">crypto.getRandomValues()</a> to take advantage of the increased security that this PRNG provides. Other CSPRNGs will be built-in in the future for browsers that need it.
-
-			<h4>Roadmap</h4>
-			<p>Planned future enhancements of <span class="Pass">Pass</span><span class="Guardian">Guardian</span> include a standalone offline program, a command line program, and support for files and QR codes. Mobile versions are being investigated also. If you are interested in becoming involved, contact the author at the email listed at the bottom of this page.
-
 
 		</section>
 
