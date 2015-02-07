@@ -1,5 +1,6 @@
 // secrets.js - by Alexander Stetsyuk - released under MIT License
 /*jslint bitwise: true, plusplus: true, maxerr: 1000 */
+/*global require, module, window, global*/
 
 (function (exports, global) {
 
@@ -632,4 +633,4 @@
     // by default, initialize without an RNG
     exports.init();
 
-})(typeof module !== "undefined" && module.exports ? module.exports : (window.secrets = {}), typeof GLOBAL !== "undefined" ? GLOBAL : window);
+})(typeof module !== "undefined" && module.exports ? module.exports : (window.secrets = {}), typeof global !== "undefined" ? global : window);
