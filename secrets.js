@@ -1,5 +1,5 @@
 // secrets.js - by Alexander Stetsyuk - released under MIT License
-/*jslint plusplus: true */
+/*jslint bitwise: true, plusplus: true, maxerr: 1000 */
 
 (function (exports, global) {
 
