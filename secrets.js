@@ -226,7 +226,6 @@
     }
 
     // Polynomial evaluation at `x` using Horner's Method
-    // TODO: this can possibly be sped up using other methods
     // NOTE: fx=fx * x + coeff[i] ->  exp(log(fx) + log(x)) + coeff[i],
     //       so if fx===0, just set fx to coeff[i] because
     //       using the exp/log form will result in incorrect value
