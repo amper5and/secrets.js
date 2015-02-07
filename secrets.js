@@ -46,10 +46,10 @@
         for (i = 0; i < config.size; i++) {
             exps[i] = x;
             logs[x] = i;
-            x <<= 1;
+            x = x << 1;              // Left shift assignment
             if (x >= config.size) {
-                x ^= primitive;
-                x &= config.max;
+                x = x ^ primitive;   // Bitwise XOR assignment
+                x = x & config.max;  // Bitwise AND assignment
             }
         }
 
