@@ -291,6 +291,30 @@
         return sum;
     }
 
+    // This is the basic polynomial generation and evaluation function
+    // for a `config.bits`-length secret (NOT an arbitrary length)
+    // Note: no error-checking at this stage! If `secrets` is NOT
+    // a NUMBER less than 2^bits-1, the output will be incorrect!
+    function getShares(secret, numShares, threshold) {
+        var shares = [],
+            coeffs = [secret],
+            i,
+            len;
+
+        for (i = 1; i < threshold; i++) {
+            coeffs[i] = parseInt(config.rng(config.bits), 2);
+        }
+
+        for (i = 1, len = numShares + 1; i < len; i++) {
+            shares[i - 1] = {
+                x: i,
+                y: horner(i, coeffs)
+            };
+        }
+
+        return shares;
+    }
+
     // Protected method that evaluates the Lagrange interpolation
     // polynomial at x=`at` for individual config.bits-length
     // segments of each share in the `shares` Array.
@@ -504,7 +528,7 @@
         secret = split(secret, padLength);
 
         for (i = 0, len = secret.length; i < len; i++) {
-            subShares = this._getShares(secret[i], numShares, threshold);
+            subShares = getShares(secret[i], numShares, threshold);
             for (j = 0; j < numShares; j++) {
                 x[j] = x[j] || subShares[j].x.toString(config.radix);
                 y[j] = padLeft(subShares[j].y.toString(2)) + (y[j] || "");
@@ -524,30 +548,6 @@
         }
 
         return x;
-    };
-
-    // This is the basic polynomial generation and evaluation function
-    // for a `config.bits`-length secret (NOT an arbitrary length)
-    // Note: no error-checking at this stage! If `secrets` is NOT
-    // a NUMBER less than 2^bits-1, the output will be incorrect!
-    exports._getShares = function (secret, numShares, threshold) {
-        var shares = [],
-            coeffs = [secret],
-            i,
-            len;
-
-        for (i = 1; i < threshold; i++) {
-            coeffs[i] = parseInt(config.rng(config.bits), 2);
-        }
-
-        for (i = 1, len = numShares + 1; i < len; i++) {
-            shares[i - 1] = {
-                x: i,
-                y: horner(i, coeffs)
-            };
-        }
-
-        return shares;
     };
 
     // Combine `shares` Array into the original secret
