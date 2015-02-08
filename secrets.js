@@ -11,7 +11,6 @@
             radix: 16, // work with HEX by default
             minBits: 3,
             maxBits: 20, // this permits 1,048,575 shares, though going this high is NOT recommended in JS!
-
             bytesPerChar: 2,
             maxBytesPerChar: 6, // Math.pow(256,7) > Math.pow(2,53)
 
@@ -293,7 +292,7 @@
 
     // This is the basic polynomial generation and evaluation function
     // for a `config.bits`-length secret (NOT an arbitrary length)
-    // Note: no error-checking at this stage! If `secrets` is NOT
+    // Note: no error-checking at this stage! If `secret` is NOT
     // a NUMBER less than 2^bits-1, the output will be incorrect!
     function getShares(secret, numShares, threshold) {
         var shares = [],
@@ -518,6 +517,10 @@
         if (threshold > config.max) {
             neededBits = Math.ceil(Math.log(threshold + 1) / Math.LN2);
             throw new Error("Threshold number of shares must be an integer between 2 and 2^bits-1 (" + config.max + "), inclusive.  To use a threshold of " + threshold + ", use at least " + neededBits + " bits.");
+        }
+
+        if (threshold > numShares) {
+            throw new Error("Threshold number of shares was " + threshold + " but must be less than or equal to the " + numShares + " shares specified as the total to generate.");
         }
 
         if (typeof padLength !== "number" || padLength % 1 !== 0) {
