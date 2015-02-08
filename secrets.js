@@ -55,7 +55,6 @@
         config.exps = exps;
     }
 
-    /** @expose **/
     exports.init = init;
 
     // Pads a string `str` with zeros on the left so that its length is a multiple of `bits`
@@ -348,13 +347,11 @@
         return bin2hex(result);
     }
 
-    /** @expose **/
     exports.getConfig = function () {
         return { "bits": config.bits };
     };
 
     // Set the PRNG to use. If no RNG function is supplied, pick a default using getRNG()
-    /** @expose **/
     exports.setRNG = function (rng) {
         if (!isInited()) {
             this.init();
@@ -375,7 +372,6 @@
     // Converts a given UTF16 character string to the HEX representation.
     // Each character of the input string is represented by
     // `bytesPerChar` bytes in the output string.
-    /** @expose **/
     exports.str2hex = function (str, bytesPerChar) {
         var hexChars,
             max,
@@ -415,7 +411,6 @@
     };
 
     // Converts a given HEX number string to a UTF16 character string.
-    /** @expose **/
     exports.hex2str = function (str, bytesPerChar) {
         var hexChars,
             out = "",
@@ -443,7 +438,6 @@
     };
 
     // Generates a random bits-length number string using the PRNG
-    /** @expose **/
     exports.random = function (bits) {
         if (!isSetRNG()) {
             this.setRNG();
@@ -460,7 +454,6 @@
     // into `numShares` shares, each expressed in radix `outputRadix` (optional, default to `inputRadix`),
     // requiring `threshold` number of shares to reconstruct the secret.
     // Optionally, zero-pads the secret to a length that is a multiple of padLength before sharing.
-    /** @expose **/
     exports.share = function (secret, numShares, threshold, padLength, withoutPrefix) {
         var neededBits,
             padding,
@@ -537,7 +530,6 @@
     // for a `config.bits`-length secret (NOT an arbitrary length)
     // Note: no error-checking at this stage! If `secrets` is NOT
     // a NUMBER less than 2^bits-1, the output will be incorrect!
-    /** @expose **/
     exports._getShares = function (secret, numShares, threshold) {
         var shares = [],
             coeffs = [secret],
@@ -559,14 +551,12 @@
     };
 
     // Combine `shares` Array into the original secret
-    /** @expose **/
     exports.combine = function (shares) {
         return combine(0, shares);
     };
 
     // Generate a new share with id `id` (a number between 1 and 2^bits-1)
     // `id` can be a Number or a String in the default radix (16)
-    /** @expose **/
     exports.newShare = function (id, shares) {
         var share,
             max,
