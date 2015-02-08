@@ -1,8 +1,8 @@
 // secrets.js - by Alexander Stetsyuk - released under MIT License
 /*jslint bitwise: true, plusplus: true, maxerr: 1000 */
-/*global require, module, window, global*/
+/*global require, module, window, Uint32Array*/
 
-(function (exports, global) {
+(function (exports) {
 
     "use strict";
 
@@ -20,8 +20,7 @@
             // i.e. to get the polynomial for n=16, use primitivePolynomials[16]
             primitivePolynomials: [null, null, 1, 3, 3, 5, 3, 3, 29, 17, 9, 5, 83, 27, 43, 3, 45, 9, 39, 39, 9, 5, 3, 33, 27, 9, 71, 39, 9, 5, 83],
 
-            // warning for insecure PRNG
-            warning: "WARNING:\nA secure random number generator was not found.\nUsing Math.random(), which is NOT cryptographically strong!"
+            insecurePRNGWarning: "WARNING:\nA secure random number generator was not found.\nUsing Math.random(), which is NOT cryptographically strong!"
         },
         config = {}; // Protected settings object
 
@@ -108,9 +107,8 @@
     // Warn about using insecure rng.
     // Called when Math.random() is being used.
     function warn() {
-        global.console.warn(defaults.warning);
-        if (typeof global.alert === "function" && config.alert) {
-            global.alert(defaults.warning);
+        if (window && window.console && typeof window.console.warn === "function") {
+            window.console.warn(defaults.insecurePRNGWarning);
         }
     }
 
@@ -130,9 +128,9 @@
             max = Math.pow(2, bitsPerNum) - 1;
 
         function construct(bits, arr, radix, size) {
-            var str = "",
-                i = 0,
-                len = arr.length - 1;
+            var i = 0,
+                len = arr.length - 1,
+                str = "";
 
             while (i < len || (str.length < bits)) {
                 str += padLeft(parseInt(arr[i], radix).toString(2), size);
@@ -161,19 +159,15 @@
             };
         }
 
-        // browsers with window.crypto.getRandomValues()
-        if (global.crypto && typeof global.crypto.getRandomValues === "function" && typeof global.Uint32Array === "function") {
-            crypto = global.crypto;
+        // browsers with window.crypto.getRandomValues() and Uint32Array() support.
+        if (window && window.crypto && typeof window.crypto.getRandomValues === "function" && typeof Uint32Array === "function") {
             return function (bits) {
                 var elems = Math.ceil(bits / 32),
-                    str = null,
-                    arr = new global.Uint32Array(elems);
+                    str = null;
 
                 while (str === null) {
-                    crypto.getRandomValues(arr);
-                    str = construct(bits, arr, 10, 32);
+                    str = construct(bits, window.crypto.getRandomValues(new Uint32Array(elems)), 10, 32);
                 }
-
                 return str;
             };
         }
@@ -389,7 +383,7 @@
 
     // Set the PRNG to use. If no RNG function is supplied, pick a default using getRNG()
     /** @expose **/
-    exports.setRNG = function (rng, alert) {
+    exports.setRNG = function (rng) {
         if (!isInited()) {
             this.init();
         }
@@ -402,7 +396,6 @@
         }
 
         config.rng = rng;
-        config.alert = !!alert;
 
         return !!config.unsafePRNG;
     };
@@ -632,4 +625,4 @@
     // by default, initialize without an RNG
     exports.init();
 
-})(typeof module !== "undefined" && module.exports ? module.exports : (window.secrets = {}), typeof global !== "undefined" ? global : window);
+})(typeof module !== "undefined" && module.exports ? module.exports : (window.secrets = {}));
