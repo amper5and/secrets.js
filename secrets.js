@@ -18,9 +18,7 @@
             // Primitive polynomials (in decimal form) for Galois Fields GF(2^n), for 2 <= n <= 30
             // The index of each term in the array corresponds to the n for that polynomial
             // i.e. to get the polynomial for n=16, use primitivePolynomials[16]
-            primitivePolynomials: [null, null, 1, 3, 3, 5, 3, 3, 29, 17, 9, 5, 83, 27, 43, 3, 45, 9, 39, 39, 9, 5, 3, 33, 27, 9, 71, 39, 9, 5, 83],
-
-            insecurePRNGWarning: "WARNING:\nA secure random number generator was not found.\nUsing Math.random(), which is NOT cryptographically strong!"
+            primitivePolynomials: [null, null, 1, 3, 3, 5, 3, 3, 29, 17, 9, 5, 83, 27, 43, 3, 45, 9, 39, 39, 9, 5, 3, 33, 27, 9, 71, 39, 9, 5, 83]
         },
         config = {}; // Protected settings object
 
@@ -104,14 +102,6 @@
         return hex;
     }
 
-    // Warn about using insecure rng.
-    // Called when Math.random() is being used.
-    function warn() {
-        if (window && window.console && typeof window.console.warn === "function") {
-            window.console.warn(defaults.insecurePRNGWarning);
-        }
-    }
-
     function isInited() {
         if (!config.bits || !config.size || !config.max || !config.logs || !config.exps || config.logs.length !== config.size || config.exps.length !== config.size) {
             return false;
@@ -122,10 +112,8 @@
     // Returns a pseudo-random number generator of the form function(bits){}
     // which should output a random string of 1's and 0's of length `bits`
     function getRNG() {
-        var randomBits,
-            crypto,
-            bitsPerNum = 32,
-            max = Math.pow(2, bitsPerNum) - 1;
+        var crypto,
+            randomBits;
 
         function construct(bits, arr, radix, size) {
             var i = 0,
@@ -172,29 +160,16 @@
             };
         }
 
-        // A totally insecure RNG!!! (except in Safari)
-        // Will produce a warning every time it is called.
-        config.unsafePRNG = true;
-        warn();
-
-        return function (bits) {
-            var elems = Math.ceil(bits / bitsPerNum),
-                arr = [],
-                str = null,
-                i;
-
-            while (str === null) {
-                for (i = 0; i < elems; i++) {
-                    arr[i] = Math.floor(Math.random() * max + 1);
-                }
-                str = construct(bits, arr, 10, bitsPerNum);
-            }
-            return str;
-        };
+        // Failed to find a suitable CSPRNG. All is lost.
+        return null;
     }
 
     function isSetRNG() {
-        return typeof config.rng === "function";
+        if (config && config.rng && typeof config.rng === "function") {
+            return true;
+        }
+
+        return false;
     }
 
     // Splits a number string `bits`-length segments, after first
@@ -375,10 +350,7 @@
 
     /** @expose **/
     exports.getConfig = function () {
-        return {
-            "bits": config.bits,
-            "unsafePRNG": config.unsafePRNG
-        };
+        return { "bits": config.bits };
     };
 
     // Set the PRNG to use. If no RNG function is supplied, pick a default using getRNG()
@@ -387,7 +359,7 @@
         if (!isInited()) {
             this.init();
         }
-        config.unsafePRNG = false;
+
         rng = rng || getRNG();
 
         // test the RNG (5 times)
@@ -397,7 +369,7 @@
 
         config.rng = rng;
 
-        return !!config.unsafePRNG;
+        return isSetRNG();
     };
 
     // Converts a given UTF16 character string to the HEX representation.
@@ -481,9 +453,6 @@
             throw new Error("Number of bits must be an integer greater than 1.");
         }
 
-        if (config.unsafePRNG) {
-            warn();
-        }
         return bin2hex(config.rng(bits));
     };
 
@@ -536,10 +505,6 @@
 
         if (typeof padLength !== "number" || padLength % 1 !== 0) {
             throw new Error("Zero-pad length must be an integer greater than 1.");
-        }
-
-        if (config.unsafePRNG) {
-            warn();
         }
 
         secret = "1" + hex2bin(secret); // append a 1 so that we can preserve the correct number of leading zeros in our secret
