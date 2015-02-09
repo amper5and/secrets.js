@@ -104,6 +104,10 @@ describe("Secrets", function () {
             expect(secrets.random(128)).toEqual("75bcd15");
         });
 
+        it("unless the arg is not a function", function () {
+            expect(function () { secrets.setRNG("FOO"); }).toThrowError("Random number generator is invalid (Not a function). Supply an CSPRNG of the form function(bits){} that returns a string containing 'bits' number of random 1's and 0's.");
+        });
+
         it("unless that function does not return a string as output", function () {
             var getFixedBitString = function (bits) {
                 return ["not", "a", "string", bits];
@@ -159,6 +163,16 @@ describe("Secrets", function () {
             expect(shares.length).toEqual(numShares);
         });
 
+        it("into 'numShares' shares where numShares is equal to the threshold and zero-padding is set", function () {
+            var numShares = 10;
+            var threhold = 10;
+            var shares = secrets.share(key, numShares, threhold);
+            var sharesWithZeroPad = secrets.share(key, numShares, threhold, 1024);
+            expect(shares.length).toEqual(numShares);
+            expect(sharesWithZeroPad.length).toEqual(numShares);
+            expect(sharesWithZeroPad[0].length).toBeGreaterThan(shares[0].length);
+        });
+
         it("unless 'numShares' is less than the threshold", function () {
             var numShares = 2;
             var threhold = 3;
@@ -206,6 +220,37 @@ describe("Secrets", function () {
             }).toThrowError("Invalid hex character.");
         });
 
+        it("unless 'key' is not a string", function () {
+            key = {"foo": "bar"};
+            expect(function () {
+                secrets.share(key, 3, 2);
+            }).toThrowError("Secret must be a string.");
+        });
+
+        it("unless 'padLength' is not a number", function () {
+            expect(function () {
+                secrets.share(key, 3, 2, "foo");
+            }).toThrowError("Zero-pad length must be an integer between 0 and 1024 inclusive.");
+        });
+
+        it("unless 'padLength' is not a whole number", function () {
+            expect(function () {
+                secrets.share(key, 3, 2, 1.3);
+            }).toThrowError("Zero-pad length must be an integer between 0 and 1024 inclusive.");
+        });
+
+        it("unless 'padLength' is < 0", function () {
+            expect(function () {
+                secrets.share(key, 3, 2, -1);
+            }).toThrowError("Zero-pad length must be an integer between 0 and 1024 inclusive.");
+        });
+
+        it("unless 'padLength' is > 1024", function () {
+            expect(function () {
+                secrets.share(key, 3, 2, 1025);
+            }).toThrowError("Zero-pad length must be an integer between 0 and 1024 inclusive.");
+        });
+
     });
 
     describe("should be able to be combined to recreate a secret", function () {
@@ -245,6 +290,17 @@ describe("Secrets", function () {
 
         it("from a full set of shares", function () {
             var combinedKey = secrets.combine(shares);
+            expect(combinedKey).toEqual(key);
+        });
+
+        it("from a full set of zero-padded shares", function () {
+            var zeroPadShares = secrets.share(key, 3, 2, 1024); // 1024 zero-padding
+            var combinedKey = secrets.combine(zeroPadShares);
+            expect(combinedKey).toEqual(key);
+        });
+
+        it("from a full set of shares with a full set of duplicates", function () {
+            var combinedKey = secrets.combine(shares.concat(shares));
             expect(combinedKey).toEqual(key);
         });
 
@@ -297,11 +353,39 @@ describe("Secrets", function () {
             key = secrets.random(128);
         });
 
-        it("and combine the mixed old/new shares back to the original key", function () {
+        it("and combine the mixed old/new shares back to the original key with ID arg as number", function () {
             var shares = secrets.share(key, 3, 2);
             var newShare = secrets.newShare(4, shares);
             var combinedKey = secrets.combine(shares.slice(1).concat(newShare));
             expect(combinedKey).toEqual(key);
+        });
+
+        it("and combine the mixed old/new shares back to the original key with ID arg as string", function () {
+            var shares = secrets.share(key, 3, 2);
+            var newShare = secrets.newShare("4", shares);
+            var combinedKey = secrets.combine(shares.slice(1).concat(newShare));
+            expect(combinedKey).toEqual(key);
+        });
+
+        it("unless ID arg is < 1", function () {
+            var shares = secrets.share(key, 3, 2);
+            expect(function () {
+                secrets.newShare(0, shares);
+            }).toThrowError("Share id must be an integer between 1 and 255, inclusive.");
+        });
+
+        it("unless ID arg is > 255 for 8 bit config", function () {
+            var shares = secrets.share(key, 3, 2);
+            expect(function () {
+                secrets.newShare(256, shares);
+            }).toThrowError("Share id must be an integer between 1 and 255, inclusive.");
+        });
+
+        it("unless ID arg is not an Integer divisible by 1", function () {
+            var shares = secrets.share(key, 3, 2);
+            expect(function () {
+                secrets.newShare(1.3, shares);
+            }).toThrowError("Share id must be an integer between 1 and 255, inclusive.");
         });
 
     });
@@ -332,6 +416,54 @@ describe("Secrets", function () {
             var shares = secrets.share(secrets.str2hex(key), 3, 2);
             var combinedKey = secrets.hex2str(secrets.combine(shares));
             expect(combinedKey).toEqual(key);
+        });
+
+        it("unless str2hex is called with a non-string", function () {
+            expect(function () {
+                secrets.str2hex([]);
+            }).toThrowError("Input must be a character string.");
+        });
+
+        it("unless str2hex bytesPerChar arg is non-Integer", function () {
+            expect(function () {
+                secrets.str2hex("abc", "foo");
+            }).toThrowError("Bytes per character must be an integer between 1 and 6, inclusive.");
+        });
+
+        it("unless str2hex bytesPerChar arg is < 1", function () {
+            expect(function () {
+                secrets.str2hex("abc", -1);
+            }).toThrowError("Bytes per character must be an integer between 1 and 6, inclusive.");
+        });
+
+        it("unless str2hex bytesPerChar arg is > 6", function () {
+            expect(function () {
+                secrets.str2hex("abc", 7);
+            }).toThrowError("Bytes per character must be an integer between 1 and 6, inclusive.");
+        });
+
+        it("unless hex2str is called with a non-string", function () {
+            expect(function () {
+                secrets.hex2str([]);
+            }).toThrowError("Input must be a hexadecimal string.");
+        });
+
+        it("unless hex2str bytesPerChar arg is non-Integer", function () {
+            expect(function () {
+                secrets.hex2str("abc", "foo");
+            }).toThrowError("Bytes per character must be an integer between 1 and 6, inclusive.");
+        });
+
+        it("unless hex2str bytesPerChar arg is < 1", function () {
+            expect(function () {
+                secrets.hex2str("abc", -1);
+            }).toThrowError("Bytes per character must be an integer between 1 and 6, inclusive.");
+        });
+
+        it("unless hex2str bytesPerChar arg is > 6", function () {
+            expect(function () {
+                secrets.hex2str("abc", 7);
+            }).toThrowError("Bytes per character must be an integer between 1 and 6, inclusive.");
         });
 
     });
@@ -373,6 +505,52 @@ describe("Secrets", function () {
             expect(function () {
                 secrets.random(65537);
             }).toThrowError("Number of bits must be an Integer between 1 and 65536.");
+        });
+
+    });
+
+    describe("should be able to do conversions", function () {
+
+        it("from a known binary string to a known hex output", function () {
+            var binStr = "00110101110001100110001011011111111100110000011111110000010010010011101001000000111010001111000111001110011000011101111111011111010111100111011100110101010000110110010101110010110101010101100000110010000010001000110101110010011110100111001010010100011001110110001010000000110000111110011100101111111110100001011100000110000101101000011100101000000100000111001010110100011001110100110001000010000011101100001111100011001001110101101100101011011101010110010100010110111000001010000000001110000010110100000010111101";
+            // private
+            expect(secrets._bin2hex(binStr)).toEqual('35c662dff307f0493a40e8f1ce61dfdf5e7735436572d55832088d727a7294676280c3e72ffa17061687281072b4674c420ec3e3275b2b756516e0a00e0b40bd');
+        });
+
+        it("from a known hex string to a known binary output", function () {
+            var hexStr = "35c662dff307f0493a40e8f1ce61dfdf5e7735436572d55832088d727a7294676280c3e72ffa17061687281072b4674c420ec3e3275b2b756516e0a00e0b40bd";
+            // private
+            expect(secrets._hex2bin(hexStr)).toEqual("00110101110001100110001011011111111100110000011111110000010010010011101001000000111010001111000111001110011000011101111111011111010111100111011100110101010000110110010101110010110101010101100000110010000010001000110101110010011110100111001010010100011001110110001010000000110000111110011100101111111110100001011100000110000101101000011100101000000100000111001010110100011001110100110001000010000011101100001111100011001001110101101100101011011101010110010100010110111000001010000000001110000010110100000010111101");
+        });
+
+        it("from an ASCII String > Hex > Binary > Hex > ASCII String round trip", function () {
+            var str = "I want to play safely!";
+            var hexStr = secrets.str2hex(str);
+            var binStr = secrets._hex2bin(hexStr); // private
+            var hexStr2 = secrets._bin2hex(binStr); // private
+            expect(secrets.hex2str(hexStr2)).toEqual(str);
+        });
+
+        it("from an UTF-8 String > Hex > Binary > Hex > UTF-8 String round trip", function () {
+            var str = "¥ · £ · € · $ · ¢ · ₡ · ₢ · ₣ · ₤ · ₥ · ₦ · ₧ · ₨ · ₩ · ₪ · ₫ · ₭ · ₮ · ₯ · ₹";
+            var hexStr = secrets.str2hex(str);
+            var binStr = secrets._hex2bin(hexStr); // private
+            var hexStr2 = secrets._bin2hex(binStr); // private
+            expect(secrets.hex2str(hexStr2)).toEqual(str);
+        });
+
+        it("from an UTF-16 String > Hex > Binary > Hex > UTF-16 String round trip", function () {
+            var str = "𐑡𐑹𐑡 ·𐑚𐑻𐑯𐑸𐑛 ·𐑖𐑷";
+            var hexStr = secrets.str2hex(str);
+            var binStr = secrets._hex2bin(hexStr); // private
+            var hexStr2 = secrets._bin2hex(binStr); // private
+            expect(secrets.hex2str(hexStr2)).toEqual(str);
+        });
+
+        it("unless a non binary character is passed to bin2hex", function () {
+            expect(function () {
+                secrets._bin2hex("000100019999"); // private
+            }).toThrowError("Invalid binary character.");
         });
 
     });

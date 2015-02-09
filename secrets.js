@@ -396,7 +396,6 @@
         }
 
         if (rng && typeof rng !== "function") {
-            // rng = getRNG();
             throw new Error(err_prefix + "(Not a function)." + err_suffix);
         }
 
@@ -423,7 +422,7 @@
 
     // Converts a given UTF16 character string to the HEX representation.
     // Each character of the input string is represented by
-    // `bytesPerChar` bytes in the output string.
+    // `bytesPerChar` bytes in the output string which defaults to 2.
     exports.str2hex = function (str, bytesPerChar) {
         var hexChars,
             max,
@@ -436,9 +435,12 @@
         if (typeof str !== "string") {
             throw new Error("Input must be a character string.");
         }
-        bytesPerChar = bytesPerChar || defaults.bytesPerChar;
 
-        if (typeof bytesPerChar !== "number" || bytesPerChar % 1 !== 0 || bytesPerChar < 1 || bytesPerChar > defaults.maxBytesPerChar) {
+        if (!bytesPerChar) {
+            bytesPerChar = defaults.bytesPerChar;
+        }
+
+        if (typeof bytesPerChar !== "number" || bytesPerChar < 1 || bytesPerChar > defaults.maxBytesPerChar || bytesPerChar % 1 !== 0) {
             throw new Error("Bytes per character must be an integer between 1 and " + defaults.maxBytesPerChar + ", inclusive.");
         }
 
@@ -552,8 +554,8 @@
             throw new Error("Threshold number of shares was " + threshold + " but must be less than or equal to the " + numShares + " shares specified as the total to generate.");
         }
 
-        if (typeof padLength !== "number" || padLength % 1 !== 0) {
-            throw new Error("Zero-pad length must be an integer greater than 1.");
+        if (typeof padLength !== "number" || padLength % 1 !== 0 || padLength < 0 || padLength > 1024) {
+            throw new Error("Zero-pad length must be an integer between 0 and 1024 inclusive.");
         }
 
         secret = "1" + hex2bin(secret); // append a 1 so that we can preserve the correct number of leading zeros in our secret
@@ -608,5 +610,22 @@
         padding = max.toString(config.radix).length;
         return config.bits.toString(36).toUpperCase() + padLeft(id.toString(config.radix), padding) + combine(id, shares);
     };
+
+    /* test-code */
+    // export private functions so they can be unit tested directly.
+    exports._padLeft = padLeft;
+    exports._hex2bin = hex2bin;
+    exports._bin2hex = bin2hex;
+    exports._isInited = isInited;
+    exports._getRNG = getRNG;
+    exports._isSetRNG = isSetRNG;
+    exports._split = split;
+    exports._horner = horner;
+    exports._inArray = inArray;
+    exports._processShare = processShare;
+    exports._lagrange = lagrange;
+    exports._getShares = getShares;
+    exports._combine = combine;
+    /* end-test-code */
 
 })(typeof module !== "undefined" && module.exports ? module.exports : (window.secrets = {}));
