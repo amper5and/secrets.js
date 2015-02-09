@@ -215,7 +215,13 @@ secrets.js is released under the MIT License. See `LICENSE`.
 
 ## Development and Testing
 There is a Jasmine test suite that exercises the entire secrets module that can be run
-by opening SpecRunner.html in your browser.
+by opening `SpecRunner.html` in your browser.
+
+### Install and run Karma Test Runner
+
+	npm install
+	npm install -g karma-cli
+	karma start
 
 ## Changelog
 * 0.2.0 (grempe : Pending)

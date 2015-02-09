@@ -104,6 +104,34 @@ describe("Secrets", function () {
             expect(secrets.random(128)).toEqual("75bcd15");
         });
 
+        it("unless that function does not return a string as output", function () {
+            var getFixedBitString = function (bits) {
+                return ["not", "a", "string", bits];
+            };
+            expect(function () { secrets.setRNG(function (bits) { return getFixedBitString(bits); }); }).toThrowError("Random number generator is invalid (Output is not a string). Supply an CSPRNG of the form function(bits){} that returns a string containing 'bits' number of random 1's and 0's.");
+        });
+
+        it("unless that function does not return a string of parseable binary digits as output", function () {
+            var getFixedBitString = function (bits) {
+                return "abcdef";
+            };
+            expect(function () { secrets.setRNG(function (bits) { return getFixedBitString(bits); }); }).toThrowError("Random number generator is invalid (Binary string output not parseable to an Integer). Supply an CSPRNG of the form function(bits){} that returns a string containing 'bits' number of random 1's and 0's.");
+        });
+
+        it("unless that function returns a string longer than config bits", function () {
+            var getFixedBitString = function (bits) {
+                return "001010101"; // 9 when expecting 8
+            };
+            expect(function () { secrets.setRNG(function (bits) { return getFixedBitString(bits); }); }).toThrowError("Random number generator is invalid (Output length is greater than config.bits). Supply an CSPRNG of the form function(bits){} that returns a string containing 'bits' number of random 1's and 0's.");
+        });
+
+        it("unless that function returns a string shorter than config bits", function () {
+            var getFixedBitString = function (bits) {
+                return "0010101"; // 7 when expecting 8
+            };
+            expect(function () { secrets.setRNG(function (bits) { return getFixedBitString(bits); }); }).toThrowError("Random number generator is invalid (Output length is less than config.bits). Supply an CSPRNG of the form function(bits){} that returns a string containing 'bits' number of random 1's and 0's.");
+        });
+
     });
 
     describe("should be able to be shared", function () {

@@ -116,8 +116,12 @@
 
         function construct(bits, arr, radix, size) {
             var i = 0,
-                len = arr.length - 1,
+                len,
                 str = "";
+
+            if (arr) {
+                len = arr.length - 1;
+            }
 
             while (i < len || (str.length < bits)) {
                 str += padLeft(parseInt(arr[i], radix).toString(2), size);
@@ -147,7 +151,7 @@
         }
 
         // browsers with window.crypto.getRandomValues() and Uint32Array() support.
-        if (window && window.crypto && typeof window.crypto.getRandomValues === "function" && typeof Uint32Array === "function") {
+        if (window && window.crypto && (typeof window.crypto.getRandomValues === "function" || typeof window.crypto.getRandomValues === "object") && (typeof Uint32Array === "function" || typeof Uint32Array === "object")) {
             return function (bits) {
                 var elems = Math.ceil(bits / 32),
                     str = null;
@@ -382,20 +386,42 @@
 
     // Set the PRNG to use. If no RNG function is supplied, pick a default using getRNG()
     exports.setRNG = function (rng) {
+
+        var err_prefix = "Random number generator is invalid ",
+            err_suffix = " Supply an CSPRNG of the form function(bits){} that returns a string containing 'bits' number of random 1's and 0's.";
+
         if (!isInited()) {
             this.init();
         }
 
-        rng = rng || getRNG();
+        if (!rng) {
+            rng = getRNG();
+        }
 
-        // test the RNG (5 times)
-        if (typeof rng !== "function" || typeof rng(config.bits) !== "string" || !parseInt(rng(config.bits), 2) || rng(config.bits).length > config.bits || rng(config.bits).length < config.bits) {
-            throw new Error("Random number generator is invalid. Supply an RNG of the form function(bits){} that returns a string containing 'bits' number of random 1's and 0's.");
+        if (rng && typeof rng !== "function") {
+            // rng = getRNG();
+            throw new Error(err_prefix + "(Not a function)." + err_suffix);
+        }
+
+        if (rng && typeof rng(config.bits) !== "string") {
+            throw new Error(err_prefix + "(Output is not a string)." + err_suffix);
+        }
+
+        if (rng && !parseInt(rng(config.bits), 2)) {
+            throw new Error(err_prefix + "(Binary string output not parseable to an Integer)." + err_suffix);
+        }
+
+        if (rng && rng(config.bits).length > config.bits) {
+            throw new Error(err_prefix + "(Output length is greater than config.bits)." + err_suffix);
+        }
+
+        if (rng && rng(config.bits).length < config.bits) {
+            throw new Error(err_prefix + "(Output length is less than config.bits)." + err_suffix);
         }
 
         config.rng = rng;
 
-        return isSetRNG();
+        return true;
     };
 
     // Converts a given UTF16 character string to the HEX representation.
