@@ -54,9 +54,6 @@
         config.exps = exps;
     };
 
-//    exports.init = init;
-//    exports.init();
-
     // Pads a string `str` with zeros on the left so that its length is a multiple of `bits`
     function padLeft(str, bits) {
         var missing;
@@ -509,7 +506,7 @@
     // into `numShares` shares, each expressed in radix `outputRadix` (optional, default to `inputRadix`),
     // requiring `threshold` number of shares to reconstruct the secret.
     // Optionally, zero-pads the secret to a length that is a multiple of padLength before sharing.
-    exports.share = function (secret, numShares, threshold, padLength, withoutPrefix) {
+    exports.share = function (secret, numShares, threshold, padLength) {
         var neededBits,
             padding,
             subShares,
@@ -572,16 +569,8 @@
 
         padding = config.max.toString(config.radix).length;
 
-// FIXME : The withoutPrefix option doesn't benefit from the padding choice? So no padding, even if specific if withoutPrefix is chosen?
-
-        if (withoutPrefix) {
-            for (i = 0; i < numShares; i++) {
-                x[i] = bin2hex(y[i]);
-            }
-        } else {
-            for (i = 0; i < numShares; i++) {
-                x[i] = config.bits.toString(36).toUpperCase() + padLeft(x[i], padding) + bin2hex(y[i]);
-            }
+        for (i = 0; i < numShares; i++) {
+            x[i] = config.bits.toString(36).toUpperCase() + padLeft(x[i], padding) + bin2hex(y[i]);
         }
 
         return x;
@@ -610,7 +599,6 @@
             throw new Error("Share id must be an integer between 1 and " + config.max + ", inclusive.");
         }
 
-// FIXME : withoutPrefix option available when originally creating shares is not present here. So if you created your first shares with no prefix, and now create a new share, you have no choice but to prefix?
 // FIXME : Need a public method to extract the bits from a previously generated share.
 // FIXME : Need a public method to extract the ID of a share.
 // FIXME : Shouldn't the ID for this method just be the highest ID + 1 of the shares provided? Actually, why is an ID needed at all??? It leaks information about how many shares there are (if you happen to have only share ID # 10,000, you know more than you did.)
