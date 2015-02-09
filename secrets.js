@@ -1,5 +1,5 @@
 // secrets.js - by Alexander Stetsyuk - released under MIT License
-/*jslint bitwise: true, plusplus: true, maxerr: 1000 */
+/*jslint passfail: false, bitwise: true, todo: false, maxerr: 1000 */
 /*global require, module, window, Uint32Array*/
 
 (function (exports) {
@@ -21,7 +21,7 @@
         },
         config = {}; // Protected settings object
 
-    function init(bits) {
+    exports.init = function (bits) {
         var logs = [],
             exps = [],
             x = 1,
@@ -52,9 +52,10 @@
 
         config.logs = logs;
         config.exps = exps;
-    }
+    };
 
-    exports.init = init;
+//    exports.init = init;
+//    exports.init();
 
     // Pads a string `str` with zeros on the left so that its length is a multiple of `bits`
     function padLeft(str, bits) {
@@ -169,6 +170,8 @@
 
         return false;
     }
+
+// FIXME : Better name for this internal function? split?
 
     // Splits a number string `bits`-length segments, after first
     // optionally zero-padding it to a length that is a multiple of `padLength.
@@ -359,6 +362,9 @@
             result = padLeft(lagrange(at, x, y[i]).toString(2)) + result;
         }
 
+// FIXME : 'at' always is set to 0 in the combine public wrapper around this???  Why is a separate public wrapper needed anyway? Actually there is a case when not... when creating new share
+
+
         // reconstructing the secret
         if (at === 0) {
             //find the first 1
@@ -466,8 +472,8 @@
             this.setRNG();
         }
 
-        if (typeof bits !== "number" || bits % 1 !== 0 || bits < 2) {
-            throw new Error("Number of bits must be an integer greater than 1.");
+        if (typeof bits !== "number" || bits % 1 !== 0 || bits < 2 || bits > 65536) {
+            throw new Error("Number of bits must be an Integer between 1 and 65536.");
         }
 
         return bin2hex(config.rng(bits));
@@ -540,6 +546,8 @@
 
         padding = config.max.toString(config.radix).length;
 
+// FIXME : The withoutPrefix option doesn't benefit from the padding choice? So no padding, even if specific if withoutPrefix is chosen?
+
         if (withoutPrefix) {
             for (i = 0; i < numShares; i++) {
                 x[i] = bin2hex(y[i]);
@@ -576,11 +584,15 @@
             throw new Error("Share id must be an integer between 1 and " + config.max + ", inclusive.");
         }
 
+// FIXME : withoutPrefix option available when originally creating shares is not present here. So if you created your first shares with no prefix, and now create a new share, you have no choice but to prefix?
+// FIXME : Need a public method to extract the bits from a previously generated share.
+// FIXME : Need a public method to extract the ID of a share.
+// FIXME : Shouldn't the ID for this method just be the highest ID + 1 of the shares provided? Actually, why is an ID needed at all??? It leaks information about how many shares there are (if you happen to have only share ID # 10,000, you know more than you did.)
+// FIXME : Allow choice of base58 output?
+// FIXME : checksum of share built in?
+
         padding = max.toString(config.radix).length;
         return config.bits.toString(36).toUpperCase() + padLeft(id.toString(config.radix), padding) + combine(id, shares);
     };
-
-    // by default, initialize without an RNG
-    exports.init();
 
 })(typeof module !== "undefined" && module.exports ? module.exports : (window.secrets = {}));

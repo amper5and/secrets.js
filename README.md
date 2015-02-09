@@ -181,7 +181,6 @@ Convert a hexadecimal string into a UTF string. Each character of the output str
 
 
 ## Share format
-
 Each share is a string in the format `<bits><id><value>`. Each part of the string is described below:
 
 * `bits`: The first character, expressed in base-36 format, is the number of bits used for the Galois Field. This number must be between 3 and 20, expressed by the characters [3-9, a-k].
@@ -214,9 +213,13 @@ When `secrets.share()` is called with a `padLength`, the `secret` is zero-padded
 ## License
 secrets.js is released under the MIT License. See `LICENSE`.
 
+## Development and Testing
+There is a Jasmine test suite that exercises the entire secrets module that can be run
+by opening SpecRunner.html in your browser.
 
 ## Changelog
 * 0.2.0 (grempe : Pending)
+	* Added a full jasmine test suite.
 	* Removed Math.random fallback random number generator. Should always fail safe, even if it means not working. `secrets.getConfig().unsafePRNG` will always result in undefined now as it is no longer ever set.
 	* refactored away need to know anything about `global` var.
 	* jslint.com, jshint.com, and eslint CLI warnings for code and style now clean.

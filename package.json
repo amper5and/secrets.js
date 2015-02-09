@@ -1,12 +1,12 @@
 {
-  "author" : "Alexander Stetsyuk <alexstets@gmail.com>",
+  "author" : "Alexander Stetsyuk <alexstets@gmail.com> and Glenn Rempe <glenn@rempe.us>",
   "description" : "Shamir's threshold secret sharing scheme for javascript.",
-  "homepage" : "https://github.com/amper5and/secrets.js",
+  "homepage" : "https://github.com/grempe/secrets.js",
   "main" : "./secrets.js",
   "name" : "secrets.js",
   "repository" : {
     "type" : "git",
-    "url" : "git://github.com/amper5and/secrets.js.git"
+    "url" : "git://github.com/grempe/secrets.js.git"
   },
-  "version" : "0.1.8"
+  "version" : "0.2.0"
 }
