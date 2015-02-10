@@ -19,7 +19,8 @@
             // i.e. to get the polynomial for n=16, use primitivePolynomials[16]
             primitivePolynomials: [null, null, 1, 3, 3, 5, 3, 3, 29, 17, 9, 5, 83, 27, 43, 3, 45, 9, 39, 39, 9, 5, 3, 33, 27, 9, 71, 39, 9, 5, 83]
         },
-        config = {}; // Protected settings object
+        config = {}, // Protected settings object
+        preGenPadding = new Array(1024).join('0'); // Pre-generate a string of 1024 0's for use by padLeft().
 
     exports.init = function (bits) {
         var logs = [],
@@ -55,20 +56,25 @@
     };
 
     // Pads a string `str` with zeros on the left so that its length is a multiple of `bits`
-    function padLeft(str, bits) {
+    function padLeft(str, multipleOfBits) {
         var missing;
 
-        if (bits === 0 || bits === 1) {
+        if (multipleOfBits === 0 || multipleOfBits === 1) {
             return str;
         }
 
-        if (bits && bits > 1024) {
-            throw new Error("Padding must be no greater than 1024 bits.");
+        if (multipleOfBits && multipleOfBits > 1024) {
+            throw new Error("Padding must be multiples of no larger than 1024 bits.");
         }
 
-        bits = bits || config.bits;
-        missing = str.length % bits;
-        return (missing ? new Array(bits - missing + 1).join("0") : "") + str;
+        multipleOfBits = multipleOfBits || config.bits;
+        missing = str.length % multipleOfBits;
+
+        if (missing) {
+            return (preGenPadding + str).slice(-(multipleOfBits - missing + str.length));
+        } else {
+            return str;
+        }
     }
 
     function hex2bin(str) {
@@ -381,8 +387,8 @@
     // Set the PRNG to use. If no RNG function is supplied, pick a default using getRNG()
     exports.setRNG = function (rng) {
 
-        var err_prefix = "Random number generator is invalid ",
-            err_suffix = " Supply an CSPRNG of the form function(bits){} that returns a string containing 'bits' number of random 1's and 0's.";
+        var errPrefix = "Random number generator is invalid ",
+            errSuffix = " Supply an CSPRNG of the form function(bits){} that returns a string containing 'bits' number of random 1's and 0's.";
 
         if (!isInited()) {
             this.init();
@@ -393,23 +399,23 @@
         }
 
         if (rng && typeof rng !== "function") {
-            throw new Error(err_prefix + "(Not a function)." + err_suffix);
+            throw new Error(errPrefix + "(Not a function)." + errSuffix);
         }
 
         if (rng && typeof rng(config.bits) !== "string") {
-            throw new Error(err_prefix + "(Output is not a string)." + err_suffix);
+            throw new Error(errPrefix + "(Output is not a string)." + errSuffix);
         }
 
         if (rng && !parseInt(rng(config.bits), 2)) {
-            throw new Error(err_prefix + "(Binary string output not parseable to an Integer)." + err_suffix);
+            throw new Error(errPrefix + "(Binary string output not parseable to an Integer)." + errSuffix);
         }
 
         if (rng && rng(config.bits).length > config.bits) {
-            throw new Error(err_prefix + "(Output length is greater than config.bits)." + err_suffix);
+            throw new Error(errPrefix + "(Output length is greater than config.bits)." + errSuffix);
         }
 
         if (rng && rng(config.bits).length < config.bits) {
-            throw new Error(err_prefix + "(Output length is less than config.bits)." + err_suffix);
+            throw new Error(errPrefix + "(Output length is less than config.bits)." + errSuffix);
         }
 
         config.rng = rng;

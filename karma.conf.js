@@ -60,7 +60,7 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    // NOTE : PhantomJS always returns null for window.crypto.getRandomValues()!
+    // NOTE : PhantomJS always returns null for window.crypto.getRandomValues() and likely won't work without a new CSPRNG!
     browsers: ['Chrome', 'Firefox', 'Safari'],
 
 
@@ -71,7 +71,7 @@ module.exports = function(config) {
 
     // optionally, configure the reporter
     coverageReporter: {
-      type : 'html',
+      type : 'html', // html, lcov, lcovonly, text, text-summary, cobertura (xml format supported by Jenkins)
       dir : 'coverage/'
     }
 

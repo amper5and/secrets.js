@@ -43,7 +43,7 @@ describe("Secrets private function", function () {
             expect(secrets._padLeft(str, 32).length).toEqual(32);
         });
 
-        it("with a value that is equal to bits", function () {
+        it("with a value that is equal in size to bits", function () {
             var str = "01234567890123456789012345678901";
             expect(secrets._padLeft(str, 32)).toEqual("01234567890123456789012345678901");
             expect(secrets._padLeft(str, 32).length).toEqual(32);
@@ -63,7 +63,7 @@ describe("Secrets private function", function () {
         it("unless bits set greater than the max of 1024", function () {
             expect(function () {
                 secrets._padLeft("abc123", 1025);
-            }).toThrowError("Padding must be no greater than 1024 bits.");
+            }).toThrowError("Padding must be multiples of no larger than 1024 bits.");
         });
 
     });
