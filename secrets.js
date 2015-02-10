@@ -58,6 +58,14 @@
     function padLeft(str, bits) {
         var missing;
 
+        if (bits === 0 || bits === 1) {
+            return str;
+        }
+
+        if (bits && bits > 1024) {
+            throw new Error("Padding must be no greater than 1024 bits.");
+        }
+
         bits = bits || config.bits;
         missing = str.length % bits;
         return (missing ? new Array(bits - missing + 1).join("0") : "") + str;
