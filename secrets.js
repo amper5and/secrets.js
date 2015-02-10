@@ -216,18 +216,6 @@
         return fx;
     }
 
-    function inArray(arr, val) {
-        var i,
-            len;
-
-        for (i = 0, len = arr.length; i < len; i++) {
-            if (arr[i] === val) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     function processShare(share) {
         var bits = parseInt(share[0], 36),
             max,
@@ -347,7 +335,8 @@
                 init(setBits);
             }
 
-            if (!inArray(x, share.id)) {
+            // Check if this share.id is already in the Array
+            if (x.indexOf(share.id) === -1) {
                 idx = x.push(share.id) - 1;
                 share = split(hex2bin(share.value));
 
@@ -621,7 +610,6 @@
     exports._isSetRNG = isSetRNG;
     exports._split = split;
     exports._horner = horner;
-    exports._inArray = inArray;
     exports._processShare = processShare;
     exports._lagrange = lagrange;
     exports._getShares = getShares;

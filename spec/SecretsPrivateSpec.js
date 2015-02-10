@@ -46,9 +46,6 @@ describe("Secrets private function", function () {
     describe("horner()", function () {
     });
 
-    describe("inArray()", function () {
-    });
-
     describe("processShare()", function () {
     });
 
