@@ -149,6 +149,24 @@ describe("Secrets", function () {
             key = secrets.random(128);
         });
 
+        it("into 'numShares' shares and retain leading zeros where the key has leading zeros", function () {
+            key = "000000000000000123";
+            var numShares = 10;
+            var threhold = 5;
+            var shares = secrets.share(key, numShares, threhold);
+            expect(shares.length).toEqual(numShares);
+            expect(secrets.combine(shares)).toEqual(key);
+        });
+
+        it("into 'numShares' shares and retain leading zeros where the key had leading zeros and was converted to hex", function () {
+            key = "0000000 is the password";
+            var numShares = 10;
+            var threhold = 5;
+            var shares = secrets.share(secrets.str2hex(key), numShares, threhold);
+            expect(shares.length).toEqual(numShares);
+            expect(secrets.hex2str(secrets.combine(shares))).toEqual(key);
+        });
+
         it("into 'numShares' shares where numShares is greater than the threshold", function () {
             var numShares = 10;
             var threhold = 5;
