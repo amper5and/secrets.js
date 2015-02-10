@@ -115,7 +115,7 @@ Divide a `secret` expressed in hexadecimal form into `numShares` number of share
 * `secret`: String, required: A hexadecimal string.
 * `numShares`: Number, required: The number of shares to compute. This must be an integer between 2 and 2^bits-1 (see `secrets.init()` below for explanation of `bits`).
 * `threshold`: Number, required: The number of shares required to reconstruct the secret. This must be an integer between 2 and 2^bits-1 (see `secrets.init()` below for explanation of `bits`).
-* `padLength`: Number, optional, default `0`: How much to zero-pad the binary representation of `secret`. This ensures a minimum length for each share. See "Note on security" below.
+* `padLength`: Number, optional, default `128`: How much to zero-pad the binary representation of `secret`. This ensures a minimum length for each share. See "Note on security" below.
 
 The output of `secrets.share()` is an Array of length `numShares`. Each item in the array is a String. See `Share format` below for information on the format.
 
@@ -189,7 +189,7 @@ Each share is a string in the format `<bits><id><value>`. Each part of the strin
 
 
 ## Note on security
-Shamir's secret sharing scheme is "information-theoretically secure" and "perfectly secure" in that less than the requisite number of shares provide no information about the secret (i.e. knowing less than the requisite number of shares is the same as knowing none of the shares). However, because the size of each share is the same as the size of the secret (when using binary Galois fields, as secrets.js does), in practice it does leak _some_ information, namely the _size_ of the secret. Therefore, if you will be using secrets.js to share _short_ password strings (which can be brute-forced much more easily than longer ones), it would be wise to zero-pad them so that the shares do not leak information about the size of the secret.
+Shamir's secret sharing scheme is "information-theoretically secure" and "perfectly secure" in that less than the requisite number of shares provide no information about the secret (i.e. knowing less than the requisite number of shares is the same as knowing none of the shares). However, because the size of each share is the same as the size of the secret (when using binary Galois fields, as secrets.js does), in practice it does leak _some_ information, namely the _size_ of the secret. Therefore, if you will be using secrets.js to share _short_ password strings (which can be brute-forced much more easily than longer ones), it would be wise to zero-pad them so that the shares do not leak information about the size of the secret. With this in mind, secrets.js will zero-pad in multiples of 128 bits by default which slightly increases the share size for small secrets in the name of added security. You can increase or decrease this padding manually by passing the `padLength` argument to `secrets.share()`.
 
 When `secrets.share()` is called with a `padLength`, the `secret` is zero-padded so that it's length is a multiple of the padLength. The second example above can be modified to use 1024-bit zero-padding, producing longer shares:
 
@@ -199,7 +199,7 @@ When `secrets.share()` is called with a `padLength`, the `secret` is zero-padded
 	var pwHex = secrets.str2hex(pw); // => 240-bit password
 
 	// split into 5 shares, with a threshold of 3, WITH zero-padding
-	var shares = secrets.share(pwHex, 5, 3, 1024); // => 1024-bit shares
+	var shares = secrets.share(pwHex, 5, 3, 1024); // => 1024-bit padded shares
 
 	// combine 3 shares
 	var comb = secrets.combine( [ shares[1], shares[3], shares[4] ] );
@@ -225,10 +225,12 @@ by opening `SpecRunner.html` in your browser.
 
 ## Changelog
 * 0.2.0 (grempe : Pending)
-	* Added a full jasmine test suite.
-	* Removed Math.random fallback random number generator. Should always fail safe, even if it means not working. `secrets.getConfig().unsafePRNG` will always result in undefined now as it is no longer ever set.
+	* [Security] Zero-pad all secrets in multiples of 128 bits (instead of 0) by default.
+	* [Performance] Massive (100x) speed optimization to padLeft() private function (the second most frequently called block of code internally).
+	* [Testing] Added a full jasmine test suite.
+	* [Security] Removed Math.random fallback random number generator. Should always fail safe, even if it means not working. `secrets.getConfig().unsafePRNG` will always result in undefined now as it is no longer ever set.
 	* refactored away need to know anything about `global` var.
-	* jslint.com, jshint.com, and eslint CLI warnings for code and style now clean.
+	* [Testing] jslint.com, jshint.com, and eslint CLI warnings for code and style now clean.
 	* Beautify code.
 * 0.1.8: bugfix release
 * 0.1.7: added config.unsafePRNG reset when supplying a new PRNG

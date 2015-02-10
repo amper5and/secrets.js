@@ -529,7 +529,11 @@
             this.setRNG();
         }
 
-        padLength = padLength || 0;
+        // Security:
+        // For additional security, pad in multiples of 128 bits by default.
+        // A small trade-off in larger share size to help prevent leakage of information
+        // about small-ish secrets and increase the difficulty of attacking them.
+        padLength = padLength || 128;
 
         if (typeof secret !== "string") {
             throw new Error("Secret must be a string.");
