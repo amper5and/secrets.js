@@ -70,81 +70,41 @@ describe("Secrets private function", function () {
 
     describe("hex2bin()", function () {
 
-        beforeEach(function () {
-            secrets.init();
-        });
-
     });
 
     describe("bin2hex()", function () {
-
-        beforeEach(function () {
-            secrets.init();
-        });
 
     });
 
     describe("isInited()", function () {
 
-        beforeEach(function () {
-            secrets.init();
-        });
-
     });
 
     describe("getRNG()", function () {
-
-        beforeEach(function () {
-            secrets.init();
-        });
 
     });
 
     describe("isSetRNG()", function () {
 
-        beforeEach(function () {
-            secrets.init();
-        });
-
     });
 
     describe("splitNumStringToIntArray()", function () {
-
-        beforeEach(function () {
-            secrets.init();
-        });
 
     });
 
     describe("horner()", function () {
 
-        beforeEach(function () {
-            secrets.init();
-        });
-
     });
 
     describe("processShare()", function () {
-
-        beforeEach(function () {
-            secrets.init();
-        });
 
     });
 
     describe("lagrange()", function () {
 
-        beforeEach(function () {
-            secrets.init();
-        });
-
     });
 
     describe("getShares()", function () {
-
-        beforeEach(function () {
-            secrets.init();
-        });
 
     });
 

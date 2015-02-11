@@ -656,4 +656,7 @@
     exports._getShares = getShares;
     /* end-test-code */
 
+    // Always initialize secrets with default settings.
+    secrets.init();
+
 })(typeof module !== "undefined" && module.exports ? module.exports : (window.secrets = {}));

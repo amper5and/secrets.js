@@ -10,9 +10,6 @@ describe("Secrets", function () {
         var key;
 
         beforeEach(function () {
-            secrets.init(8);
-            secrets.setRNG();
-            // generate a 128 bit hex string key
             key = secrets.random(128);
         });
 
@@ -69,9 +66,12 @@ describe("Secrets", function () {
 
     describe("should return its own config with getConfig()", function () {
 
+        beforeEach(function () {
+            secrets.init();
+        });
+
         it("with no args to init", function () {
             var expectedConfig = { radix: 16, bits: 8, maxShares: 255, hasCSPRNG: true };
-            secrets.init();
             expect(secrets.getConfig()).toEqual(expectedConfig);
         });
 
@@ -84,9 +84,9 @@ describe("Secrets", function () {
     });
 
     describe("should be able to be created using a custom Random Number Generator function", function () {
+
         beforeEach(function () {
-            secrets.init(8);
-            secrets.setRNG();
+            secrets.init();
         });
 
         it("when that function accepts a 'bits' arg and returns a bits length string of binary digits", function () {
@@ -143,9 +143,6 @@ describe("Secrets", function () {
         var key;
 
         beforeEach(function () {
-            secrets.init(8);
-            secrets.setRNG();
-            // generate a 128 bit hex string key
             key = secrets.random(128);
         });
 
@@ -279,9 +276,6 @@ describe("Secrets", function () {
             shares;
 
         beforeEach(function () {
-            secrets.init(8);
-            secrets.setRNG();
-            // generate a 128 bit hex string key
             key = secrets.random(128);
             numShares = 10;
             threshold = 5;
@@ -366,8 +360,6 @@ describe("Secrets", function () {
         var key;
 
         beforeEach(function () {
-            secrets.init(8);
-            secrets.setRNG();
             key = secrets.random(128);
         });
 
@@ -411,8 +403,6 @@ describe("Secrets", function () {
     describe("should be able to round trip convert a string to/from Hex for sharing", function () {
 
         beforeEach(function () {
-            secrets.init(8);
-            secrets.setRNG();
         });
 
         it("if the string is plain ASCII text", function () {
@@ -489,7 +479,7 @@ describe("Secrets", function () {
     describe("should be able to generate a random Hex string", function () {
 
         beforeEach(function () {
-            secrets.init(8);
+            secrets.init();
             secrets.setRNG();
         });
 
@@ -574,10 +564,6 @@ describe("Secrets", function () {
     });
 
     describe("share data should be able to be extracted", function () {
-
-        beforeEach(function () {
-            secrets.init(8);
-        });
 
         it("when 8 bit shares are created", function () {
             var shares = ["8013ac6c71ce163b661fa6ac8ce0141885ebee425222f1f07d07cad2e4a63f995b7",
