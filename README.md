@@ -158,6 +158,7 @@ Returns an Object with the current configuration. Has the following properties:
 * `bits`: [Number] The number of bits used for the current initialized finite field
 * `radix`: [Number] The current radix (Default: 16)
 * `maxShares`: [Number] The max shares that can be created with the current `bits`. Computed as `Math.pow(2, config.bits) - 1`
+* `hasCSPRNG`: [Boolean] Indicates whether or not a Cryptographically Secure Pseudo Random Number Generator has been found and initialized. 
 
 #### secrets.extractShareComponents( share )
 Returns an Object with the extracted parts of a public share string passed as an argument. Has the following properties:

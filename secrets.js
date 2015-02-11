@@ -53,6 +53,11 @@
 
         config.logs = logs;
         config.exps = exps;
+
+        if (!isSetRNG()) {
+            this.setRNG();
+        }
+
     };
 
     // Pads a string `str` with zeros on the left so that its length is a multiple of `bits`
@@ -381,6 +386,7 @@
         obj.radix = config.radix;
         obj.bits = config.bits;
         obj.maxShares = config.maxShares;
+        obj.hasCSPRNG = isSetRNG();
         return obj;
     };
 
@@ -532,10 +538,6 @@
 
     // Generates a random bits-length number string using the PRNG
     exports.random = function (bits) {
-        if (!isSetRNG()) {
-            this.setRNG();
-        }
-
         if (typeof bits !== "number" || bits % 1 !== 0 || bits < 2 || bits > 65536) {
             throw new Error("Number of bits must be an Integer between 1 and 65536.");
         }
@@ -559,10 +561,6 @@
 
         if (!isInited()) {
             this.init();
-        }
-
-        if (!isSetRNG()) {
-            this.setRNG();
         }
 
         // Security:
