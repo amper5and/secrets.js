@@ -58,6 +58,10 @@
             this.setRNG();
         }
 
+        if (!config.bits || !config.size || !config.maxShares || !config.logs || !config.exps || config.logs.length !== config.size || config.exps.length !== config.size) {
+            throw new Error("Initialization failed.");
+        }
+
     };
 
     // Pads a string `str` with zeros on the left so that its length is a multiple of `bits`
@@ -115,13 +119,6 @@
         }
 
         return hex;
-    }
-
-    function isInited() {
-        if (!config.bits || !config.size || !config.maxShares || !config.logs || !config.exps || config.logs.length !== config.size || config.exps.length !== config.size) {
-            return false;
-        }
-        return true;
     }
 
     // Returns a pseudo-random number generator of the form function(bits){}
@@ -432,10 +429,6 @@
         var errPrefix = "Random number generator is invalid ",
             errSuffix = " Supply an CSPRNG of the form function(bits){} that returns a string containing 'bits' number of random 1's and 0's.";
 
-        if (!isInited()) {
-            this.init();
-        }
-
         if (!rng) {
             rng = getRNG();
         }
@@ -559,10 +552,6 @@
             j,
             len;
 
-        if (!isInited()) {
-            this.init();
-        }
-
         // Security:
         // For additional security, pad in multiples of 128 bits by default.
         // A small trade-off in larger share size to help prevent leakage of information
@@ -646,7 +635,6 @@
     exports._padLeft = padLeft;
     exports._hex2bin = hex2bin;
     exports._bin2hex = bin2hex;
-    exports._isInited = isInited;
     exports._getRNG = getRNG;
     exports._isSetRNG = isSetRNG;
     exports._splitNumStringToIntArray = splitNumStringToIntArray;

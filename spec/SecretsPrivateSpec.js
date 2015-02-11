@@ -76,10 +76,6 @@ describe("Secrets private function", function () {
 
     });
 
-    describe("isInited()", function () {
-
-    });
-
     describe("getRNG()", function () {
 
     });
