@@ -108,7 +108,7 @@ describe("Secrets private function", function () {
 
     });
 
-    describe("split()", function () {
+    describe("splitNumStringToIntArray()", function () {
 
         beforeEach(function () {
             secrets.init();

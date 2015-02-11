@@ -186,14 +186,12 @@
         return false;
     }
 
-// FIXME : Better name for this internal function? split?
-
     // Splits a number string `bits`-length segments, after first
     // optionally zero-padding it to a length that is a multiple of `padLength.
     // Returns array of integers (each less than 2^bits-1), with each element
     // representing a `bits`-length segment of the input string from right to left,
     // i.e. parts[0] represents the right-most `bits`-length segment of the input string.
-    function split(str, padLength) {
+    function splitNumStringToIntArray(str, padLength) {
         var parts = [],
             i;
 
@@ -353,7 +351,7 @@
             // Check if this share.id is already in the Array
             if (x.indexOf(share.id) === -1) {
                 idx = x.push(share.id) - 1;
-                share = split(hex2bin(share.value));
+                share = splitNumStringToIntArray(hex2bin(share.value));
 
                 for (j = 0, len2 = share.length; j < len2; j++) {
                     y[j] = y[j] || [];
@@ -604,7 +602,7 @@
         }
 
         secret = "1" + hex2bin(secret); // append a 1 so that we can preserve the correct number of leading zeros in our secret
-        secret = split(secret, padLength);
+        secret = splitNumStringToIntArray(secret, padLength);
 
         for (i = 0, len = secret.length; i < len; i++) {
             subShares = getShares(secret[i], numShares, threshold);
@@ -657,7 +655,7 @@
     exports._isInited = isInited;
     exports._getRNG = getRNG;
     exports._isSetRNG = isSetRNG;
-    exports._split = split;
+    exports._splitNumStringToIntArray = splitNumStringToIntArray;
     exports._horner = horner;
     exports._processShare = processShare;
     exports._lagrange = lagrange;
