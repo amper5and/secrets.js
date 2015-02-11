@@ -22,6 +22,14 @@
         config = {}, // Protected settings object
         preGenPadding = new Array(1024).join("0"); // Pre-generate a string of 1024 0's for use by padLeft().
 
+    function isSetRNG() {
+        if (config && config.rng && typeof config.rng === "function") {
+            return true;
+        }
+
+        return false;
+    }
+
     exports.init = function (bits) {
         var logs = [],
             exps = [],
@@ -178,14 +186,6 @@
 
         // Failed to find a suitable CSPRNG. All is lost.
         return null;
-    }
-
-    function isSetRNG() {
-        if (config && config.rng && typeof config.rng === "function") {
-            return true;
-        }
-
-        return false;
     }
 
     // Splits a number string `bits`-length segments, after first
@@ -605,7 +605,7 @@
             id = parseInt(id, config.radix);
         }
 
-        share = secrets.extractShareComponents(shares[0]);
+        share = this.extractShareComponents(shares[0]);
         max = Math.pow(2, share.bits) - 1;
 
         if (typeof id !== "number" || id % 1 !== 0 || id < 1 || id > max) {
