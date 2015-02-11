@@ -1,5 +1,5 @@
 // secrets.js - by Alexander Stetsyuk - released under MIT License
-/*jslint passfail: false, bitwise: true, todo: false, maxerr: 1000 */
+/*jslint passfail: false, bitwise: true, nomen: false, plusplus: true, todo: false, maxerr: 1000 */
 /*global require, module, window, Uint32Array*/
 
 (function (exports) {
@@ -72,9 +72,9 @@
 
         if (missing) {
             return (preGenPadding + str).slice(-(multipleOfBits - missing + str.length));
-        } else {
-            return str;
         }
+
+        return str;
     }
 
     function hex2bin(str) {
@@ -382,6 +382,42 @@
         return { "bits": config.bits };
     };
 
+    // Given a public share, extract the bits (Integer), share ID (Integer), and share data (Hex)
+    // and return an Object containing those components.
+    exports.extractShareComponents = function (share) {
+        var bits,
+            id,
+            idLen,
+            obj = {},
+            regexStr,
+            shareComponents;
+
+        // Extract the first char which represents the bits in Base 36
+        bits = parseInt(share.substr(0, 1), 36);
+
+        // Determine the ID length which is variable and based on the bit count.
+        idLen = (Math.pow(2, bits) - 1).toString(16).length;
+
+        // Extract all the parts now that the segment sizes are known.
+        regexStr = "^([a-kA-K3-9]{1})([a-fA-F0-9]{" + idLen + "})([a-fA-F0-9]+)$";
+        shareComponents = new RegExp(regexStr).exec(share);
+
+        // The ID is a Hex number and needs to be converted to an Integer
+        if (shareComponents) {
+            id = parseInt(shareComponents[2], 16);
+        }
+
+        if (bits && bits >= defaults.minBits && bits <= defaults.maxBits && id && id >= 1 && shareComponents && shareComponents[3]) {
+            obj.bits = bits;
+            obj.id = id;
+            obj.data = shareComponents[3];
+            return obj;
+        }
+
+        throw new Error("The share provided is invalid : " + share);
+
+    };
+
     // Set the PRNG to use. If no RNG function is supplied, pick a default using getRNG()
     exports.setRNG = function (rng) {
 
@@ -601,8 +637,6 @@
             throw new Error("Share id must be an integer between 1 and " + config.max + ", inclusive.");
         }
 
-// FIXME : Need a public method to extract the bits from a previously generated share.
-// FIXME : Need a public method to extract the ID of a share.
 // FIXME : Shouldn't the ID for this method just be the highest ID + 1 of the shares provided? Actually, why is an ID needed at all??? It leaks information about how many shares there are (if you happen to have only share ID # 10,000, you know more than you did.)
 // FIXME : Allow choice of base58 output?
 // FIXME : checksum of share built in?

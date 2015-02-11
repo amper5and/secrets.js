@@ -573,4 +573,57 @@ describe("Secrets", function () {
 
     });
 
+    describe("share data should be able to be extracted", function () {
+
+        beforeEach(function () {
+            secrets.init(8);
+        });
+
+        it("when 8 bit shares are created", function () {
+            var shares = ["8013ac6c71ce163b661fa6ac8ce0141885ebee425222f1f07d07cad2e4a63f995b7",
+                          "80274919338dfc671c2e9d78d2e02140d0d61624a245ea20e0ff8e45c0dc68f37a8",
+                          "8034e5754243ea5c7a313bc45850327853cdfeb6f2671c909b184287230a556a256"];
+            expect(secrets.extractShareComponents(shares[0]).bits).toEqual(8);
+            expect(secrets.extractShareComponents(shares[0]).id).toEqual(1);
+            expect(secrets.extractShareComponents(shares[0]).data).toEqual("3ac6c71ce163b661fa6ac8ce0141885ebee425222f1f07d07cad2e4a63f995b7");
+            expect(secrets.extractShareComponents(shares[1]).bits).toEqual(8);
+            expect(secrets.extractShareComponents(shares[1]).id).toEqual(2);
+            expect(secrets.extractShareComponents(shares[1]).data).toEqual("74919338dfc671c2e9d78d2e02140d0d61624a245ea20e0ff8e45c0dc68f37a8");
+            expect(secrets.extractShareComponents(shares[2]).bits).toEqual(8);
+            expect(secrets.extractShareComponents(shares[2]).id).toEqual(3);
+            expect(secrets.extractShareComponents(shares[2]).data).toEqual("4e5754243ea5c7a313bc45850327853cdfeb6f2671c909b184287230a556a256");
+        });
+
+        it("when 1000 20 bit shares are created", function () {
+            var share = "K003e88f72b74da4a55404d3abd1dc9a44199d50fd27e79cf974633fe1eae164d91b022";
+
+            expect(secrets.extractShareComponents(share).bits).toEqual(20);
+            expect(secrets.extractShareComponents(share).id).toEqual(1000);
+            expect(secrets.extractShareComponents(share).data).toEqual("8f72b74da4a55404d3abd1dc9a44199d50fd27e79cf974633fe1eae164d91b022");
+        });
+
+        it("when 20 bit shares are created", function () {
+            var shares = ["K000019359d6ab1e44238b75ef84d1cba6e16b4c36ba325d539c82cb147403c8765c951",
+                          "K0000226b33d563c884706ebd739a9e744abdd88660462baaee90ebf22d80e00eab9279",
+                          "K00003b5eaebfd22cc648d9e38ad7e7ce56ab034566e52e7fa358a9430bc0ab89ee5b61"];
+
+            expect(secrets.extractShareComponents(shares[0]).bits).toEqual(20);
+            expect(secrets.extractShareComponents(shares[0]).id).toEqual(1);
+            expect(secrets.extractShareComponents(shares[0]).data).toEqual("9359d6ab1e44238b75ef84d1cba6e16b4c36ba325d539c82cb147403c8765c951");
+            expect(secrets.extractShareComponents(shares[1]).bits).toEqual(20);
+            expect(secrets.extractShareComponents(shares[1]).id).toEqual(2);
+            expect(secrets.extractShareComponents(shares[1]).data).toEqual("26b33d563c884706ebd739a9e744abdd88660462baaee90ebf22d80e00eab9279");
+            expect(secrets.extractShareComponents(shares[2]).bits).toEqual(20);
+            expect(secrets.extractShareComponents(shares[2]).id).toEqual(3);
+            expect(secrets.extractShareComponents(shares[2]).data).toEqual("b5eaebfd22cc648d9e38ad7e7ce56ab034566e52e7fa358a9430bc0ab89ee5b61");
+        });
+
+        it("unless the share is in an invalid format", function () {
+            expect(function () {
+                secrets.extractShareComponents("Zabc123");
+            }).toThrowError("The share provided is invalid : Zabc123");
+        });
+
+    });
+
 });

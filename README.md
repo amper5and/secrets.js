@@ -156,6 +156,12 @@ Note:
 Returns an Object with the current configuration. Has the following properties:
 * `bits`: [Number] The number of bits used for the current initialized finite field
 
+#### secrets.extractShareComponents( share )
+Returns an Object with the extracted parts of a public share string passed as an argument. Has the following properties:
+* `bits`: [Number] The number of bits configured when the share was created.
+* `id`: [Number] The ID number associated with the share when created.
+* `data`: [String] A hex string of the actual share data.
+
 #### secrets.setRNG( function(bits){} )
 Set the pseudo-random number generator used to compute shares.
 
