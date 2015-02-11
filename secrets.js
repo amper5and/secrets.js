@@ -20,7 +20,7 @@
             primitivePolynomials: [null, null, 1, 3, 3, 5, 3, 3, 29, 17, 9, 5, 83, 27, 43, 3, 45, 9, 39, 39, 9, 5, 3, 33, 27, 9, 71, 39, 9, 5, 83]
         },
         config = {}, // Protected settings object
-        preGenPadding = new Array(1024).join('0'); // Pre-generate a string of 1024 0's for use by padLeft().
+        preGenPadding = new Array(1024).join("0"); // Pre-generate a string of 1024 0's for use by padLeft().
 
     exports.init = function (bits) {
         var logs = [],
@@ -294,39 +294,44 @@
     // Array. Each share is expressed in base `inputRadix`. The output
     // is expressed in base `outputRadix'.
     exports.combine = function (shares, at) {
-        var setBits,
-            share,
-            x = [],
-            y = [],
-            result = "",
+        var i,
             idx,
-            i,
+            j,
             len,
             len2,
-            j;
+            result = "",
+            setBits,
+            share,
+            splitShare,
+            x = [],
+            y = [];
 
         at = at || 0;
 
         for (i = 0, len = shares.length; i < len; i++) {
             share = this.extractShareComponents(shares[i]);
+
+            // All shares must have the same bits settings.
             if (setBits === undefined) {
                 setBits = share.bits;
             } else if (share.bits !== setBits) {
                 throw new Error("Mismatched shares: Different bit settings.");
             }
 
+            // Reset everything to the bit settings of the shares.
             if (config.bits !== setBits) {
                 this.init(setBits);
             }
 
             // Check if this share.id is already in the Array
+            // and proceed if it is not found.
             if (x.indexOf(share.id) === -1) {
                 idx = x.push(share.id) - 1;
-                share = splitNumStringToIntArray(hex2bin(share.data));
+                splitShare = splitNumStringToIntArray(hex2bin(share.data));
 
-                for (j = 0, len2 = share.length; j < len2; j++) {
+                for (j = 0, len2 = splitShare.length; j < len2; j++) {
                     y[j] = y[j] || [];
-                    y[j][idx] = share[j];
+                    y[j][idx] = splitShare[j];
                 }
             }
 
@@ -343,7 +348,6 @@
             return bin2hex(result.slice(idx + 1));
         }
 
-        // generating a new share
         return bin2hex(result);
     };
 
