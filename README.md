@@ -103,6 +103,7 @@ To use it in the browser, include *secrets.js* or *secrets.min.js* (minified usi
 * secrets.newShare()
 * secrets.init()
 * secrets.getConfig()
+* secrets.extractShareComponents()
 * secrets.setRNG()
 * secrets.random()
 * secrets.str2hex()
@@ -155,6 +156,8 @@ Note:
 #### secrets.getConfig()
 Returns an Object with the current configuration. Has the following properties:
 * `bits`: [Number] The number of bits used for the current initialized finite field
+* `radix`: [Number] The current radix (Default: 16)
+* `maxShares`: [Number] The max shares that can be created with the current `bits`. Computed as `Math.pow(2, config.bits) - 1`
 
 #### secrets.extractShareComponents( share )
 Returns an Object with the extracted parts of a public share string passed as an argument. Has the following properties:
@@ -231,11 +234,13 @@ by opening `SpecRunner.html` in your browser.
 
 ## Changelog
 * 0.2.0 (grempe : Pending)
+	* [Enhancement] Extend the output of getConfig() to include the `radix` and `maxShares` properties.
 	* [Security] Zero-pad all secrets in multiples of 128 bits (instead of 0) by default.
 	* [Performance] Massive (100x) speed optimization to padLeft() private function (the second most frequently called block of code internally).
-	* [Testing] Added a full jasmine test suite.
+	* [Testing] Added a full jasmine test suite and Karma test runner. Karma runs will also generate code coverage HTML reports. Code coverage is currently >90%.
+	* [Testing] Expose all private functions as Underscore (_) prefixed functions to allow direct unit testing.
 	* [Security] Removed Math.random fallback random number generator. Should always fail safe, even if it means not working. `secrets.getConfig().unsafePRNG` will always result in undefined now as it is no longer ever set.
-	* refactored away need to know anything about `global` var.
+	* Refactored away need to know anything about `global` var.
 	* [Testing] jslint.com, jshint.com, and eslint CLI warnings for code and style now clean.
 	* Beautify code.
 * 0.1.8: bugfix release

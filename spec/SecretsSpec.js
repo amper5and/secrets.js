@@ -70,13 +70,13 @@ describe("Secrets", function () {
     describe("should return its own config with getConfig()", function () {
 
         it("with no args to init", function () {
-            var expectedConfig = {"bits": 8};
+            var expectedConfig = { radix: 16, bits: 8, maxShares: 255 };
             secrets.init();
             expect(secrets.getConfig()).toEqual(expectedConfig);
         });
 
         it("with 16 bits arg to init", function () {
-            var expectedConfig = {"bits": 16};
+            var expectedConfig = { radix: 16, bits: 16, maxShares: 65535 };
             secrets.init(16);
             expect(secrets.getConfig()).toEqual(expectedConfig);
         });

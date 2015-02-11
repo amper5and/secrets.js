@@ -36,7 +36,7 @@
         config.radix = defaults.radix;
         config.bits = bits || defaults.bits;
         config.size = Math.pow(2, config.bits);
-        config.max = config.size - 1;
+        config.maxShares = config.size - 1;
 
         // Construct the exp and log tables for multiplication.
         primitive = defaults.primitivePolynomials[config.bits];
@@ -47,7 +47,7 @@
             x = x << 1;              // Left shift assignment
             if (x >= config.size) {
                 x = x ^ primitive;   // Bitwise XOR assignment
-                x = x & config.max;  // Bitwise AND assignment
+                x = x & config.maxShares;  // Bitwise AND assignment
             }
         }
 
@@ -113,7 +113,7 @@
     }
 
     function isInited() {
-        if (!config.bits || !config.size || !config.max || !config.logs || !config.exps || config.logs.length !== config.size || config.exps.length !== config.size) {
+        if (!config.bits || !config.size || !config.maxShares || !config.logs || !config.exps || config.logs.length !== config.size || config.exps.length !== config.size) {
             return false;
         }
         return true;
@@ -221,7 +221,7 @@
 
         for (i = coeffs.length - 1; i >= 0; i--) {
             if (fx !== 0) {
-                fx = config.exps[(logx + config.logs[fx]) % config.max] ^ coeffs[i];
+                fx = config.exps[(logx + config.logs[fx]) % config.maxShares] ^ coeffs[i];
             } else {
                 fx = coeffs[i];
             }
@@ -245,7 +245,7 @@
         id = parseInt(share.substr(1, idLength), config.radix);
 
         if (typeof id !== "number" || id % 1 !== 0 || id < 1 || id > max) {
-            throw new Error("Share id must be an integer between 1 and " + config.max + ", inclusive.");
+            throw new Error("Share id must be an integer between 1 and " + config.maxShares + ", inclusive.");
         }
 
         share = share.substr(idLength + 1);
@@ -282,7 +282,7 @@
                             product = -1; // fix for a zero product term, after which the sum should be sum^0 = sum, not sum^1
                             break;
                         }
-                        product = (product + config.logs[at ^ x[j]] - config.logs[x[i] ^ x[j]] + config.max) % config.max; // to make sure it's not negative
+                        product = (product + config.logs[at ^ x[j]] - config.logs[x[i] ^ x[j]] + config.maxShares) % config.maxShares; // to make sure it's not negative
                     }
                 }
 
@@ -379,7 +379,11 @@
     };
 
     exports.getConfig = function () {
-        return { "bits": config.bits };
+        var obj = {};
+        obj.radix = config.radix;
+        obj.bits = config.bits;
+        obj.maxShares = config.maxShares;
+        return obj;
     };
 
     // Given a public share, extract the bits (Integer), share ID (Integer), and share data (Hex)
@@ -574,21 +578,21 @@
         }
 
         if (typeof numShares !== "number" || numShares % 1 !== 0 || numShares < 2) {
-            throw new Error("Number of shares must be an integer between 2 and 2^bits-1 (" + config.max + "), inclusive.");
+            throw new Error("Number of shares must be an integer between 2 and 2^bits-1 (" + config.maxShares + "), inclusive.");
         }
 
-        if (numShares > config.max) {
+        if (numShares > config.maxShares) {
             neededBits = Math.ceil(Math.log(numShares + 1) / Math.LN2);
-            throw new Error("Number of shares must be an integer between 2 and 2^bits-1 (" + config.max + "), inclusive. To create " + numShares + " shares, use at least " + neededBits + " bits.");
+            throw new Error("Number of shares must be an integer between 2 and 2^bits-1 (" + config.maxShares + "), inclusive. To create " + numShares + " shares, use at least " + neededBits + " bits.");
         }
 
         if (typeof threshold !== "number" || threshold % 1 !== 0 || threshold < 2) {
-            throw new Error("Threshold number of shares must be an integer between 2 and 2^bits-1 (" + config.max + "), inclusive.");
+            throw new Error("Threshold number of shares must be an integer between 2 and 2^bits-1 (" + config.maxShares + "), inclusive.");
         }
 
-        if (threshold > config.max) {
+        if (threshold > config.maxShares) {
             neededBits = Math.ceil(Math.log(threshold + 1) / Math.LN2);
-            throw new Error("Threshold number of shares must be an integer between 2 and 2^bits-1 (" + config.max + "), inclusive.  To use a threshold of " + threshold + ", use at least " + neededBits + " bits.");
+            throw new Error("Threshold number of shares must be an integer between 2 and 2^bits-1 (" + config.maxShares + "), inclusive.  To use a threshold of " + threshold + ", use at least " + neededBits + " bits.");
         }
 
         if (threshold > numShares) {
@@ -610,7 +614,7 @@
             }
         }
 
-        padding = config.max.toString(config.radix).length;
+        padding = config.maxShares.toString(config.radix).length;
 
         for (i = 0; i < numShares; i++) {
             x[i] = config.bits.toString(36).toUpperCase() + padLeft(x[i], padding) + bin2hex(y[i]);
@@ -634,7 +638,7 @@
         max = Math.pow(2, share.bits) - 1;
 
         if (typeof id !== "number" || id % 1 !== 0 || id < 1 || id > max) {
-            throw new Error("Share id must be an integer between 1 and " + config.max + ", inclusive.");
+            throw new Error("Share id must be an integer between 1 and " + config.maxShares + ", inclusive.");
         }
 
 // FIXME : Why am I hiding the total shares? It leaks through the share itself. Shouldn't the ID for this method just be the highest ID + 1 of the shares provided? Actually, why is an ID needed at all??? It leaks information about how many shares there are (if you happen to have only share ID # 10,000, you know more than you did.)
