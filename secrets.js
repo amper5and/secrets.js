@@ -347,7 +347,7 @@
             }
 
             if (config.bits !== setBits) {
-                init(setBits);
+                this.init(setBits);
             }
 
             // Check if this share.id is already in the Array
@@ -637,12 +637,12 @@
             throw new Error("Share id must be an integer between 1 and " + config.max + ", inclusive.");
         }
 
-// FIXME : Shouldn't the ID for this method just be the highest ID + 1 of the shares provided? Actually, why is an ID needed at all??? It leaks information about how many shares there are (if you happen to have only share ID # 10,000, you know more than you did.)
+// FIXME : Why am I hiding the total shares? It leaks through the share itself. Shouldn't the ID for this method just be the highest ID + 1 of the shares provided? Actually, why is an ID needed at all??? It leaks information about how many shares there are (if you happen to have only share ID # 10,000, you know more than you did.)
 // FIXME : Allow choice of base58 output?
 // FIXME : checksum of share built in?
 
         padding = max.toString(config.radix).length;
-        return config.bits.toString(36).toUpperCase() + padLeft(id.toString(config.radix), padding) + secrets.combine(shares, id);
+        return config.bits.toString(36).toUpperCase() + padLeft(id.toString(config.radix), padding) + this.combine(shares, id);
     };
 
     /* test-code */
