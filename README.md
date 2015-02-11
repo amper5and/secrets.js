@@ -254,6 +254,9 @@ by opening `SpecRunner.html` in your browser.
 
 
 ## Possible future enhancements
+* Consider changing the share format to output Base 58 strings which are more human friendly. (Requires share format change)
+* Consider removing the ID from each share (or make it optional) since it leaks information about how many shares are in the wild. (Requires share format change)
+* Add a checksum to the share format to validate its integrity and reject combine() of bad shares. (Requires share format change)
 * A strong PRNG for browsers that don't have crypto.getRandomValues()
 * Operate on [node.js streams](http://nodejs.org/api/stream.html)
 * [Cheater-detection](http://h.web.umkc.edu/harnl/papers/J68.pdf)
