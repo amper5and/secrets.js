@@ -320,12 +320,11 @@
         return shares;
     }
 
-    // Protected method that evaluates the Lagrange interpolation
-    // polynomial at x=`at` for individual config.bits-length
-    // segments of each share in the `shares` Array.
-    // Each share is expressed in base `inputRadix`. The output
-    // is expressed in base `outputRadix'
-    function combine(at, shares) {
+    // Evaluates the Lagrange interpolation polynomial at x=`at` for
+    // individual config.bits-length segments of each share in the `shares`
+    // Array. Each share is expressed in base `inputRadix`. The output
+    // is expressed in base `outputRadix'.
+    exports.combine = function (shares, at) {
         var setBits,
             share,
             x = [],
@@ -336,6 +335,8 @@
             len,
             len2,
             j;
+
+        at = at || 0;
 
         for (i = 0, len = shares.length; i < len; i++) {
             share = processShare(shares[i]);
@@ -366,9 +367,6 @@
             result = padLeft(lagrange(at, x, y[i]).toString(2)) + result;
         }
 
-// FIXME : 'at' always is set to 0 in the combine public wrapper around this???  Why is a separate public wrapper needed anyway? Actually there is a case when not... when creating new share
-
-
         // reconstructing the secret
         if (at === 0) {
             //find the first 1
@@ -378,7 +376,7 @@
 
         // generating a new share
         return bin2hex(result);
-    }
+    };
 
     exports.getConfig = function () {
         return { "bits": config.bits };
@@ -585,11 +583,6 @@
         return x;
     };
 
-    // Combine `shares` Array into the original secret
-    exports.combine = function (shares) {
-        return combine(0, shares);
-    };
-
     // Generate a new share with id `id` (a number between 1 and 2^bits-1)
     // `id` can be a Number or a String in the default radix (16)
     exports.newShare = function (id, shares) {
@@ -615,7 +608,7 @@
 // FIXME : checksum of share built in?
 
         padding = max.toString(config.radix).length;
-        return config.bits.toString(36).toUpperCase() + padLeft(id.toString(config.radix), padding) + combine(id, shares);
+        return config.bits.toString(36).toUpperCase() + padLeft(id.toString(config.radix), padding) + secrets.combine(shares, id);
     };
 
     /* test-code */
@@ -631,7 +624,6 @@
     exports._processShare = processShare;
     exports._lagrange = lagrange;
     exports._getShares = getShares;
-    exports._combine = combine;
     /* end-test-code */
 
 })(typeof module !== "undefined" && module.exports ? module.exports : (window.secrets = {}));

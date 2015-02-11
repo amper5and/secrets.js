@@ -148,12 +148,4 @@ describe("Secrets private function", function () {
 
     });
 
-    describe("combine()", function () {
-
-        beforeEach(function () {
-            secrets.init();
-        });
-
-    });
-
 });
