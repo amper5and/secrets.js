@@ -92,10 +92,6 @@ describe("Secrets private function", function () {
 
     });
 
-    describe("processShare()", function () {
-
-    });
-
     describe("lagrange()", function () {
 
     });

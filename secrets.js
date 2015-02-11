@@ -58,7 +58,7 @@
             this.setRNG();
         }
 
-        if (!config.bits || !config.size || !config.maxShares || !config.logs || !config.exps || config.logs.length !== config.size || config.exps.length !== config.size) {
+        if (!isSetRNG() || !config.bits || !config.size || !config.maxShares || !config.logs || !config.exps || config.logs.length !== config.size || config.exps.length !== config.size) {
             throw new Error("Initialization failed.");
         }
 
@@ -230,37 +230,6 @@
         return fx;
     }
 
-    function processShare(share) {
-        var bits = parseInt(share[0], 36),
-            max,
-            idLength,
-            id;
-
-        if (bits && (typeof bits !== "number" || bits % 1 !== 0 || bits < defaults.minBits || bits > defaults.maxBits)) {
-            throw new Error("Number of bits must be an integer between " + defaults.minBits + " and " + defaults.maxBits + ", inclusive.");
-        }
-
-        max = Math.pow(2, bits) - 1;
-        idLength = max.toString(config.radix).length;
-        id = parseInt(share.substr(1, idLength), config.radix);
-
-        if (typeof id !== "number" || id % 1 !== 0 || id < 1 || id > max) {
-            throw new Error("Share id must be an integer between 1 and " + config.maxShares + ", inclusive.");
-        }
-
-        share = share.substr(idLength + 1);
-
-        if (!share.length) {
-            throw new Error("Invalid share: zero-length share.");
-        }
-
-        return {
-            "bits": bits,
-            "id": id,
-            "value": share
-        };
-    }
-
     // Evaluate the Lagrange interpolation polynomial at x = `at`
     // using x and y Arrays that are of the same length, with
     // corresponding elements constituting points on the polynomial.
@@ -339,7 +308,7 @@
         at = at || 0;
 
         for (i = 0, len = shares.length; i < len; i++) {
-            share = processShare(shares[i]);
+            share = this.extractShareComponents(shares[i]);
             if (setBits === undefined) {
                 setBits = share.bits;
             } else if (share.bits !== setBits) {
@@ -353,7 +322,7 @@
             // Check if this share.id is already in the Array
             if (x.indexOf(share.id) === -1) {
                 idx = x.push(share.id) - 1;
-                share = splitNumStringToIntArray(hex2bin(share.value));
+                share = splitNumStringToIntArray(hex2bin(share.data));
 
                 for (j = 0, len2 = share.length; j < len2; j++) {
                     y[j] = y[j] || [];
@@ -393,6 +362,7 @@
         var bits,
             id,
             idLen,
+            max,
             obj = {},
             regexStr,
             shareComponents;
@@ -400,8 +370,15 @@
         // Extract the first char which represents the bits in Base 36
         bits = parseInt(share.substr(0, 1), 36);
 
+        if (bits && (typeof bits !== "number" || bits % 1 !== 0 || bits < defaults.minBits || bits > defaults.maxBits)) {
+            throw new Error("Invalid share : Number of bits must be an integer between " + defaults.minBits + " and " + defaults.maxBits + ", inclusive.");
+        }
+
+        // calc the max shares allowed for given bits
+        max = Math.pow(2, bits) - 1;
+
         // Determine the ID length which is variable and based on the bit count.
-        idLen = (Math.pow(2, bits) - 1).toString(16).length;
+        idLen = (Math.pow(2, bits) - 1).toString(config.radix).length;
 
         // Extract all the parts now that the segment sizes are known.
         regexStr = "^([a-kA-K3-9]{1})([a-fA-F0-9]{" + idLen + "})([a-fA-F0-9]+)$";
@@ -409,17 +386,21 @@
 
         // The ID is a Hex number and needs to be converted to an Integer
         if (shareComponents) {
-            id = parseInt(shareComponents[2], 16);
+            id = parseInt(shareComponents[2], config.radix);
         }
 
-        if (bits && bits >= defaults.minBits && bits <= defaults.maxBits && id && id >= 1 && shareComponents && shareComponents[3]) {
+        if (typeof id !== "number" || id % 1 !== 0 || id < 1 || id > max) {
+            throw new Error("Invalid share : Share id must be an integer between 1 and " + config.maxShares + ", inclusive.");
+        }
+
+        if (shareComponents && shareComponents[3]) {
             obj.bits = bits;
             obj.id = id;
             obj.data = shareComponents[3];
             return obj;
         }
 
-        throw new Error("The share provided is invalid : " + share);
+        throw new Error("The share data provided is invalid : " + share);
 
     };
 
@@ -531,6 +512,7 @@
 
     // Generates a random bits-length number string using the PRNG
     exports.random = function (bits) {
+
         if (typeof bits !== "number" || bits % 1 !== 0 || bits < 2 || bits > 65536) {
             throw new Error("Number of bits must be an Integer between 1 and 65536.");
         }
@@ -619,7 +601,7 @@
             id = parseInt(id, config.radix);
         }
 
-        share = processShare(shares[0]);
+        share = secrets.extractShareComponents(shares[0]);
         max = Math.pow(2, share.bits) - 1;
 
         if (typeof id !== "number" || id % 1 !== 0 || id < 1 || id > max) {
@@ -639,7 +621,6 @@
     exports._isSetRNG = isSetRNG;
     exports._splitNumStringToIntArray = splitNumStringToIntArray;
     exports._horner = horner;
-    exports._processShare = processShare;
     exports._lagrange = lagrange;
     exports._getShares = getShares;
     /* end-test-code */

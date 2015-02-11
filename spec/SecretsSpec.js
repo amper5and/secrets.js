@@ -350,7 +350,7 @@ describe("Secrets", function () {
 
             expect(function () {
                 secrets.combine(shares);
-            }).toThrowError("Share id must be an integer between 1 and 255, inclusive.");
+            }).toThrowError("Invalid share : Share id must be an integer between 1 and 255, inclusive.");
         });
 
     });
@@ -607,7 +607,7 @@ describe("Secrets", function () {
         it("unless the share is in an invalid format", function () {
             expect(function () {
                 secrets.extractShareComponents("Zabc123");
-            }).toThrowError("The share provided is invalid : Zabc123");
+            }).toThrowError("Invalid share : Number of bits must be an integer between 3 and 20, inclusive.");
         });
 
     });
