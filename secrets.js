@@ -289,6 +289,29 @@
         return shares;
     }
 
+    function constructPublicShareString(bits, id, data) {
+        var bitsBase36,
+            idHex,
+            idMax,
+            idPaddingLen,
+            newShareString;
+
+        id = parseInt(id, config.radix);
+        bits = parseInt(bits, 10) || config.bits;
+        bitsBase36 = bits.toString(36).toUpperCase();
+        idMax = Math.pow(2, bits) - 1;
+        idPaddingLen = idMax.toString(config.radix).length;
+        idHex = padLeft(id.toString(config.radix), idPaddingLen);
+
+        if (typeof id !== "number" || id % 1 !== 0 || id < 1 || id > idMax) {
+            throw new Error("Share id must be an integer between 1 and " + idMax + ", inclusive.");
+        }
+
+        newShareString = bitsBase36 + idHex + data;
+
+        return newShareString;
+    }
+
     // Evaluates the Lagrange interpolation polynomial at x=`at` for
     // individual config.bits-length segments of each share in the `shares`
     // Array. Each share is expressed in base `inputRadix`. The output
@@ -585,10 +608,8 @@
             }
         }
 
-        padding = config.maxShares.toString(config.radix).length;
-
         for (i = 0; i < numShares; i++) {
-            x[i] = config.bits.toString(36).toUpperCase() + padLeft(x[i], padding) + bin2hex(y[i]);
+            x[i] = constructPublicShareString(config.bits, x[i], bin2hex(y[i]));
         }
 
         return x;
@@ -597,23 +618,18 @@
     // Generate a new share with id `id` (a number between 1 and 2^bits-1)
     // `id` can be a Number or a String in the default radix (16)
     exports.newShare = function (id, shares) {
-        var share,
-            max,
-            padding;
+        var share;
 
-        if (typeof id === "string") {
+        if (id && typeof id === "string") {
             id = parseInt(id, config.radix);
         }
 
-        share = this.extractShareComponents(shares[0]);
-        max = Math.pow(2, share.bits) - 1;
-
-        if (typeof id !== "number" || id % 1 !== 0 || id < 1 || id > max) {
-            throw new Error("Share id must be an integer between 1 and " + config.maxShares + ", inclusive.");
+        if (id && shares && shares[0]) {
+            share = this.extractShareComponents(shares[0]);
+            return constructPublicShareString(share.bits, id, this.combine(shares, id));
         }
 
-        padding = max.toString(config.radix).length;
-        return config.bits.toString(36).toUpperCase() + padLeft(id.toString(config.radix), padding) + this.combine(shares, id);
+        throw new Error("Invalid 'id' or 'shares' Array argument to newShare().");
     };
 
     /* test-code */
@@ -627,6 +643,7 @@
     exports._horner = horner;
     exports._lagrange = lagrange;
     exports._getShares = getShares;
+    exports._constructPublicShareString = constructPublicShareString;
     /* end-test-code */
 
     // Always initialize secrets with default settings.

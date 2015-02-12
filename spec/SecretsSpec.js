@@ -377,24 +377,24 @@ describe("Secrets", function () {
             expect(combinedKey).toEqual(key);
         });
 
+        it("and combine the mixed old/new shares back to the original key with ID arg as a float", function () {
+            var shares = secrets.share(key, 3, 2);
+            var newShare = secrets.newShare(1.3, shares);
+            var combinedKey = secrets.combine(shares.slice(1).concat(newShare));
+            expect(combinedKey).toEqual(key);
+        });
+
         it("unless ID arg is < 1", function () {
             var shares = secrets.share(key, 3, 2);
             expect(function () {
                 secrets.newShare(0, shares);
-            }).toThrowError("Share id must be an integer between 1 and 255, inclusive.");
+            }).toThrowError("Invalid 'id' or 'shares' Array argument to newShare().");
         });
 
         it("unless ID arg is > 255 for 8 bit config", function () {
             var shares = secrets.share(key, 3, 2);
             expect(function () {
                 secrets.newShare(256, shares);
-            }).toThrowError("Share id must be an integer between 1 and 255, inclusive.");
-        });
-
-        it("unless ID arg is not an Integer divisible by 1", function () {
-            var shares = secrets.share(key, 3, 2);
-            expect(function () {
-                secrets.newShare(1.3, shares);
             }).toThrowError("Share id must be an integer between 1 and 255, inclusive.");
         });
 

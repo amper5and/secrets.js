@@ -100,4 +100,40 @@ describe("Secrets private function", function () {
 
     });
 
+    describe("constructPublicShareString()", function () {
+
+        it("should construct a well formed 3 bit share", function () {
+            expect(secrets._constructPublicShareString(3, 1, "ffff")).toEqual("31ffff");
+        });
+
+        it("should construct a well formed 8 bit share", function () {
+            expect(secrets._constructPublicShareString(8, 1, "ffff")).toEqual("801ffff");
+        });
+
+        it("should construct a well formed 20 bit share", function () {
+            expect(secrets._constructPublicShareString(20, 1024, "ffff")).toEqual("K01024ffff");
+        });
+
+        it("should construct a well formed 20 bit share with bits as a string", function () {
+            expect(secrets._constructPublicShareString("20", 1024, "ffff")).toEqual("K01024ffff");
+        });
+
+        it("should construct a well formed 20 bit share with ID as a string", function () {
+            expect(secrets._constructPublicShareString(20, "1024", "ffff")).toEqual("K01024ffff");
+        });
+
+        it("unless id < 1", function () {
+            expect(function () {
+                secrets._constructPublicShareString(8, 0, "ffff");
+            }).toThrowError("Share id must be an integer between 1 and 255, inclusive.");
+        });
+
+        it("unless id > 255", function () {
+            expect(function () {
+                secrets._constructPublicShareString(8, 256, "ffff");
+            }).toThrowError("Share id must be an integer between 1 and 255, inclusive.");
+        });
+
+    });
+
 });
