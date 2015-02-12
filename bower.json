@@ -1,0 +1,22 @@
+{
+  "name": "secrets.js",
+  "main": "secrets.js",
+  "version": "0.2.0",
+  "homepage": "https://github.com/amper5and/secrets.js",
+  "authors": [
+    "Alexander Stetsyuk <alexstets@gmail.com>"
+  ],
+  "description": "Shamir's threshold secret sharing scheme for javascript.",
+  "keywords": [
+    "secret",
+    "sharing",
+    "shamir"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "spec"
+  ]
+}
