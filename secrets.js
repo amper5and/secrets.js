@@ -180,6 +180,7 @@
                 while (str === null) {
                     str = construct(bits, window.crypto.getRandomValues(new Uint32Array(elems)), 10, 32);
                 }
+
                 return str;
             };
         }
@@ -647,6 +648,6 @@
     /* end-test-code */
 
     // Always initialize secrets with default settings.
-    secrets.init();
+    exports.init();
 
 })(typeof module !== "undefined" && module.exports ? module.exports : (window.secrets = {}));
