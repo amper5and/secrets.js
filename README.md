@@ -222,6 +222,14 @@ secrets.js is released under the MIT License. See `LICENSE`.
 
 ## Development and Testing
 
+### Minifying
+
+The minified version of the `secrets.js` can be found in `secrets.min.js`. This file was generated using the [UglifyJS2](https://github.com/mishoo/UglifyJS2) tool with the following command line:
+
+	uglifyjs secrets.js --screw-ie8 --compress --mangle --lint --output secrets.min.js
+
+You can run the Jasmine test suite against the minified version of the code by opening `SpecRunnerMinified.html` in your browser.
+
 ### Browser Testing with the  Karma Test Runner
 
 There is a [Jasmine](https://jasmine.github.io/2.2/introduction.html) test suite that exercises the entire `secrets` module that can be run
