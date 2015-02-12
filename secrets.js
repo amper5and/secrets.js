@@ -1,6 +1,11 @@
 // secrets.js - by Alexander Stetsyuk - released under MIT License
+
 /*jslint passfail: false, bitwise: true, nomen: false, plusplus: true, todo: false, maxerr: 1000 */
 /*global require, module, window, Uint32Array*/
+
+// eslint : http://eslint.org/docs/configuring/
+/*eslint-env node, browser, jasmine */
+/*eslint no-underscore-dangle:0 */
 
 (function (exports) {
 
@@ -554,7 +559,6 @@
     // Optionally, zero-pads the secret to a length that is a multiple of padLength before sharing.
     exports.share = function (secret, numShares, threshold, padLength) {
         var neededBits,
-            padding,
             subShares,
             x = new Array(numShares),
             y = new Array(numShares),
