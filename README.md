@@ -35,18 +35,18 @@ Divide a 512-bit key, expressed in hexadecimal form, into 10 shares, requiring t
 	console.log(comb === key); // => false
 
 	// combine 5 shares
-	var comb = secrets.combine( shares.slice(4,9) );
+	comb = secrets.combine( shares.slice(4,9) );
 	console.log(comb === key); // => true
 
 	// combine ALL shares
-	var comb = secrets.combine( shares );
+	comb = secrets.combine( shares );
 	console.log(comb === key); // => true
 
 	// create another share with id 8
 	var newShare = secrets.newShare(8, shares); // => newShare = '808xxx...xxx'
 
 	// reconstruct using 4 original shares and the new share:
-	var comb = secrets.combine( shares.slice(1,5).concat(newShare) );
+	comb = secrets.combine( shares.slice(1,5).concat(newShare) );
 	console.log(comb === key); // => true
 
 
@@ -60,7 +60,6 @@ Divide a password containing a mix of numbers, letters, and other characters, re
 	// split into 5 shares, with a threshold of 3
 	var shares = secrets.share(pwHex, 5, 3);
 
-
 	// combine 2 shares:
 	var comb = secrets.combine( shares.slice(1,3) );
 
@@ -68,13 +67,11 @@ Divide a password containing a mix of numbers, letters, and other characters, re
 	comb = secrets.hex2str(comb);
 	console.log( comb === pw  ); // => false
 
-
 	// combine 3 shares:
-	var comb = secrets.combine( [ shares[1], shares[3], shares[4] ] );
+	comb = secrets.combine( [ shares[1], shares[3], shares[4] ] );
 
 	//convert back to UTF string:
 	comb = secrets.hex2str(comb);
-
 	console.log( comb === pw  ); // => true
 
 ## Installation and usage
@@ -91,7 +88,7 @@ To use it in node.js:
 
 	var secrets = require('secrets.js');
 
-To use it in the browser, include *secrets.js* or *secrets.min.js* (minified using Google Closure Compiler)
+To use it in the browser, include *secrets.js* or *secrets.min.js*
 
 	<script src="secrets.min.js"></script>
 
@@ -224,14 +221,28 @@ When `secrets.share()` is called with a `padLength`, the `secret` is zero-padded
 secrets.js is released under the MIT License. See `LICENSE`.
 
 ## Development and Testing
-There is a Jasmine test suite that exercises the entire secrets module that can be run
-by opening `SpecRunner.html` in your browser.
 
-### Install and run Karma Test Runner
+### Browser Testing with the  Karma Test Runner
+
+There is a [Jasmine](https://jasmine.github.io/2.2/introduction.html) test suite that exercises the entire `secrets` module that can be run
+by simply opening `SpecRunner.html` file in your browser.
+
+### Browser Testing with the  Karma Test Runner
+
+[Karma](https://karma-runner.github.io/0.12/index.html) is a test runner that will watch your files for changes and re-run them on every save. This will launch Chrome, Safari, and Firefox and run the tests in each simultaneously. It will also generate HTML coverage reports under the `coverage/` dir. Modify the file `karma.conf.js` locally as needed.
 
 	npm install
 	npm install -g karma-cli
 	karma start
+
+### node.js testing
+
+You can run the entire Jasmine test suite within node.js as well as in your browser.
+
+Install [node.js](http://nodejs.org/) first.
+
+	npm install jasmine-node@2.0.0 -g
+	jasmine-node spec/
 
 ## Changelog
 * 0.2.0 (grempe : Pending)
