@@ -1,8 +1,6 @@
 secrets.js
 ==========
 
-See it in action at http://passguardian.com
-
 - [What is it?](#what-is-it)
 - [Examples](#examples)
 - [Installation and usage](#installation-and-usage)
@@ -14,10 +12,11 @@ See it in action at http://passguardian.com
 - [Possible future enhancements](#possible-future-enhancements)
 
 ## What is it?
-secrets.js is an implementation of [Shamir's threshold secret sharing scheme](http://en.wikipedia.org/wiki/Shamir's_Secret_Sharing) in javascript, for node.js and browsers.
+secrets.js is an implementation of [Shamir's threshold secret sharing scheme](http://en.wikipedia.org/wiki/Shamir's_Secret_Sharing) in javascript, for Node.js and browsers with both Global variable and AMD module loading support.
 
 It can be used to split any "secret" (i.e. a password, text file, Bitcoin private key, anything) into _n_ number of "shares" (each the same size in bits as the original secret), requiring that exactly any number _t_ ("threshold") of them be present to reconstruct the original secret.
 
+This is a fork of the original excellent code created by `amper5and` on Github. The [original secrets.js can be found there](https://github.com/amper5and/secrets.js/).
 
 ## Examples:
 
@@ -75,23 +74,23 @@ Divide a password containing a mix of numbers, letters, and other characters, re
 	console.log( comb === pw  ); // => true
 
 ## Installation and usage
-secrets.js is available on [npm](https://npmjs.org/package/secrets.js). Install using
+This fork of secrets.js is available on [bower.io](http://bower.io/search/?q=secrets.js-grempe). Install using
 
-	npm install secrets.js
+	bower install secrets.js-grempe
 
-The version on npm may not always reflect all the latest changes, especially during times of heavy development. To get the most up-to-date version, download [the current master zip file](https://github.com/amper5and/secrets.js/zipball/master), then run the following code from inside the folder:
+The source code for this package is available on [Github](https://github.com/grempe/secrets.js).
 
-	npm install
-
-
-To use it in node.js:
+To use it in a Node.js application (Requires OpenSSL support compiled into Node):
 
 	var secrets = require('secrets.js');
 
-To use it in the browser, include *secrets.js* or *secrets.min.js*
+To use it in the browser with the global 'secrets' defined, include *secrets.js* or *secrets.min.js* in your HTML.
 
 	<script src="secrets.min.js"></script>
 
+To use it in the browser with an AMD module loading tool like [require.js](http://www.requirejs.org/)
+
+  TODO
 
 ## API
 
@@ -166,7 +165,7 @@ Returns an Object with the extracted parts of a public share string passed as an
 #### secrets.setRNG( function(bits){} )
 Set the pseudo-random number generator used to compute shares.
 
-secrets.js uses a PRNG in the `secrets.share()` and `secrets.random()` functions. By default, it tries to use a cryptographically strong PRNG. In node.js this is `crypto.randomBytes()`. In browsers that support it, it is `crypto.getRandomValues()` (using typed arrays, which must be supported too). If neither of these are available an error will be thrown.
+secrets.js uses a PRNG in the `secrets.share()` and `secrets.random()` functions. By default, it tries to use a cryptographically strong PRNG. In Node.js this is `crypto.randomBytes()`. In browsers that support it, it is `crypto.getRandomValues()` (using typed arrays, which must be supported too). If neither of these are available an error will be thrown.
 
 To supply your own PRNG, use `secrets.setRNG()`. It expects a Function of the form `function(bits){}`. It should compute a random integer between 1 and 2^bits-1. The output must be a String of length `bits` containing random 1's and 0's (cannot be ALL 0's). When `secrets.setRNG()` is called, it tries to check the PRNG to make sure it complies with some of these demands, but obviously it's not possible to run through all possible outputs. So make sure that it works correctly.
 
@@ -186,14 +185,14 @@ Convert a UTF string `str` into a hexadecimal string, using `bytesPerChar` bytes
 #### secrets.hex2str( str, [bytesPerChar] )
 Convert a hexadecimal string into a UTF string. Each character of the output string is represented by `bytesPerChar` bytes in the String `str`. See note on `bytesPerChar` under `secrets.str2hex()` above.
 
-
 ## Share format
 Each share is a string in the format `<bits><id><value>`. Each part of the string is described below:
 
-* `bits`: The first character, expressed in base-36 format, is the number of bits used for the Galois Field. This number must be between 3 and 20, expressed by the characters [3-9, a-k].
+* `bits`: The first character, expressed in Base36 format, is the number of bits used for the Galois Field. This number must be between 3 and 20, expressed by the characters [3-9, a-k] in Base36.
 * `id`: The id of the share. This is a number between 1 and 2^bits-1, expressed in hexadecimal form. The number of characters used to represent the id is the character-length of the representation of the maximum id (2^bits-1) in hexadecimal: `(Math.pow(2,bits)-1).toString(16).length`.
-* `value`: The value of the share, expressed in hexadecimal form. The length of this string depends on the length of the secret.
+* `data`: The value of the share, expressed in hexadecimal form. The length of this string depends on the length of the secret.
 
+You can extract these attributes from a share in your possession with the `secrets.extractShareComponents(share)` function which will return an Object with these attributes. You may use these values, for example, to call `secrets.init()` with the proper bits setting for shares you want to combine.
 
 ## Note on security
 Shamir's secret sharing scheme is "information-theoretically secure" and "perfectly secure" in that less than the requisite number of shares provide no information about the secret (i.e. knowing less than the requisite number of shares is the same as knowing none of the shares). However, because the size of each share is the same as the size of the secret (when using binary Galois fields, as secrets.js does), in practice it does leak _some_ information, namely the _size_ of the secret. Therefore, if you will be using secrets.js to share _short_ password strings (which can be brute-forced much more easily than longer ones), it would be wise to zero-pad them so that the shares do not leak information about the size of the secret. With this in mind, secrets.js will zero-pad in multiples of 128 bits by default which slightly increases the share size for small secrets in the name of added security. You can increase or decrease this padding manually by passing the `padLength` argument to `secrets.share()`.
@@ -218,7 +217,7 @@ When `secrets.share()` is called with a `padLength`, the `secret` is zero-padded
 
 
 ## License
-secrets.js is released under the MIT License. See `LICENSE`.
+secrets.js is released under the MIT License. See the `LICENSE` file.
 
 ## Development and Testing
 
@@ -230,30 +229,38 @@ The minified version of the `secrets.js` can be found in `secrets.min.js`. This 
 
 You can run the Jasmine test suite against the minified version of the code by opening `SpecRunnerMinified.html` in your browser.
 
+### Browser Testing with the Jasmine Test Runner
+
+There is a [Jasmine](https://jasmine.github.io/) test suite that exercises the entire `secrets` module that can be run
+by simply opening the `SpecRunner.html` file in your browser. You can run the specs against the minified version of secrets.js by opening `SpecRunnerMinified.html`.
+
 ### Browser Testing with the  Karma Test Runner
 
-There is a [Jasmine](https://jasmine.github.io/2.2/introduction.html) test suite that exercises the entire `secrets` module that can be run
-by simply opening `SpecRunner.html` file in your browser.
-
-### Browser Testing with the  Karma Test Runner
-
-[Karma](https://karma-runner.github.io/0.12/index.html) is a test runner that will watch your files for changes and re-run them on every save. This will launch Chrome, Safari, and Firefox and run the tests in each simultaneously. It will also generate HTML coverage reports under the `coverage/` dir. Modify the file `karma.conf.js` locally as needed.
+[Karma](https://karma-runner.github.io/0.12/index.html) is a test runner that will watch your files for changes and re-run them on every save. This will launch Chrome, Safari, and Firefox and run the tests in each simultaneously. It will also generate HTML coverage reports under the `coverage/` dir. Modify the file `karma.conf.js` locally as needed if you need to change this setup for local dev.
 
 	npm install
 	npm install -g karma-cli
 	karma start
 
-### node.js testing
+### Node.js testing
 
-You can run the entire Jasmine test suite within node.js as well as in your browser.
+You can run the entire Jasmine test suite within Node.js as well as in your browser.
 
-Install [node.js](http://nodejs.org/) first.
+Install [Node.js](http://nodejs.org/) first using and [Installer](http://nodejs.org/download/) or a [package manager for your OS](https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager).
+
+Then use [Jasmine](https://jasmine.github.io/) to run all of the specs in a Node environment.
 
 	npm install jasmine-node@2.0.0 -g
 	jasmine-node spec/
 
 ## Changelog
-* 0.2.0 (grempe : Pending)
+* 0.2.1
+	* [Enhancement] Now supports the Javascript Universal Module Definition [UMDJS](https://github.com/umdjs/umd) for loading this module in the Browser with a `secrets` global, using an AMD Module loader like require.js, or in Node.js apps.
+	* Refactor getRNG() to no longer have embedded `require` now that crypto is included on module load with the UMDJS change.
+	* Updated README.md with info about this fork of secrets.js.
+	* Added some simple examples of usage to the examples folder.
+
+* 0.2.0
 	* [Enhancement] Extend the output of getConfig() to include the `radix` and `maxShares` properties.
 	* [Security] Zero-pad all secrets in multiples of 128 bits (instead of 0) by default.
 	* [Performance] Massive (100x) speed optimization to padLeft() private function (the second most frequently called block of code internally).

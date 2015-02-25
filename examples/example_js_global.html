@@ -1,0 +1,39 @@
+<!-- USAGE : Just open this file in your web browser of choice -->
+
+<html>
+  <head>
+    <title>secrets.js - HTML w/ JS Global Test</title>
+  </head>
+
+  <body>
+
+    <h1>secrets.js</h1>
+    <p>You can also open a javascript console to interact directly with the 'secrets' global.</p>
+
+    <h2>The following code is being run:</h2>
+    <pre>
+        var key, comb, shares, newShare;
+        key = secrets.random(512);
+        shares = secrets.share(key, 10, 5);
+        comb = secrets.combine( shares );
+        newShare = secrets.newShare(8, shares);
+        comb = secrets.combine( shares.slice(1,5).concat(newShare) );
+        document.write('You should see two identical keys below, with a key both before and after a share and combine operation.\n\n' + key + '\n' + comb);
+    </pre>
+
+    <br />
+
+    <h2>Code Output:</h2>
+    <script src="../secrets.js"></script>
+    <script charset="utf-8">
+      var key, comb, shares, newShare;
+      key = secrets.random(512);
+      shares = secrets.share(key, 10, 5);
+      comb = secrets.combine( shares );
+      newShare = secrets.newShare(8, shares);
+      comb = secrets.combine( shares.slice(1,5).concat(newShare) );
+      document.write('You should see two identical keys below, with a key both before and after a share and combine operation.\n\n' + key + '\n' + comb);
+    </script>
+
+  </body>
+</html>

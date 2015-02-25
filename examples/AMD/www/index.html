@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script data-main="app" src="lib/require.js"></script>
+    </head>
+    <body>
+        <h1>Hello Secrets!</h1>
+
+        <script>
+          require(['../../../secrets'], function() {
+              var key, comb, shares, newShare;
+              key = secrets.random(512);
+              shares = secrets.share(key, 10, 5);
+              comb = secrets.combine( shares );
+              newShare = secrets.newShare(8, shares);
+              comb = secrets.combine( shares.slice(1,5).concat(newShare) );
+              document.write('You should see two identical keys below, with a key both before and after a share and combine operation.\n\n' + key + '\n' + comb);
+          });
+        </script>
+
+    </body>
+</html>
