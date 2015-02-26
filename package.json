@@ -1,23 +1,45 @@
 {
-  "author": "Alexander Stetsyuk <alexstets@gmail.com>",
-  "description": "Shamir's threshold secret sharing scheme for javascript.",
-  "homepage": "https://github.com/amper5and/secrets.js",
-  "main": "./secrets.js",
-  "name": "secrets.js",
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/amper5and/secrets.js.git"
+  "name": "secrets.js-grempe",
+  "version": "1.0.0",
+  "description": "Shamir's threshold secret sharing scheme for JavaScript.",
+  "main": "secrets.js",
+  "directories": {
+    "example": "examples"
   },
-  "version": "0.2.0",
+  "dependencies": {
+  },
   "devDependencies": {
+    "benchmark": "^1.0.0",
     "jasmine": "^2.2.1",
     "jasmine-core": "^2.2.0",
     "karma": "^0.12.31",
-    "karma-chrome-launcher": "^0.1.7",
-    "karma-coverage": "^0.2.7",
-    "karma-firefox-launcher": "^0.1.4",
     "karma-jasmine": "^0.3.5",
-    "karma-phantomjs-launcher": "^0.1.4",
+    "karma-coverage": "^0.2.7",
+    "karma-chrome-launcher": "^0.1.7",
+    "karma-firefox-launcher": "^0.1.4",
     "karma-safari-launcher": "^0.1.1"
-  }
+  },
+  "scripts": {
+    "test": "jasmine-node spec/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/grempe/secrets.js.git"
+  },
+  "keywords": [
+    "secret",
+    "sharing",
+    "shamir",
+    "cryptography",
+    "split"
+  ],
+  "author": "Alexander Stetsyuk <alexstets@gmail.com>",
+  "contributors": [
+    "Glenn Rempe <glenn@rempe.us>"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/grempe/secrets.js/issues"
+  },
+  "homepage": "https://github.com/grempe/secrets.js"
 }

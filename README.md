@@ -8,6 +8,7 @@ secrets.js
 - [Share format](#share-format)
 - [Note on security](#note-on-security)
 - [License](#license)
+- [Development and Testing](#development-and-testing)
 - [Changelog](#changelog)
 - [Possible future enhancements](#possible-future-enhancements)
 
@@ -74,7 +75,11 @@ Divide a password containing a mix of numbers, letters, and other characters, re
 	console.log( comb === pw  ); // => true
 
 ## Installation and usage
-This fork of secrets.js is available on [bower.io](http://bower.io/search/?q=secrets.js-grempe). Install using
+This fork of secrets.js is available from [bower.io](http://bower.io/search/?q=secrets.js-grempe) and [www.npmjs.com](https://www.npmjs.com/package/secrets.js-grempe). Install using
+
+	npm install secrets.js-grempe
+
+or
 
 	bower install secrets.js-grempe
 
@@ -88,9 +93,7 @@ To use it in the browser with the global 'secrets' defined, include *secrets.js*
 
 	<script src="secrets.min.js"></script>
 
-To use it in the browser with an AMD module loading tool like [require.js](http://www.requirejs.org/)
-
-  TODO
+You can also use it in the browser with an AMD module loading tool like [require.js](http://www.requirejs.org/). See the AMD loading example in the `examples` dir.
 
 ## API
 
@@ -185,7 +188,7 @@ Convert a UTF string `str` into a hexadecimal string, using `bytesPerChar` bytes
 #### secrets.hex2str( str, [bytesPerChar] )
 Convert a hexadecimal string into a UTF string. Each character of the output string is represented by `bytesPerChar` bytes in the String `str`. See note on `bytesPerChar` under `secrets.str2hex()` above.
 
-## Share format
+## Share Format
 Each share is a string in the format `<bits><id><value>`. Each part of the string is described below:
 
 * `bits`: The first character, expressed in Base36 format, is the number of bits used for the Galois Field. This number must be between 3 and 20, expressed by the characters [3-9, a-k] in Base36.
@@ -194,7 +197,7 @@ Each share is a string in the format `<bits><id><value>`. Each part of the strin
 
 You can extract these attributes from a share in your possession with the `secrets.extractShareComponents(share)` function which will return an Object with these attributes. You may use these values, for example, to call `secrets.init()` with the proper bits setting for shares you want to combine.
 
-## Note on security
+## Note on Security
 Shamir's secret sharing scheme is "information-theoretically secure" and "perfectly secure" in that less than the requisite number of shares provide no information about the secret (i.e. knowing less than the requisite number of shares is the same as knowing none of the shares). However, because the size of each share is the same as the size of the secret (when using binary Galois fields, as secrets.js does), in practice it does leak _some_ information, namely the _size_ of the secret. Therefore, if you will be using secrets.js to share _short_ password strings (which can be brute-forced much more easily than longer ones), it would be wise to zero-pad them so that the shares do not leak information about the size of the secret. With this in mind, secrets.js will zero-pad in multiples of 128 bits by default which slightly increases the share size for small secrets in the name of added security. You can increase or decrease this padding manually by passing the `padLength` argument to `secrets.share()`.
 
 When `secrets.share()` is called with a `padLength`, the `secret` is zero-padded so that it's length is a multiple of the padLength. The second example above can be modified to use 1024-bit zero-padding, producing longer shares:
@@ -220,6 +223,11 @@ When `secrets.share()` is called with a `padLength`, the `secret` is zero-padded
 secrets.js is released under the MIT License. See the `LICENSE` file.
 
 ## Development and Testing
+
+Install any NPM and Bower development dependencies locally by running both:
+
+	npm install
+	bower install
 
 ### Minifying
 
@@ -254,7 +262,8 @@ Then use [Jasmine](https://jasmine.github.io/) to run all of the specs in a Node
 	jasmine-node spec/
 
 ## Changelog
-* 0.2.1
+* 1.0.0
+	* Packaging cleanup and ready for 1.0.0 release on Bower and NPM.
 	* [Enhancement] Now supports the Javascript Universal Module Definition [UMDJS](https://github.com/umdjs/umd) for loading this module in the Browser with a `secrets` global, using an AMD Module loader like require.js, or in Node.js apps.
 	* Refactor getRNG() to no longer have embedded `require` now that crypto is included on module load with the UMDJS change.
 	* Updated README.md with info about this fork of secrets.js.

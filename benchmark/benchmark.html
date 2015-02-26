@@ -1,0 +1,32 @@
+<html>
+  <head>
+    <title>benchmark</title>
+  </head>
+  <body>
+
+    <script src="../node_modules/benchmark/benchmark.js"></script>
+    <script src="../secrets.js"></script>
+
+    <script charset="utf-8">
+      var suite = new Benchmark.Suite;
+      var padding = Array(256).join('0'); // make a string of 255 zero's
+
+      // add tests
+      suite.add('original padLeft', function() {
+        secrets._padLeft("abc123", 4);
+      })
+      // .add('newPadLeft()', function() {
+      //   secrets._newPadLeft(padding, 256);
+      // })
+      // add listeners
+      .on('cycle', function(event) {
+      console.log(String(event.target));
+      })
+      .on('complete', function() {
+      console.log('Fastest is ' + this.filter('fastest').pluck('name'));
+      })
+      // run async
+      .run({ 'async': false });
+    </script>
+  </body>
+</html>
