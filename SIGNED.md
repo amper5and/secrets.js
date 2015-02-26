@@ -2,19 +2,19 @@
 ```
 -----BEGIN PGP SIGNATURE-----
 
-iQIcBAABCgAGBQJU7jOfAAoJEOcWanfPl9CR8UEP/31NRMzreNFyu7TP7Y1Jrb8v
-XJEsE9X9gRH36/CKdUTVxj25FiiIk/Br8MRDJ7nvIP7byKKAQn29eZeEiK9sv4xf
-tGaFBnSk3JVwwfiVbOsqpYw6lSpTzEiNWMTAajJRmLcOtqqBUDTN0eog/iclmjDP
-ebKAjzqUUGjV1OXJJ3IreiBJUrtrtZip98FgsW8T3uqjp6icrSZWPH7tox04bYhL
-aLJwWLNWPSXCp5q0e521iC1pgyKY0PaU8sloGArXz7Z3CHzttGht7mlzxPwTtV4V
-swgxcA9eTKEE2gdePjDDQeMNu3nGxLwWbCxhugg+FKplztZR7J5a9jG4C4mwGzwH
-CXp8kDd7CC4KIyQnsOyX6JICwr3UXX6M7fwTNZUQlsRbvZ/It87F7nZcx9rDWU/Y
-eZryW5VvtPMF9GhvNFXqii79+lvA+kJ6XwLQiXFo21lvY41v1zCA5xlglZfl6yD5
-c5zEPFE3Pv4Te62GjxCBLFIA71ONyCJ1IA/nZjSg5HOZ+vHjNcRTfq0+zb9m/y5q
-Cy2zcOJrRY0lGHu6mmmSm9Pfi+zJPln1ZS9ifsIqtmkLAV3g+cKguo8c7qhjQyrD
-yNAhl7ZiptOLGxQnjkCaWYUboJR6cfe3BvuUiA0J5oSJpDY1x0mbW2s/uVmY+OVE
-3War6nTOfMhybTbUGa3k
-=pgOe
+iQIcBAABCgAGBQJU71kSAAoJEOcWanfPl9CRRW8P/i/x0hmxv64YfQxptMwoHC+Y
+cfeRMs2vvhmO2Aa8UOUpGOmdVqUpXnAdoQ6Vg4ztJxmAYm7g/BUnIRzfCEvLEzgq
+YH2tdWTcpstwlnVpaMjEPyGx7FTjldbQS+QOGrTUv3vpgZssczu3JKwJE5afN4P5
++03Aa+hYfK89lXT53gcyuB/u7+sZQM1GaW80nX7P5TS7HX7vzuo2YqWdDUKVviR9
+8+vRJ9w683vR9iQ5r3iPl8xufDOvmkL5KdZXyNopoAjpb8dhe/iaXV5Qn1FbJzBl
+XWn3PSdjdrZiB9axAXVxkBEYi4Gjyl+hZml+Bfw+jy5uYawRfEnibR935l6rrYwT
+limGUd2PuDgzUeCVVagC438tojeP2VkuHgBY3E2RfSy3cm06ALerlpWZ1vtFAP5A
+l1KbPg92BajQEc4/o1jDrRj7kOICY+WMp33hLiXSOBPqMa1F8Npv1BK9jax0p5Cr
+240oHOdT1CuwhemWwZzwtZZUxiG2tgNAx/lW4x90dynu62KwEy0GSmJLWhGrALJ3
+qoYj2bjZX6R3z5ZLpRBtNoyyYLYg/eJOzdUKN7nCK1RJDQPZHOjI523/LPcn9w38
+tTOCI4/7duoK1aBdXeiZFQafvJo68HpTShHamFhqSyiT1QAmQE4YI3fHhayweypi
+nKYTgyv9TemVaniHKYfl
+=ZNJX
 -----END PGP SIGNATURE-----
 
 ```
@@ -28,6 +28,7 @@ yNAhl7ZiptOLGxQnjkCaWYUboJR6cfe3BvuUiA0J5oSJpDY1x0mbW2s/uVmY+OVE
 ```
 size     exec  file                               contents                                                                                                                         
                ./                                                                                                                                                                  
+230              .editorconfig                    017caf2a9928fb0437d5cc564d0da6b986fb3c5ffa16edbb55aa3caa5d6386c2                                                                 
 34               .gitignore                       4f2acaedf9dc54351ef665c87b9e7f01a60e05524da7264a2c1816a1f7fe691e                                                                 
 815              benchmark.html                   8ecc531380f1c76b1c8baf59800824201550fdc44708e2a4643d4def3fa1174c                                                                 
 113842           benchmark.js                     2c4ccb8bd33f9a40d1cd4ef0a2e34051c63d94c5db97c966b4f7501e3929df20                                                                 
