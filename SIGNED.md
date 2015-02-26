@@ -2,19 +2,19 @@
 ```
 -----BEGIN PGP SIGNATURE-----
 
-iQIcBAABCgAGBQJU73AwAAoJEOcWanfPl9CRS9EP/0LVb6jrbShKPF7G0l+43edm
-ggEEhAzX8IfIHxnvuIiPTSAUymGDsvZfSoFWYlTfm9oiVKUs3kLH5AVwwvw/jZQd
-f1eHrj/0/leRZbeP3A7km9V0cIHGC1nc6VU9hpiGvDNFVhrGoemTB4rVm4X6RUsR
-nRQ8dHEsb1jjsrUwzWJVgzMKNNtu1mY+1sGLevjFMEnsEpx4YiwtAeaTkVtXBAe7
-6q8zRTIINe+I0vUceD460Xw0wFqJri323SHrIT1zHiCoE/0nUurxocCA8HexLb90
-HVeZyD1bUKPcHmCx2yALM8EhkxfRDfoWLFd08j/bj+4jqiChsCAMkDE2ZyU6eCN+
-2n7GsUlwU+XdA4vkVttuLEVrOEk+cFlS5Q/WXN+vciiCDgvgYcHRqajBPvjIbyA4
-GDCH2mp4vugqmvh4YUv0ME1KODCBy3uWQxcejdRUefvRx6faHsFz96HvIMrUEQAW
-HkvFY4Vn3naregAYKxPLaRSGTloWNGyuQkoIAlyZn+s5dbgGBuTBPuKHbiZ3HG9L
-+gvdDxTCRDwFD6LeNPks0U5I8MeQA33FDMXDGZ/GxnZC6NrSAcJ73tfj+AzKiaWM
-sz8eUaisdJsIV/nFUGNbLEMFTmTo69AIS3f409Esy/fkBtb+RT3DvetItkmdeMsg
-yp3WDPZfC6dlvlRVwI2Q
-=6lcl
+iQIbBAABCgAGBQJU73v4AAoJEOcWanfPl9CRBIAP92ffRcvVIuL7AAFml2MTywiL
+JjWc0OMIefrwB4J571hxf2ZCMjy43YDXl+SSQkFIACKKEK5zBwcrMzoEvFwT8p8k
+mAFqSxAv1tLTbHtL6tNtBMKAfNQJDY7eAjEkrRb7F2Fixd9+ShmsJYRYqo0OIZVR
+o4HrIe6voNPXh93gdgRrJjMlS0rgWLCkaP9gbSl8lNUG0k4vC97/HnT24lLSZ7bi
+QL0vs4JG5EfU6f8nZyaHaEkEUW1R9jWONifNpaS4DdP0ACy9NpFu8dvH8PBZUqL5
+7txA+dwr+VBB0GmiiM71AoypMR7mwF0yLqlIsDV6a8yy8SZodDpSntvTBGfwrHEx
+qj13/R/8A8ORST6iuStIgMWGaEILVu7HpNuDG1WMyRttx21clbmdg0NQhR+N1DRd
+zCjfMfePxC1COlhj9FmTJ0rGpJsicZOBbZ8Z10A5Yneaf/xQCALP21asNRTc8XRo
+87TRV+s1YA7qWsbCCIc1KDjBvmh3hMppUQxkxuGo8MHkqEOJmS6m2uw7wHFgCGbk
+K0H7Ecvsv+mHk5+97+obwSGmyR+CnEhudWQ5o1509zflt9tNdst2iAJjCyU0g/yl
+tD7sJaXdAKmw0wwDbD96jeQfDg2Tjqr9Hlq72lTYJkN/HFa7LfvMpvGkfJCZFyg0
+wzsrIY4Up1f5k1Oxqz4=
+=Q9mX
 -----END PGP SIGNATURE-----
 
 ```
@@ -32,7 +32,7 @@ size     exec  file                        contents
 49               .gitignore                d31fb15eaa0640946f70eefc01db23050b9fe441772823b63efcf0f63e694fa9
 49               .npmignore                d31fb15eaa0640946f70eefc01db23050b9fe441772823b63efcf0f63e694fa9
                  benchmark/                                                                                
-844                benchmark.html          9d98819d303922556c316665cc6d0d6436a1a699b44fe384a787bea6dc2b4322
+998                benchmark.html          f9857fbe1b467fdb04b2576941e27a630f267feecf61d1f1e77da373b14171ee
 581              bower.json                2ed3de234d35594913f0cbbab9791b3af2e119490ce06bff0ef89a0156e290f4
                  examples/                                                                                 
                    AMD/                                                                                    
