@@ -74,6 +74,8 @@ Divide a password containing a mix of numbers, letters, and other characters, re
 	comb = secrets.hex2str(comb);
 	console.log( comb === pw  ); // => true
 
+There are some additional examples of simple usage in the browser, Node.js, and AMD loading (require.js) in the `examples` folder.
+
 ## Installation and usage
 This fork of secrets.js is available from [bower.io](http://bower.io/search/?q=secrets.js-grempe) and [www.npmjs.com](https://www.npmjs.com/package/secrets.js-grempe). Install using
 
