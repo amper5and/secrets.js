@@ -9,6 +9,7 @@ describe("Secrets private function", function () {
 
         beforeEach(function () {
             secrets.init();
+            secrets.setRNG("testRandom");
         });
 
         it("without specifying bits of padding it should default to config.bits", function () {

@@ -2,19 +2,19 @@
 ```
 -----BEGIN PGP SIGNATURE-----
 
-iQIbBAABCgAGBQJU73v4AAoJEOcWanfPl9CRBIAP92ffRcvVIuL7AAFml2MTywiL
-JjWc0OMIefrwB4J571hxf2ZCMjy43YDXl+SSQkFIACKKEK5zBwcrMzoEvFwT8p8k
-mAFqSxAv1tLTbHtL6tNtBMKAfNQJDY7eAjEkrRb7F2Fixd9+ShmsJYRYqo0OIZVR
-o4HrIe6voNPXh93gdgRrJjMlS0rgWLCkaP9gbSl8lNUG0k4vC97/HnT24lLSZ7bi
-QL0vs4JG5EfU6f8nZyaHaEkEUW1R9jWONifNpaS4DdP0ACy9NpFu8dvH8PBZUqL5
-7txA+dwr+VBB0GmiiM71AoypMR7mwF0yLqlIsDV6a8yy8SZodDpSntvTBGfwrHEx
-qj13/R/8A8ORST6iuStIgMWGaEILVu7HpNuDG1WMyRttx21clbmdg0NQhR+N1DRd
-zCjfMfePxC1COlhj9FmTJ0rGpJsicZOBbZ8Z10A5Yneaf/xQCALP21asNRTc8XRo
-87TRV+s1YA7qWsbCCIc1KDjBvmh3hMppUQxkxuGo8MHkqEOJmS6m2uw7wHFgCGbk
-K0H7Ecvsv+mHk5+97+obwSGmyR+CnEhudWQ5o1509zflt9tNdst2iAJjCyU0g/yl
-tD7sJaXdAKmw0wwDbD96jeQfDg2Tjqr9Hlq72lTYJkN/HFa7LfvMpvGkfJCZFyg0
-wzsrIY4Up1f5k1Oxqz4=
-=Q9mX
+iQIcBAABCgAGBQJU8sZyAAoJEOcWanfPl9CRofAP+wXqyEiN93Eg8Z3sxu4mU5Hw
+hUQ9pBpmxyMVraTJOtjfMU2SoRRAwi+nWqN885bhq0UnERFBOYV5lY/nvMFtb4T/
+qW5KPvRYOT9aYUwQcZpIoC6HEjtNvi1x7LLUe0Rz/AHJ987rLabr1ibxfavyJZXN
+Uk9wBCgMkzgYugeesm64s2omBd98ZfOtYiTtTDkTOh2NSnN76gh4GiV/cdiRTimM
+TqSF2OXfmNCN31SolVDauTQQUQxLngP/BR6NzcvQR8oEg805vzcGO1Oimvufh+DX
+Hb5niGj+9TyBpREaF7qMc4mcCDp8cNjnwvsosg+DGNz3+cjhlFvavYNUUdUd/kqj
+5qEYmhc0w/wOVSOu8QQwq/vgbv7J23hWYv1MDz4AR9BfHERKmxYBLcb1NNx7o8Yp
+AolNe0m/432DiMiwu/Sxkb+4VPzRsnbxwt81H5bXCCg8K9E7b+RcBpx66fIPUBH0
+dM1fKXKoK0lbhsEgtss/jr6cizAy4BM614KCvkHUw8QnVBRPdMPAi9aD7bUf/8iG
+uf5IFFI/PvH9bwZLDK/5erumzG0WBF+yFwr+mrb1XQ6CiR0dp75HlFlHWmXRzaof
+lkd0LWrGt4Btjtrk1Q5bDzhy195E4Wvh+rVIbqFhbZbtpyo2lGtmVJGnkNvYmsP8
+bAHI98lCT5rjHklKlt5m
+=aDg6
 -----END PGP SIGNATURE-----
 
 ```
@@ -33,7 +33,7 @@ size     exec  file                        contents
 49               .npmignore                d31fb15eaa0640946f70eefc01db23050b9fe441772823b63efcf0f63e694fa9
                  benchmark/                                                                                
 998                benchmark.html          f9857fbe1b467fdb04b2576941e27a630f267feecf61d1f1e77da373b14171ee
-581              bower.json                2ed3de234d35594913f0cbbab9791b3af2e119490ce06bff0ef89a0156e290f4
+581              bower.json                c27592109d5e68f0aa9d6097d8a014b1bd6d4ba3b4f625b90480b0fdaf2e5293
                  examples/                                                                                 
                    AMD/                                                                                    
 11                   .gitignore            2b49e9d3cc2f080e0c46ce40d71683c66176a6ea1ac0266b575d4a5ab834e785
@@ -53,16 +53,17 @@ size     exec  file                        contents
 83520                    require.js        346b4cd789dfa63e4695ee5386d2f115a4233da2bab3c322f2fc32c87a854ce9
 1351               example_js_global.html  e16178f36198a8f652f2f50dc72ac4249992f461e215e6c86372a2b345391937
 861                example_node.js         f83d3502aa789a83e638016f61c0693f8445a08521d7fa06b30e03937a1eb0f4
-2157             karma.conf.js             1e6a36c394088eb396ba3a26b79ce6e58ed5420ab02a93ac6c04a7c02f72423e
+1586             Gruntfile.js              f18527798251211ee341dc74b7c7d0ea6086b48d41f3fddb9e8e071b7400767e
+                 lcov/                                                                                     
 1061             LICENSE                   2baf40ac753a4f17c5f447f923f63aee1024fa1799f77393b91b9adeb2b648d7
-1056             package.json              037e716946980530749964bc71efee00b73854a722cb8b9bd29a88c36f578cc4
-19447            README.md                 de0d5ebdac4f3c95048cfb17123e45ea819c54e02a59d06d64b68b8259d0baf3
-26557            secrets.js                18c30a3c847152d45643668a7db9382a69e5ccd38c3c03e85dfdc6b446440bf6
-8213             secrets.min.js            2790a9221667fd9dd6c4cadfda8af2d6e414b71b57efc9bd09c611c463522ce3
+1074             package.json              235ff441b544678f6cef7f64721b308d16ae202b3c14bc5f70bd78c3e32b1a9d
+21697            README.md                 a27be6b49148a3e503aeb51798be85c2d9712d4b4e8881fd3d49a3e8847d251b
+32065            secrets.js                2962e2f384f4535a5ff4364317e8f481a8e2b473563d73be8799257209d572bb
+9843             secrets.min.js            ec1087269456654fa7425e0be551484544e5fe5b220205feac33b6d82315e7d2
                  spec/                                                                                     
-4702     x         SecretsPrivateSpec.js   d4d0ab22b34b7754c62e1f3a75273714173b7902763b4531e9379dc6099c9580
-28722    x         SecretsSpec.js          c48dc47dc59bc007c729cf16865c27c9c2f31e0ca572dc2503d682e087dd100a
-79       x         SpecHelper.js           7238666977c1c2769ed2e0962468ecff239059723a59f01645dbd0a6b628160c
+4744     x         SecretsPrivateSpec.js   3bbe3e4e6c6b5fadaa84ae40213c695df309ce131c658a1984ef30fd854bdf6d
+30832    x         SecretsSpec.js          7dfb359482f5e5e22b9b0263d6819a364de39b1aaf9e7135db324eb667863736
+145      x         SpecHelper.js           a892657eb892e659d06b42f8e8da8f689a75bf4c32816fa0b4edb3edf520c5a7
 865      x       SpecRunner.html           9f4703ce00901dd14705e2b3fbbae3453c74e7ee4a7921f0d5e34c06c854dc14
 869      x       SpecRunnerMinified.html   9ad77379d63f0c2fbc741c2d3ed109f5aa89432d533cfec790d2985805f9bd30
 ```

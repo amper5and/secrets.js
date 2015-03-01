@@ -10,6 +10,8 @@ describe("Secrets", function () {
         var key;
 
         beforeEach(function () {
+            secrets.init();
+            secrets.setRNG("testRandom");
             key = secrets.random(128);
         });
 
@@ -68,25 +70,60 @@ describe("Secrets", function () {
 
         beforeEach(function () {
             secrets.init();
+            secrets.setRNG("testRandom");
         });
 
         it("with no args to init", function () {
-            var expectedConfig = { radix: 16, bits: 8, maxShares: 255, hasCSPRNG: true };
+            var expectedConfig;
+            expectedConfig = { radix: 16, bits: 8, maxShares: 255, hasCSPRNG: true, typeCSPRNG: "testRandom" };
             expect(secrets.getConfig()).toEqual(expectedConfig);
         });
 
         it("with 16 bits arg to init", function () {
-            var expectedConfig = { radix: 16, bits: 16, maxShares: 65535, hasCSPRNG: true };
-            secrets.init(16);
+            var expectedConfig;
+            expectedConfig = { radix: 16, bits: 16, maxShares: 65535, hasCSPRNG: true, typeCSPRNG: "testRandom" };
+            secrets.init(16, "testRandom");
             expect(secrets.getConfig()).toEqual(expectedConfig);
         });
 
     });
 
-    describe("should be able to be created using a custom Random Number Generator function", function () {
+    describe("should be able to be created specifying Random Number Generator with setRNG()", function () {
 
         beforeEach(function () {
             secrets.init();
+            secrets.setRNG("testRandom");
+        });
+
+        it("when its a string that is a valid RNG type", function () {
+
+            secrets.setRNG("browserSJCLRandom");
+            expect(secrets.getConfig().typeCSPRNG).toEqual("browserSJCLRandom");
+
+            // modify the test for node vs. browser env.
+            if (typeof crypto === "object" && typeof crypto.randomBytes === "function") {
+                secrets.setRNG("nodeCryptoRandomBytes");
+                expect(secrets.getConfig().typeCSPRNG).toEqual("nodeCryptoRandomBytes");
+            } else {
+                secrets.setRNG("browserCryptoGetRandomValues");
+                expect(secrets.getConfig().typeCSPRNG).toEqual("browserCryptoGetRandomValues");
+            }
+
+        });
+
+        it("when its a function accepts a 'bits' arg and returns a bits length string of binary digits", function () {
+            var getFixedBitString = function (bits) {
+                var arr = new Uint32Array(1);
+                arr[0] = 123456789;
+                // convert the 'random' num to binary and take only 'bits' characters.
+                return arr[0].toString(2).substr(0, bits);
+            };
+
+            secrets.setRNG(function (bits) { return getFixedBitString(bits); });
+
+            // Expect the same random value every time since the fixed RNG always
+            // returns the same string for a given bitlength.
+            expect(secrets.random(128)).toEqual("75bcd15");
         });
 
         it("when that function accepts a 'bits' arg and returns a bits length string of binary digits", function () {
@@ -104,8 +141,8 @@ describe("Secrets", function () {
             expect(secrets.random(128)).toEqual("75bcd15");
         });
 
-        it("unless the arg is not a function", function () {
-            expect(function () { secrets.setRNG("FOO"); }).toThrowError("Random number generator is invalid (Not a function). Supply an CSPRNG of the form function(bits){} that returns a string containing 'bits' number of random 1's and 0's.");
+        it("unless the arg is a string that is not a valid RNG type", function () {
+            expect(function () { secrets.setRNG("FOO"); }).toThrowError("Invalid RNG type argument : 'FOO'");
         });
 
         it("unless that function does not return a string as output", function () {
@@ -143,6 +180,8 @@ describe("Secrets", function () {
         var key;
 
         beforeEach(function () {
+            secrets.init();
+            secrets.setRNG("testRandom");
             key = secrets.random(128);
         });
 
@@ -276,6 +315,8 @@ describe("Secrets", function () {
             shares;
 
         beforeEach(function () {
+            secrets.init();
+            secrets.setRNG("testRandom");
             key = secrets.random(128);
             numShares = 10;
             threshold = 5;
@@ -360,6 +401,8 @@ describe("Secrets", function () {
         var key;
 
         beforeEach(function () {
+            secrets.init();
+            secrets.setRNG("testRandom");
             key = secrets.random(128);
         });
 
@@ -403,6 +446,8 @@ describe("Secrets", function () {
     describe("should be able to round trip convert a string to/from Hex for sharing", function () {
 
         beforeEach(function () {
+            secrets.init();
+            secrets.setRNG("testRandom");
         });
 
         it("if the string is plain ASCII text", function () {
@@ -480,7 +525,7 @@ describe("Secrets", function () {
 
         beforeEach(function () {
             secrets.init();
-            secrets.setRNG();
+            secrets.setRNG("testRandom");
         });
 
         it("with valid Hex chars 0-9 and a-f", function () {
@@ -518,6 +563,11 @@ describe("Secrets", function () {
     });
 
     describe("should be able to do conversions", function () {
+
+        beforeEach(function () {
+            secrets.init();
+            secrets.setRNG("testRandom");
+        });
 
         it("from a known binary string to a known hex output", function () {
             var binStr = "00110101110001100110001011011111111100110000011111110000010010010011101001000000111010001111000111001110011000011101111111011111010111100111011100110101010000110110010101110010110101010101100000110010000010001000110101110010011110100111001010010100011001110110001010000000110000111110011100101111111110100001011100000110000101101000011100101000000100000111001010110100011001110100110001000010000011101100001111100011001001110101101100101011011101010110010100010110111000001010000000001110000010110100000010111101";
@@ -564,6 +614,11 @@ describe("Secrets", function () {
     });
 
     describe("share data should be able to be extracted", function () {
+
+        beforeEach(function () {
+            secrets.init();
+            secrets.setRNG("testRandom");
+        });
 
         it("when 8 bit shares are created", function () {
             var shares = ["8013ac6c71ce163b661fa6ac8ce0141885ebee425222f1f07d07cad2e4a63f995b7",

@@ -1,10 +1,12 @@
-// secrets.js - by Alexander Stetsyuk, with enhancements by Glenn Rempe - released under MIT License
+// @preserve author Alexander Stetsyuk
+// @preserve author Glenn Rempe <glenn@rempe.us>
+// @license MIT
 
 /*jslint passfail: false, bitwise: true, nomen: true, plusplus: true, todo: false, maxerr: 1000 */
-/*global define, require, module, exports, window, Uint32Array*/
+/*global define, require, module, exports, window, Uint32Array, sjcl */
 
 // eslint : http://eslint.org/docs/configuring/
-/*eslint-env node, browser, jasmine */
+/*eslint-env node, browser, jasmine, sjcl */
 /*eslint no-underscore-dangle:0 */
 
 // UMD (Universal Module Definition)
@@ -20,7 +22,9 @@
     if (typeof define === "function" && define.amd) {
         // AMD. Register as an anonymous module.
         define([], function () {
+            /*eslint-disable no-return-assign */
             return (root.secrets = factory());
+            /*eslint-enable no-return-assign */
         });
     } else if (typeof exports === "object") {
         // Node. Does not work with strict CommonJS, but
@@ -34,7 +38,15 @@
 }(this, function (crypto) {
     "use strict";
 
-    var defaults = {
+    var defaults,
+        config,
+        preGenPadding,
+        runCSPRNGTest,
+        sjclParanoia,
+        CSPRNGTypes;
+
+    function reset() {
+        defaults = {
             bits: 8, // default number of bits
             radix: 16, // work with HEX by default
             minBits: 3,
@@ -46,9 +58,15 @@
             // The index of each term in the array corresponds to the n for that polynomial
             // i.e. to get the polynomial for n=16, use primitivePolynomials[16]
             primitivePolynomials: [null, null, 1, 3, 3, 5, 3, 3, 29, 17, 9, 5, 83, 27, 43, 3, 45, 9, 39, 39, 9, 5, 3, 33, 27, 9, 71, 39, 9, 5, 83]
-        },
-        config = {}, // Protected settings object
+        };
+        config = {};
         preGenPadding = new Array(1024).join("0"); // Pre-generate a string of 1024 0's for use by padLeft().
+        runCSPRNGTest = true;
+        sjclParanoia = 10;
+
+        // WARNING : Never use 'testRandom' except for testing.
+        CSPRNGTypes = ["nodeCryptoRandomBytes", "browserCryptoGetRandomValues", "browserSJCLRandom", "testRandom"];
+    }
 
     function isSetRNG() {
         if (config && config.rng && typeof config.rng === "function") {
@@ -119,8 +137,14 @@
     }
 
     // Returns a pseudo-random number generator of the form function(bits){}
-    // which should output a random string of 1's and 0's of length `bits`
-    function getRNG() {
+    // which should output a random string of 1's and 0's of length `bits`.
+    // `type` (Optional) : A string representing the CSPRNG that you want to
+    // force to be loaded, overriding feature detection. Can be one of:
+    //    "nodeCryptoRandomBytes"
+    //    "browserCryptoGetRandomValues"
+    //    "browserSJCLRandom"
+    //
+    function getRNG(type) {
 
         function construct(bits, arr, radix, size) {
             var i = 0,
@@ -133,7 +157,8 @@
             }
 
             while (i < len || (str.length < bits)) {
-                parsedInt = parseInt(arr[i], radix);
+                // convert any negative nums to positive with Math.abs()
+                parsedInt = Math.abs(parseInt(arr[i], radix));
                 str = str + padLeft(parsedInt.toString(2), size);
                 i++;
             }
@@ -148,49 +173,134 @@
             return str;
         }
 
-        // Return a random generator function for browsers that support HTML5
-        // window.crypto.getRandomValues(), or Node.js compiled with OpenSSL support.
-        // You can set your own CSPRNG (if you *really* know what you are doing)
-        // with secrets.setRNG().
-        return function (bits) {
+        // Node.js : crypto.randomBytes()
+        // Note : Node.js and crypto.randomBytes() uses the OpenSSL RAND_bytes() function for its CSPRNG.
+        //        Node.js will need to have been compiled with OpenSSL for this to work.
+        // See : https://github.com/joyent/node/blob/d8baf8a2a4481940bfed0196308ae6189ca18eee/src/node_crypto.cc#L4696
+        // See : https://www.openssl.org/docs/crypto/rand.html
+        function nodeCryptoRandomBytes(bits) {
             var buf,
                 bytes,
-                elems,
                 radix,
                 size,
                 str = null;
 
-            if (typeof crypto === "object" && typeof crypto.randomBytes === "function") {
-                // Node.js : crypto.randomBytes()
-                // Note : Node.js and crypto.randomBytes() uses the OpenSSL RAND_bytes() function for its CSPRNG.
-                //        Node.js will need to have been compiled with OpenSSL for this to work.
-                // See : https://github.com/joyent/node/blob/d8baf8a2a4481940bfed0196308ae6189ca18eee/src/node_crypto.cc#L4696
-                // See : https://www.openssl.org/docs/crypto/rand.html
+            radix = 16;
+            size = 4;
+            bytes = Math.ceil(bits / 8);
 
-                radix = 16;
-                size = 4;
-                bytes = Math.ceil(bits / 8);
-
-                while (str === null) {
-                    buf = crypto.randomBytes(bytes);
-                    str = construct(bits, buf.toString("hex"), radix, size);
-                }
-            } else if (window && window.crypto && (typeof window.crypto.getRandomValues === "function" || typeof window.crypto.getRandomValues === "object") && (typeof Uint32Array === "function" || typeof Uint32Array === "object")) {
-                // Browser : window.crypto.getRandomValues()
-                // See : https://dvcs.w3.org/hg/webcrypto-api/raw-file/tip/spec/Overview.html#dfn-Crypto
-                // See : https://developer.mozilla.org/en-US/docs/Web/API/RandomSource/getRandomValues
-                // Supported Browsers : http://caniuse.com/#search=crypto.getRandomValues
-
-                radix = 10;
-                size = 32;
-                elems = Math.ceil(bits / 32);
-                while (str === null) {
-                    str = construct(bits, window.crypto.getRandomValues(new Uint32Array(elems)), radix, size);
-                }
+            while (str === null) {
+                buf = crypto.randomBytes(bytes);
+                str = construct(bits, buf.toString("hex"), radix, size);
             }
 
             return str;
-        };
+        }
+
+        // Browser : window.crypto.getRandomValues()
+        // See : https://dvcs.w3.org/hg/webcrypto-api/raw-file/tip/spec/Overview.html#dfn-Crypto
+        // See : https://developer.mozilla.org/en-US/docs/Web/API/RandomSource/getRandomValues
+        // Supported Browsers : http://caniuse.com/#search=crypto.getRandomValues
+        function browserCryptoGetRandomValues(bits) {
+            var elems,
+                radix,
+                size,
+                str = null;
+
+            radix = 10;
+            size = 32;
+            elems = Math.ceil(bits / 32);
+            while (str === null) {
+                str = construct(bits, window.crypto.getRandomValues(new Uint32Array(elems)), radix, size);
+            }
+
+            return str;
+        }
+
+        // Browser SJCL : If the Stanford Javascript Crypto Library (SJCL) is loaded in the browser
+        // then use it as a fallback CSPRNG when window.crypto.getRandomValues() is not available.
+        // It may require some time and mouse movements to be fully seeded. Uses a modified version
+        // of the Fortuna RNG.
+        // See : https://bitwiseshiftleft.github.io/sjcl/
+        function browserSJCLRandom(bits) {
+            var elems,
+                radix,
+                size,
+                str = null;
+
+            radix = 10;
+            size = 32;
+            elems = Math.ceil(bits / 32);
+
+            if(sjcl.random.isReady(sjclParanoia)) {
+                str = construct(bits, sjcl.random.randomWords(elems, sjclParanoia), radix, size);
+            } else {
+                throw new Error("SJCL isn't finished seeding the RNG yet.");
+            }
+
+            return str;
+        }
+
+        // /////////////////////////////////////////////////////////////
+        // WARNING : DO NOT USE. For testing purposes only.
+        // /////////////////////////////////////////////////////////////
+        // This function will return repeatable non-random test bits. Can be used
+        // for testing only. Node.js does not return proper random bytes
+        // when run within a PhantomJS container.
+        function testRandom(bits) {
+            var arr,
+                elems,
+                int,
+                radix,
+                size,
+                str = null;
+
+            radix = 10;
+            size = 32;
+            elems = Math.ceil(bits / 32);
+            int = 123456789;
+            arr = new Uint32Array(elems);
+
+            // Fill every element of the Uint32Array with the same int.
+            for (var i = 0; i < arr.length; i++) {
+                arr[i] = int;
+            }
+
+            while (str === null) {
+                str = construct(bits, arr, radix, size);
+            }
+
+            return str;
+        }
+
+        // Return a random generator function for browsers that support HTML5
+        // window.crypto.getRandomValues(), Node.js compiled with OpenSSL support.
+        // or the Stanford Javascript Crypto Library Fortuna RNG.
+        // WARNING : NEVER use testRandom outside of a testing context. Totally non-random!
+        if (type && type === "testRandom") {
+            config.typeCSPRNG = type;
+            return testRandom;
+        } else if (type && type === "nodeCryptoRandomBytes") {
+            config.typeCSPRNG = type;
+            return nodeCryptoRandomBytes;
+        } else if (type && type === "browserCryptoGetRandomValues") {
+            config.typeCSPRNG = type;
+            return browserCryptoGetRandomValues;
+        } else if (type && type === "browserSJCLRandom") {
+            runCSPRNGTest = false;
+            config.typeCSPRNG = type;
+            return browserSJCLRandom;
+        } else if (typeof crypto === "object" && typeof crypto.randomBytes === "function") {
+            config.typeCSPRNG = "nodeCryptoRandomBytes";
+            return nodeCryptoRandomBytes;
+        } else if (window && window.crypto && (typeof window.crypto.getRandomValues === "function" || typeof window.crypto.getRandomValues === "object") && (typeof Uint32Array === "function" || typeof Uint32Array === "object")) {
+            config.typeCSPRNG = "browserCryptoGetRandomValues";
+            return browserCryptoGetRandomValues;
+        } else if (window && window.sjcl && typeof window.sjcl === "object" && typeof window.sjcl.random === "object") {
+            runCSPRNGTest = false;
+            config.typeCSPRNG = "browserSJCLRandom";
+            return browserSJCLRandom;
+        }
 
     }
 
@@ -323,15 +433,22 @@
 
     var secrets = {
 
-        init: function (bits) {
+        init: function (bits, rngType) {
             var logs = [],
                 exps = [],
                 x = 1,
                 primitive,
                 i;
 
+            // reset all config back to initial state
+            reset();
+
             if (bits && (typeof bits !== "number" || bits % 1 !== 0 || bits < defaults.minBits || bits > defaults.maxBits)) {
                 throw new Error("Number of bits must be an integer between " + defaults.minBits + " and " + defaults.maxBits + ", inclusive.");
+            }
+
+            if (rngType && CSPRNGTypes.indexOf(rngType) === -1) {
+                throw new Error("Invalid RNG type argument : '" + rngType + "'");
             }
 
             config.radix = defaults.radix;
@@ -355,8 +472,20 @@
             config.logs = logs;
             config.exps = exps;
 
+            if (rngType) {
+                this.setRNG(rngType);
+            }
+
             if (!isSetRNG()) {
                 this.setRNG();
+            }
+
+            // Setup SJCL and start collecting entropy from mouse movements
+            if (config.typeCSPRNG === "browserSJCLRandom") {
+                /*eslint-disable new-cap */
+                sjcl.random = new sjcl.prng(sjclParanoia);
+                /*eslint-enable new-cap */
+                sjcl.random.startCollectors();
             }
 
             if (!isSetRNG() || !config.bits || !config.size || !config.maxShares || !config.logs || !config.exps || config.logs.length !== config.size || config.exps.length !== config.size) {
@@ -433,6 +562,7 @@
             obj.bits = config.bits;
             obj.maxShares = config.maxShares;
             obj.hasCSPRNG = isSetRNG();
+            obj.typeCSPRNG = config.typeCSPRNG;
             return obj;
         },
 
@@ -490,28 +620,44 @@
             var errPrefix = "Random number generator is invalid ",
                 errSuffix = " Supply an CSPRNG of the form function(bits){} that returns a string containing 'bits' number of random 1's and 0's.";
 
+            if (rng && typeof rng === "string" && CSPRNGTypes.indexOf(rng) === -1) {
+                throw new Error("Invalid RNG type argument : '" + rng + "'");
+            }
+
+            // If RNG was not specified at all,
+            // try to pick one appropriate for this env.
             if (!rng) {
                 rng = getRNG();
             }
 
-            if (rng && typeof rng !== "function") {
-                throw new Error(errPrefix + "(Not a function)." + errSuffix);
+            // If `rng` is a string, try to forcibly
+            // set the RNG to the type specified.
+            if (rng && typeof rng === "string") {
+                rng = getRNG(rng);
             }
 
-            if (rng && typeof rng(config.bits) !== "string") {
-                throw new Error(errPrefix + "(Output is not a string)." + errSuffix);
-            }
+            if (runCSPRNGTest) {
 
-            if (rng && !parseInt(rng(config.bits), 2)) {
-                throw new Error(errPrefix + "(Binary string output not parseable to an Integer)." + errSuffix);
-            }
+                if (rng && typeof rng !== "function") {
+                    throw new Error(errPrefix + "(Not a function)." + errSuffix);
+                }
 
-            if (rng && rng(config.bits).length > config.bits) {
-                throw new Error(errPrefix + "(Output length is greater than config.bits)." + errSuffix);
-            }
+                if (rng && typeof rng(config.bits) !== "string") {
+                    throw new Error(errPrefix + "(Output is not a string)." + errSuffix);
+                }
 
-            if (rng && rng(config.bits).length < config.bits) {
-                throw new Error(errPrefix + "(Output length is less than config.bits)." + errSuffix);
+                if (rng && !parseInt(rng(config.bits), 2)) {
+                    throw new Error(errPrefix + "(Binary string output not parseable to an Integer)." + errSuffix);
+                }
+
+                if (rng && rng(config.bits).length > config.bits) {
+                    throw new Error(errPrefix + "(Output length is greater than config.bits)." + errSuffix);
+                }
+
+                if (rng && rng(config.bits).length < config.bits) {
+                    throw new Error(errPrefix + "(Output length is less than config.bits)." + errSuffix);
+                }
+
             }
 
             config.rng = rng;
@@ -595,6 +741,10 @@
 
             if (typeof bits !== "number" || bits % 1 !== 0 || bits < 2 || bits > 65536) {
                 throw new Error("Number of bits must be an Integer between 1 and 65536.");
+            }
+
+            if (config.typeCSPRNG === "browserSJCLRandom" && sjcl.random.isReady(sjclParanoia) < 1) {
+                throw new Error("SJCL isn't finished seeding the RNG yet. Needs new entropy added or more mouse movement.");
             }
 
             return bin2hex(config.rng(bits));
@@ -686,6 +836,7 @@
 
         /* test-code */
         // export private functions so they can be unit tested directly.
+        _reset: reset,
         _padLeft: padLeft,
         _hex2bin: hex2bin,
         _bin2hex: bin2hex,
