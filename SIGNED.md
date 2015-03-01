@@ -2,19 +2,19 @@
 ```
 -----BEGIN PGP SIGNATURE-----
 
-iQIcBAABCgAGBQJU8sZyAAoJEOcWanfPl9CRofAP+wXqyEiN93Eg8Z3sxu4mU5Hw
-hUQ9pBpmxyMVraTJOtjfMU2SoRRAwi+nWqN885bhq0UnERFBOYV5lY/nvMFtb4T/
-qW5KPvRYOT9aYUwQcZpIoC6HEjtNvi1x7LLUe0Rz/AHJ987rLabr1ibxfavyJZXN
-Uk9wBCgMkzgYugeesm64s2omBd98ZfOtYiTtTDkTOh2NSnN76gh4GiV/cdiRTimM
-TqSF2OXfmNCN31SolVDauTQQUQxLngP/BR6NzcvQR8oEg805vzcGO1Oimvufh+DX
-Hb5niGj+9TyBpREaF7qMc4mcCDp8cNjnwvsosg+DGNz3+cjhlFvavYNUUdUd/kqj
-5qEYmhc0w/wOVSOu8QQwq/vgbv7J23hWYv1MDz4AR9BfHERKmxYBLcb1NNx7o8Yp
-AolNe0m/432DiMiwu/Sxkb+4VPzRsnbxwt81H5bXCCg8K9E7b+RcBpx66fIPUBH0
-dM1fKXKoK0lbhsEgtss/jr6cizAy4BM614KCvkHUw8QnVBRPdMPAi9aD7bUf/8iG
-uf5IFFI/PvH9bwZLDK/5erumzG0WBF+yFwr+mrb1XQ6CiR0dp75HlFlHWmXRzaof
-lkd0LWrGt4Btjtrk1Q5bDzhy195E4Wvh+rVIbqFhbZbtpyo2lGtmVJGnkNvYmsP8
-bAHI98lCT5rjHklKlt5m
-=aDg6
+iQIcBAABCgAGBQJU81GOAAoJEOcWanfPl9CRct0P/jb9g6dpTUoM3JtTNOtCgYWX
+TA0MaPaN/aYqR9WqRnLkafrc1HI7somx2YvB1ojvzXA0MQnQG4+HjgvizrdX+OJN
+A5atl91P85ZvPUGhW7vH1nhBwI+hbOIwNnvesG0FTSk543NMbvrbAnCAXjkwgX8+
+GPdyfGSdm0u1ddcjM0hMPVYHdUyWh3n+FWZXpXrToN7R1bwsAzJX3fZ0pQmymWWx
+FPrNFA84QBkBPWjgt+lnTPWI9ctdUPzTPrqmpm6FSdJW8Z21AGyqkIl/p1jdbcOZ
+nLQyTEarqELceap+NHW4/APzWL2/HSCaiBdkX8Kwt9eRXX2pcf22kOYy4lLWaJPh
+lOC/7NWLnq8nXlzfnlCsRZhJWf68N45elWzlRYhy58nM0o/DmNMPN7FnOO4qRHSu
+INP8QoSV+KdEekgrOvJewYyN2eCJH15oe6Xnb+7kCmi42bSqGEHNlYWKH+k6//W+
+qcSR7EIKboBPgqdTwno5YPfZh56qeEbSTRfOzKp7FEU8M04O93XBftmwo/4VuhD0
+ajSv8cYNN8QW/H/FB0l1si4Ryt8W5l5foOfkdn3Fy56aa6bRiA4PPH2TpuSHkDq6
+3lSf6Hra9s2gccnfDNxIJCacesqnwPOFqa/mRjuwenrZTYgh/tCJEv2gLkBGPW3C
+aESsS4ruZ72vn7gyzT2A
+=ZICm
 -----END PGP SIGNATURE-----
 
 ```
@@ -53,11 +53,11 @@ size     exec  file                        contents
 83520                    require.js        346b4cd789dfa63e4695ee5386d2f115a4233da2bab3c322f2fc32c87a854ce9
 1351               example_js_global.html  e16178f36198a8f652f2f50dc72ac4249992f461e215e6c86372a2b345391937
 861                example_node.js         f83d3502aa789a83e638016f61c0693f8445a08521d7fa06b30e03937a1eb0f4
-1586             Gruntfile.js              f18527798251211ee341dc74b7c7d0ea6086b48d41f3fddb9e8e071b7400767e
+1825             Gruntfile.js              fbf167d4644be094765dc2f3cd2baa012812f1cd1e6bb7504e2f6d4094c24b56
                  lcov/                                                                                     
 1061             LICENSE                   2baf40ac753a4f17c5f447f923f63aee1024fa1799f77393b91b9adeb2b648d7
-1074             package.json              235ff441b544678f6cef7f64721b308d16ae202b3c14bc5f70bd78c3e32b1a9d
-21697            README.md                 a27be6b49148a3e503aeb51798be85c2d9712d4b4e8881fd3d49a3e8847d251b
+1111             package.json              151b3ae2d2e4a519795148be2b18ef06f1aca2172b258dc34ca50442f36498f3
+21959            README.md                 0fe51520fbc66393d4ab92692d8286c64372822fdd8ce808b87a1775caf523ea
 32065            secrets.js                2962e2f384f4535a5ff4364317e8f481a8e2b473563d73be8799257209d572bb
 9843             secrets.min.js            ec1087269456654fa7425e0be551484544e5fe5b220205feac33b6d82315e7d2
                  spec/                                                                                     

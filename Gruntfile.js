@@ -47,6 +47,16 @@ module.exports = function(grunt) {
 
     eslint: {
         target: ['secrets.js']
+    },
+
+    watch: {
+      scripts: {
+        files: ['**/*.js'],
+        tasks: ['uglify', 'jasmine_nodejs', 'jshint', 'eslint'],
+        options: {
+          spawn: false,
+        },
+      },
     }
 
   });
@@ -56,6 +66,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-check-modules');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-eslint');
+  grunt.loadNpmTasks('grunt-contrib-watch');
 
   // Default task(s).
   grunt.registerTask('default', ['uglify', 'jasmine_nodejs', 'jshint', 'eslint', 'check-modules']);

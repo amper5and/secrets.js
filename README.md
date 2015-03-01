@@ -242,6 +242,10 @@ Install all development dependencies locally:
 	npm install
 	bower install
 
+### Continuous Development
+
+You can run 'grunt watch' to start watching all JavaScript files and run the testing and minification Grunt tasks on every save to a file.
+
 ### Minifying
 
 The minified version of the `secrets.js` can be found in `secrets.min.js`. This file was generated using the [UglifyJS2](https://github.com/mishoo/UglifyJS2) tool and was run with `grunt`:
@@ -270,6 +274,7 @@ OR
 ## Changelog
 
 * 1.1.0
+	* Added `grunt watch` task to auto-run tests and minification on every JavaScript file save.
 	* Minified file now contains name, version and author comments automatically.
 	* Configured basic `grunt` tasks for minification, Node.js testing with Jasmine, jshint, eslint. Removed Karma test runner and manual minification and testing steps. Just run `grunt`.
 	* [Bugfix] calling `secrets.init()` now actually resets *all* internal state back to the default settings. Previously `init()` only reset some internal values. `init()` now calls a new private function `reset()` to accomplish this.
