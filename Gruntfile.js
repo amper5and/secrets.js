@@ -20,11 +20,10 @@ module.exports = function(grunt) {
         // task specific (default) options
         options: {
             showColors: true,
-            // FILED BUG : https://github.com/onury/grunt-jasmine-nodejs/issues/1
-            // Helpers never load.
-            specNameSuffix: '.js', // also accepts an array
+            specNameSuffix: 'spec.js', // also accepts an array
             helperNameSuffix: 'helper.js',
-            useHelpers: true
+            useHelpers: false,
+            verboseReport: false
         },
         secrets: {
             // target specific options
@@ -51,8 +50,8 @@ module.exports = function(grunt) {
 
     watch: {
       scripts: {
-        files: ['**/*.js'],
-        tasks: ['uglify', 'jasmine_nodejs', 'jshint', 'eslint'],
+        files: ['secrets.js', 'spec/**/*.js'],
+        tasks: ['jasmine_nodejs', 'jshint', 'eslint'],
         options: {
           spawn: false,
         },
