@@ -2,19 +2,19 @@
 ```
 -----BEGIN PGP SIGNATURE-----
 
-iQIcBAABCgAGBQJU9JfLAAoJEOcWanfPl9CRdO8P/R/imE070r0FwzbuMmT5HBuD
-ZUSrAp5oFb6npI/WkRCF/KxPp1lEldtylIkCYRYbh+VEgjcrjHHDVPlODNUausnA
-UD87v1zGaXpnibl2chLPg7JVvKayCpg4U6dfDVWPgYpDtimUVaOK2mqONqfJDMJ2
-x8+GsOpOIFBZzarCXamZYfk9TCB6GRmMdqJ8SUVMAe0Cz9prceahID/uyynWTf8j
-9/0RJgTtzvlRBZNZONX9hFS1UO6N/3PoexTQRbMpNrQsZjWkG6mdtnKS671wxYYc
-mUbDz4kr37zixuFdcRp9XhlBUIQXBbEp45IoFxD2WfEsFZ5ykrYTxFo54YayJzxw
-YrxR6yN6pu93J7nHJAphZwyrLqeHADsXsTkZHOxTt2yVnehODS1UszKI8Z9vsK+k
-c1XV4bzhhxaiG32v6g7z9WAfZALwsIHogwuYqSCSUuo4LKOubhQehF+q5FWe5S59
-JV7vu9xs1GcxSIv/XFk3IrxNwKjfiHrQT00qDKJPSryUNGShhX5vOrR0RsEQosKX
-tMtKHwMewE0VT1KXk45hdxt7Kkbch/VvjLrMLVDWFq3MTiCDyzvmLd0OTBBEO21u
-/XQMUgFP+/4fyZGrIMf5bRqxs8/wcRV4Kam4AQD5jyFYy8LkSftJ2zLbLvKfbcyw
-sjGUEIhjV+IM9LjCR+FC
-=BM99
+iQIcBAABCgAGBQJU9PDfAAoJEOcWanfPl9CRc+kP/1P3OXshdkQY7UuElsbjHZzQ
+OqVr1fQ0750ek43ILvDdGDexENY8NinWvBG02wlCPkNXQUOYhwLY/Meuj3FeHiwH
+ZHWgoRMk7nA2rz2voU6BRF6EXmH4boI00I3rT78iZM8C2ZoZkpq0hYBVNM2n+bf6
+pVIPeyBDMRrQrQ2EUAPjLkBq06BjN2FQEPy87xcl4EjtnQBDmtxl54tDzeQnSaH/
+uo1DYHqZcuXcPlMwhUpnErDOzrAEp+vowhIe76DEDcJm39vd1BER8IrjJ1cNs4ct
+/Nb0r++M85MNFBNEINd4tbvPGToFoFDpJ8gVr16C8jR9nA0QGgaUKU2FBv+EUE7l
+dBsiNqyzTFz+aXf1P/60SgLvKyuHjubRA8t9hr31FvVC0D50TDUHoA+hGO1fSnWT
+cqZAkref57OzSn/oyM5yzHiVuDsg+OMucg8nTm3AnIHLArpXBM5awwaMkCPE7dm5
+0+APh1W5ylM2rISJd5F51MHwyG8VSItwfn8+k6CiWwdICaKzsbfy+tUinlW1svzy
+0FPmbRX+OkgG8nt+vHRDpru36/Ll47N/tEy4tJ0OnwVj6K6T18rboMWfe5bKtPna
+TW4S3N31jzsfRVPdzaha51MVtArSy2XkAmOvBpZ81wx6d+f/zPizu99MNmmON27j
+t6ueD35WcXCLlCXuy91K
+=1D2W
 -----END PGP SIGNATURE-----
 
 ```
@@ -51,18 +51,18 @@ size     exec  file                        contents
                        lib/                                                                                
 91                       print.js          338fadd6fdfdf9ff82b7dc7a14aafeb326ffbfbd109254c7634e37c08e983bcb
 83520                    require.js        346b4cd789dfa63e4695ee5386d2f115a4233da2bab3c322f2fc32c87a854ce9
-1351               example_js_global.html  e16178f36198a8f652f2f50dc72ac4249992f461e215e6c86372a2b345391937
+1393               example_js_global.html  b6835c5e33998ae34d4894ae0eec82cd23dc23311db1e2af5c5d54180553b131
 861                example_node.js         f83d3502aa789a83e638016f61c0693f8445a08521d7fa06b30e03937a1eb0f4
 1756             Gruntfile.js              a451f25e56da30d4475cfdd14199c3386144bbe09e3850714964758d91960334
                  lcov/                                                                                     
 1061             LICENSE                   2baf40ac753a4f17c5f447f923f63aee1024fa1799f77393b91b9adeb2b648d7
 1111             package.json              63cd49be7cb3faf1be794fc70303c08ec7446868da4b30a31fc764ca1b32c5e3
-22046            README.md                 77ccaa111fe05ad1f8fc54699b555ecff7fda861bbf640b9211b8f7787b50f86
-30764            secrets.js                9d4e73fb9dec255b1b2f392d1263a71b1ee0b5ef5b790f573bcec8a740bf3700
-9559             secrets.min.js            f92905bb019f0d98f20677de2ce8df6cf592394ced17dd188f5b81e99602d990
+21797            README.md                 fbaa3ad1cd39e4bf8a5726e54b3fb021dc66551adfd7514e2b5897a8b024052f
+34053            secrets.js                7b9dbdbd32db204ea67a301e7f5a326ae0cc75bb064c55c33fe8e4f191123a2e
+9836             secrets.min.js            317e1929d6c77e37ef7aa3388df61273ca7d3b07dc32df1f31c5a39f49836510
                  spec/                                                                                     
-4015     x         SecretsPrivateSpec.js   3cf98322816d35d20f26d246685123fb622148284ad7bcbfc660576e5916288f
-29810    x         SecretsSpec.js          e13339d41efffe573b70dbce73e93a709924100eea26b9c4b2ae707d8e3d6b09
+4744     x         SecretsPrivateSpec.js   3bbe3e4e6c6b5fadaa84ae40213c695df309ce131c658a1984ef30fd854bdf6d
+31783    x         SecretsSpec.js          057739c4a5dcbd1368c473f7ab4fd101bee958758ace85f727a51904e7f47aef
 145      x         SpecHelper.js           a892657eb892e659d06b42f8e8da8f689a75bf4c32816fa0b4edb3edf520c5a7
 865      x       SpecRunner.html           9f4703ce00901dd14705e2b3fbbae3453c74e7ee4a7921f0d5e34c06c854dc14
 869      x       SpecRunnerMinified.html   9ad77379d63f0c2fbc741c2d3ed109f5aa89432d533cfec790d2985805f9bd30

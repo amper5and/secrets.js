@@ -5,6 +5,19 @@ describe("Secrets", function () {
 
     "use strict";
 
+    describe("should be able to complete a simple end-to-end test", function () {
+
+        it("with ASCII text", function () {
+            expect(secrets.hex2str(secrets.combine(secrets.share(secrets.str2hex("foo"), 3, 2)))).toEqual("foo");
+        });
+
+        it("with UTF-8 text", function () {
+            var key = "¥ · £ · € · $ · ¢ · ₡ · ₢ · ₣ · ₤ · ₥ · ₦ · ₧ · ₨ · ₩ · ₪ · ₫ · ₭ · ₮ · ₯ · ₹";
+            expect(secrets.hex2str(secrets.combine(secrets.share(secrets.str2hex(key), 3, 2)))).toEqual(key);
+        });
+
+    });
+
     describe("should be able to be initialized", function () {
 
         var key;
@@ -404,6 +417,13 @@ describe("Secrets", function () {
             secrets.init();
             secrets.setRNG("testRandom");
             key = secrets.random(128);
+        });
+
+        it("when newShare() is provided with only the minimum original shares required", function () {
+            var shares = secrets.share(key, 5, 2);
+            var newShare = secrets.newShare(6, shares.slice(0, 2));
+            var combinedKey = secrets.combine(shares.slice(0,1).concat(newShare));
+            expect(combinedKey).toEqual(key);
         });
 
         it("and combine the mixed old/new shares back to the original key with ID arg as number", function () {

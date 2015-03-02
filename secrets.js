@@ -371,7 +371,7 @@
                     }
                 }
 
-                // though exps[-1]= undefined and undefined ^ anything = anything in
+                // though exps[-1] === undefined and undefined ^ anything = anything in
                 // chrome, this behavior may not hold everywhere, so do the check
                 sum = product === -1 ? sum : sum ^ config.exps[product];
             }
@@ -500,7 +500,6 @@
         // is expressed in base `outputRadix'.
         combine: function (shares, at) {
             var i,
-                idx,
                 j,
                 len,
                 len2,
@@ -528,32 +527,63 @@
                     this.init(setBits);
                 }
 
-                // Check if this share.id is already in the Array
-                // and proceed if it is not found.
+                // Proceed if this share.id is not already in the Array 'x' and
+                // then split each share's hex data into an Array of Integers,
+                // then 'rotate' those arrays where the first element of each row is converted to
+                // its own array, the second element of each to its own Array, and so on for all of the rest.
+                // Essentially zipping all of the shares together.
+                //
+                // e.g.
+                //   [ 193, 186, 29, 150, 5, 120, 44, 46, 49, 59, 6, 1, 102, 98, 177, 196 ]
+                //   [ 53, 105, 139, 49, 187, 240, 91, 92, 98, 118, 12, 2, 204, 196, 127, 149 ]
+                //   [ 146, 211, 249, 167, 209, 136, 118, 114, 83, 77, 10, 3, 170, 166, 206, 81 ]
+                //
+                // becomes:
+                //
+                // [ [ 193, 53, 146 ],
+                //   [ 186, 105, 211 ],
+                //   [ 29, 139, 249 ],
+                //   [ 150, 49, 167 ],
+                //   [ 5, 187, 209 ],
+                //   [ 120, 240, 136 ],
+                //   [ 44, 91, 118 ],
+                //   [ 46, 92, 114 ],
+                //   [ 49, 98, 83 ],
+                //   [ 59, 118, 77 ],
+                //   [ 6, 12, 10 ],
+                //   [ 1, 2, 3 ],
+                //   [ 102, 204, 170 ],
+                //   [ 98, 196, 166 ],
+                //   [ 177, 127, 206 ],
+                //   [ 196, 149, 81 ] ]
+                //
                 if (x.indexOf(share.id) === -1) {
-                    idx = x.push(share.id) - 1;
+                    x.push(share.id);
                     splitShare = splitNumStringToIntArray(hex2bin(share.data));
-
                     for (j = 0, len2 = splitShare.length; j < len2; j++) {
                         y[j] = y[j] || [];
-                        y[j][idx] = splitShare[j];
+                        y[j][x.length - 1] = splitShare[j];
                     }
                 }
 
             }
 
+            // Extract the secret from the 'rotated' share data and return a
+            // string of Binary digits which represent the secret directly. or in the
+            // case of a newShare() return the binary string representing just that
+            // new share.
             for (i = 0, len = y.length; i < len; i++) {
                 result = padLeft(lagrange(at, x, y[i]).toString(2)) + result;
             }
 
-            // reconstructing the secret
-            if (at === 0) {
-                //find the first 1
-                idx = result.indexOf("1");
-                return bin2hex(result.slice(idx + 1));
-            }
-
-            return bin2hex(result);
+            // If 'at' is non-zero combine() was called from newShare(). In this
+            // case return the result (the new share data) directly.
+            //
+            // Otherwise find the first '1' which was added in the share() function as a padding marker
+            // and return only the data after the padding and the marker. Convert this Binary string
+            // to hex, which represents the final secret result (which can be converted from hex back
+            // to the original string in user space using `hex2str()`).
+            return bin2hex(at >= 1 ? result : result.slice(result.indexOf("1") + 1));
         },
 
         getConfig: function () {
@@ -799,7 +829,7 @@
                 throw new Error("Zero-pad length must be an integer between 0 and 1024 inclusive.");
             }
 
-            secret = "1" + hex2bin(secret); // append a 1 so that we can preserve the correct number of leading zeros in our secret
+            secret = "1" + hex2bin(secret); // append a 1 as a marker so that we can preserve the correct number of leading zeros in our secret
             secret = splitNumStringToIntArray(secret, padLength);
 
             for (i = 0, len = secret.length; i < len; i++) {
