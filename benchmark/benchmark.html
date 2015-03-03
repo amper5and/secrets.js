@@ -1,0 +1,35 @@
+<html>
+  <head>
+    <title>benchmark</title>
+  </head>
+  <body>
+
+    <script src="../node_modules/benchmark/benchmark.js"></script>
+    <script src="../secrets.js"></script>
+
+    <script charset="utf-8">
+      var suite = new Benchmark.Suite;
+
+      suite.add('share and combine', function() {
+        var key, shares, comb, newShare;
+        key = secrets.random(512);
+        shares = secrets.share(key, 10, 5);
+        comb = secrets.combine( shares );
+        newShare = secrets.newShare(8, shares);
+        comb = secrets.combine( shares.slice(1,5).concat(newShare) );
+      })
+      // .add('newPadLeft()', function() {
+      //   secrets._newPadLeft(padding, 256);
+      // })
+      // add listeners
+      .on('cycle', function(event) {
+        console.log(String(event.target));
+      })
+      .on('complete', function() {
+        console.log('Fastest is ' + this.filter('fastest').pluck('name'));
+      })
+      // run async
+      .run({ 'async': false });
+    </script>
+  </body>
+</html>

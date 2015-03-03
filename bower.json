@@ -1,0 +1,30 @@
+{
+  "name": "secrets.js-grempe",
+  "main": "secrets.js",
+  "version": "1.2.0",
+  "homepage": "https://github.com/grempe/secrets.js",
+  "authors": [
+    "Alexander Stetsyuk <alexstets@gmail.com>",
+    "Glenn Rempe <glenn@rempe.us>"
+  ],
+  "description": "Shamir's threshold secret sharing scheme for JavaScript.",
+  "keywords": [
+    "secret",
+    "sharing",
+    "shamir",
+    "cryptography",
+    "split"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "coverage"
+  ],
+  "moduleType": [
+    "amd",
+    "globals",
+    "node"
+  ]
+}
