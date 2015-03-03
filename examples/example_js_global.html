@@ -13,26 +13,92 @@
     <h2>The following code is being run:</h2>
     <pre>
       var key, comb1, comb2, shares, newShare;
-      key = secrets.random(512);
-      shares = secrets.share(key, 10, 5);
-      comb1 = secrets.combine( shares );
-      newShare = secrets.newShare(8, shares);
-      comb2 = secrets.combine( shares.slice(1,5).concat(newShare) );
-      document.write('You should see three identical keys below, with a key both before and after a share and combine operation.\n\n' + key + '\n' + comb1 + '\n' + comb2);
+
+      secrets.init(8, "browserSJCLRandom");
+
+      // https://github.com/tunnckoCore/randomorg-js
+      var randomJs = new RandomJs();
+      var result = randomJs
+      .apikey('YOUR_API_KEY_HERE') // your apikey here
+      .method('generateStrings')
+      .params({n:16,length:20})
+      .post(function(xhr, stream, body) {
+        // console.log('==START==')
+        // console.log('==xhr==')
+        // console.log(xhr)
+        // console.log('==stream==')
+        // console.log(stream)
+        // console.log('==body==')
+        // console.log(body)
+        // console.log('==body==')
+        // console.log(body.result.random.data.join(''))
+        // console.log('==END==')
+
+        console.log("sjcl.random.getProgress() before : " + sjcl.random.getProgress());
+        console.log("secrets.quickSeed() : " + body.result.random.data.join(''));
+        secrets.seedRNG(body.result.random.data.join(''), 1024, "randomorg");
+        console.log("sjcl.random.getProgress() after : " + sjcl.random.getProgress());
+        console.log("bitsUsed: " + body.result.bitsUsed);
+        console.log("bitsLeft: " + body.result.bitsLeft);
+
+        key = secrets.random(512);
+        shares = secrets.share(key, 10, 5);
+        comb1 = secrets.combine( shares );
+        newShare = secrets.newShare(8, shares);
+        comb2 = secrets.combine( shares.slice(1,5).concat(newShare) );
+        $('#output').text('You should see three identical keys below, with a key both before and after a share and combine operation.\n\n' + key + '\n' + comb1 + '\n' + comb2);
+      });
     </pre>
 
     <br />
 
     <h2>Code Output:</h2>
+    <div id="output"></div>
+
+    <br />
+
+    <script src="../node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="../node_modules/randomorg-js/dist/randomorg-js.js"></script>
+    <script src="../node_modules/sjcl/sjcl.js"></script>
     <script src="../secrets.js"></script>
+
     <script charset="utf-8">
       var key, comb1, comb2, shares, newShare;
-      key = secrets.random(512);
-      shares = secrets.share(key, 10, 5);
-      comb1 = secrets.combine( shares );
-      newShare = secrets.newShare(8, shares);
-      comb2 = secrets.combine( shares.slice(1,5).concat(newShare) );
-      document.write('You should see three identical keys below, with a key both before and after a share and combine operation.\n\n' + key + '\n' + comb1 + '\n' + comb2);
+
+      secrets.init(8, "browserSJCLRandom");
+
+      // https://github.com/tunnckoCore/randomorg-js
+      var randomJs = new RandomJs();
+      var result = randomJs
+      .apikey('ed25ba36-d912-4820-9ee7-b2abe40390cb') // your apikey here
+      .method('generateStrings')
+      .params({n:16,length:20})
+      .post(function(xhr, stream, body) {
+        // console.log('==START==')
+        // console.log('==xhr==')
+        // console.log(xhr)
+        // console.log('==stream==')
+        // console.log(stream)
+        // console.log('==body==')
+        // console.log(body)
+        // console.log('==body==')
+        // console.log(body.result.random.data.join(''))
+        // console.log('==END==')
+
+        console.log("sjcl.random.getProgress() before : " + sjcl.random.getProgress());
+        console.log("secrets.quickSeed() : " + body.result.random.data.join(''));
+        secrets.seedRNG(body.result.random.data.join(''), 1024, "randomorg");
+        console.log("sjcl.random.getProgress() after : " + sjcl.random.getProgress());
+        console.log("bitsUsed: " + body.result.bitsUsed);
+        console.log("bitsLeft: " + body.result.bitsLeft);
+
+        key = secrets.random(512);
+        shares = secrets.share(key, 10, 5);
+        comb1 = secrets.combine( shares );
+        newShare = secrets.newShare(8, shares);
+        comb2 = secrets.combine( shares.slice(1,5).concat(newShare) );
+        $('#output').text('You should see three identical keys below, with a key both before and after a share and combine operation.\n\n' + key + '\n' + comb1 + '\n' + comb2);
+      });
     </script>
 
   </body>

@@ -136,6 +136,38 @@
         return hex;
     }
 
+    // Browser supports crypto.getRandomValues()
+    function hasCryptoGetRandomValues() {
+        if (crypto &&
+            typeof crypto === "object" &&
+            (typeof crypto.getRandomValues === "function" || typeof crypto.getRandomValues === "object") &&
+            (typeof Uint32Array === "function" || typeof Uint32Array === "object")) {
+                return true;
+            }
+
+        return false;
+    }
+
+    // Node.js support for crypto.randomBytes()
+    function hasCryptoRandomBytes() {
+        if (typeof crypto === "object" &&
+            typeof crypto.randomBytes === "function") {
+            return true;
+        }
+
+        return false;
+    }
+
+    // Stanford Javascript Crypto Library Support
+    function hasSJCL() {
+        if (typeof sjcl === "object" &&
+            typeof sjcl.random === "object") {
+            return true;
+        }
+
+        return false;
+    }
+
     // Returns a pseudo-random number generator of the form function(bits){}
     // which should output a random string of 1's and 0's of length `bits`.
     // `type` (Optional) : A string representing the CSPRNG that you want to
@@ -197,7 +229,7 @@
             return str;
         }
 
-        // Browser : window.crypto.getRandomValues()
+        // Browser : crypto.getRandomValues()
         // See : https://dvcs.w3.org/hg/webcrypto-api/raw-file/tip/spec/Overview.html#dfn-Crypto
         // See : https://developer.mozilla.org/en-US/docs/Web/API/RandomSource/getRandomValues
         // Supported Browsers : http://caniuse.com/#search=crypto.getRandomValues
@@ -211,14 +243,14 @@
             size = 32;
             elems = Math.ceil(bits / 32);
             while (str === null) {
-                str = construct(bits, window.crypto.getRandomValues(new Uint32Array(elems)), radix, size);
+                str = construct(bits, crypto.getRandomValues(new Uint32Array(elems)), radix, size);
             }
 
             return str;
         }
 
         // Browser SJCL : If the Stanford Javascript Crypto Library (SJCL) is loaded in the browser
-        // then use it as a fallback CSPRNG when window.crypto.getRandomValues() is not available.
+        // then use it as a fallback CSPRNG when crypto.getRandomValues() is not available.
         // It may require some time and mouse movements to be fully seeded. Uses a modified version
         // of the Fortuna RNG.
         // See : https://bitwiseshiftleft.github.io/sjcl/
@@ -274,7 +306,7 @@
         }
 
         // Return a random generator function for browsers that support HTML5
-        // window.crypto.getRandomValues(), Node.js compiled with OpenSSL support.
+        // crypto.getRandomValues(), Node.js compiled with OpenSSL support.
         // or the Stanford Javascript Crypto Library Fortuna RNG.
         // WARNING : NEVER use testRandom outside of a testing context. Totally non-random!
         if (type && type === "testRandom") {
@@ -290,13 +322,13 @@
             runCSPRNGTest = false;
             config.typeCSPRNG = type;
             return browserSJCLRandom;
-        } else if (typeof crypto === "object" && typeof crypto.randomBytes === "function") {
+        } else if (hasCryptoRandomBytes()) {
             config.typeCSPRNG = "nodeCryptoRandomBytes";
             return nodeCryptoRandomBytes;
-        } else if (window && window.crypto && (typeof window.crypto.getRandomValues === "function" || typeof window.crypto.getRandomValues === "object") && (typeof Uint32Array === "function" || typeof Uint32Array === "object")) {
+        } else if (hasCryptoGetRandomValues()) {
             config.typeCSPRNG = "browserCryptoGetRandomValues";
             return browserCryptoGetRandomValues;
-        } else if (window && window.sjcl && typeof window.sjcl === "object" && typeof window.sjcl.random === "object") {
+        } else if (hasSJCL()) {
             runCSPRNGTest = false;
             config.typeCSPRNG = "browserSJCLRandom";
             return browserSJCLRandom;
@@ -481,17 +513,68 @@
             }
 
             // Setup SJCL and start collecting entropy from mouse movements
-            if (config.typeCSPRNG === "browserSJCLRandom") {
+            if (hasSJCL() && config.typeCSPRNG === "browserSJCLRandom") {
                 /*eslint-disable new-cap */
                 sjcl.random = new sjcl.prng(sjclParanoia);
                 /*eslint-enable new-cap */
-                sjcl.random.startCollectors();
+
+                // In a Browser
+                if (hasCryptoGetRandomValues()) {
+                    // Collects entropy from browser mouse movement
+                    // which obviously won't work in Node.js.
+                    sjcl.random.startCollectors();
+                }
+
+                // see SJCL with browser or Node.js RNG if available.
+                this.seedRNG();
             }
 
             if (!isSetRNG() || !config.bits || !config.size || !config.maxShares || !config.logs || !config.exps || config.logs.length !== config.size || config.exps.length !== config.size) {
                 throw new Error("Initialization failed.");
             }
 
+        },
+
+        // Pass in additional secure entropy, and an estimate of the bits of entropy
+        // provided, and a source name, and it will be used to seed the SJCL PRNG. This is
+        // useful since SJCL may take a while to be seeded since it depends on mouse
+        // movement and this can kickstart the generator almost immediately. SJCL will
+        // also continue to collect entropy from mouse movements after seeding.
+        //
+        // e.g. from random data sources like:
+        // https://api.random.org/json-rpc/1/
+        // https://entropy.ubuntu.com/?challenge=123
+        // https://qrng.anu.edu.au/API/api-demo.php
+        //
+        // See `examples/example_js_global.html` for sample usage with an
+        // external source of entropy.
+        seedRNG: function (data, estimatedEntropy, source) {
+
+            var bytes, rand;
+
+            estimatedEntropy = parseInt(estimatedEntropy, 10);
+            source = source || "seedRNG";
+
+            // Seed with browser RNG
+            if (hasSJCL() && hasCryptoGetRandomValues()) {
+                bytes = new Uint32Array(256);
+                rand = crypto.getRandomValues(bytes);
+                //console.log(rand);
+                sjcl.random.addEntropy(rand, 2048, "cryptoGetRandomValues");
+            }
+
+            // See with Node.js RNG (Async)
+            if (hasSJCL() && hasCryptoRandomBytes()) {
+                crypto.randomBytes(256, function(ex, buf) {
+                  if (ex) { throw ex; }
+                  //console.log("Have %d bytes of random data containing %s", buf.length, buf.toString('hex'));
+                  sjcl.random.addEntropy(buf.toString("hex"), 2048, "cryptoRandomBytes");
+                });
+            }
+
+            if (hasSJCL() && data && estimatedEntropy && source && config.typeCSPRNG === "browserSJCLRandom") {
+                sjcl.random.addEntropy(data, estimatedEntropy, source);
+            }
         },
 
         // Evaluates the Lagrange interpolation polynomial at x=`at` for
@@ -870,6 +953,9 @@
         _padLeft: padLeft,
         _hex2bin: hex2bin,
         _bin2hex: bin2hex,
+        _hasCryptoGetRandomValues: hasCryptoGetRandomValues,
+        _hasCryptoRandomBytes: hasCryptoRandomBytes,
+        _hasSJCL: hasSJCL,
         _getRNG: getRNG,
         _isSetRNG: isSetRNG,
         _splitNumStringToIntArray: splitNumStringToIntArray,

@@ -1,7 +1,7 @@
 {
   "name": "secrets.js-grempe",
   "main": "secrets.js",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "homepage": "https://github.com/grempe/secrets.js",
   "authors": [
     "Alexander Stetsyuk <alexstets@gmail.com>",
