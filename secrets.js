@@ -446,8 +446,8 @@ function split(str, padLength){
 // Pads a string `str` with zeros on the left so that its length is a multiple of `bits`
 function padLeft(str, bits){
 	bits = bits || config.bits
-	var missing = str.length % bits;
-	return (missing ? new Array(bits - missing + 1).join('0') : '') + str;
+	while(str.length % bits) str = '0' + str;
+	return str;
 };
 
 function hex2bin(str){
