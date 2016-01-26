@@ -243,7 +243,7 @@ exports.share = function(secret, numShares, threshold, padLength, withoutPrefix)
 		}
 	}else{
 		for(var i=0; i<numShares; i++){
-			x[i] = config.bits.toString(36).toUpperCase() + padLeft(x[i],padding) + bin2hex(y[i]);
+			x[i] = padLeft(config.bits.toString(16).toUpperCase(), 2) + padLeft(x[i], padding) + bin2hex(y[i]);
 		}
 	}
 	
@@ -300,7 +300,7 @@ function inArray(arr,val){
 
 function processShare(share){
 	
-	var bits = parseInt(share[0], 36);
+	var bits = parseInt(share.substring(0, 2), 16);
 	if(bits && (typeof bits !== 'number' || bits%1 !== 0 || bits<defaults.minBits || bits>defaults.maxBits)){
 		throw new Error('Number of bits must be an integer between ' + defaults.minBits + ' and ' + defaults.maxBits + ', inclusive.')
 	}
@@ -308,7 +308,7 @@ function processShare(share){
 	var max = Math.pow(2, bits) - 1;
 	var idLength = max.toString(config.radix).length;
 	
-	var id = parseInt(share.substr(1, idLength), config.radix);
+	var id = parseInt(share.substr(2, idLength), config.radix);
 	if(typeof id !== 'number' || id%1 !== 0 || id<1 || id>max){
 		throw new Error('Share id must be an integer between 1 and ' + config.max + ', inclusive.');
 	}
@@ -392,7 +392,7 @@ exports.newShare = function(id, shares){
 	}
 
 	var padding = max.toString(config.radix).length;
-	return config.bits.toString(36).toUpperCase() + padLeft(id.toString(config.radix), padding) + combine(id, shares);
+	return padLeft(config.bits.toString(36).toUpperCase(), 2) + padLeft(id.toString(config.radix), padding) + combine(id, shares);
 };
 	
 // Evaluate the Lagrange interpolation polynomial at x = `at`
