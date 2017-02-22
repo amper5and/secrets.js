@@ -529,4 +529,4 @@ exports.hex2str = function(str, bytesPerChar){
 	
 // by default, initialize without an RNG
 exports.init();
-})(typeof module !== 'undefined' && module['exports'] ? module['exports'] : (window['secrets'] = {}), typeof GLOBAL !== 'undefined' ? GLOBAL : window );
+})(typeof module !== 'undefined' && module['exports'] ? module['exports'] : (window['secrets'] = {}), typeof global !== 'undefined' ? global : window );
