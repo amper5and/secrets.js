@@ -22,60 +22,63 @@ It can be used to split any "secret" (i.e. a password, text file, Bitcoin privat
 ## Examples: 
 
 Divide a 512-bit key, expressed in hexadecimal form, into 10 shares, requiring that any 5 of them are necessary to reconstruct the original key:
-	
-	// generate a 512-bit key
-	var key = secrets.random(512); // => key is a hex string
-	
-	// split into 10 shares with a threshold of 5
-	var shares = secrets.share(key, 10, 5); 
-	// => shares = ['801xxx...xxx','802xxx...xxx','803xxx...xxx','804xxx...xxx','805xxx...xxx']
-	
-	// combine 4 shares
-	var comb = secrets.combine( shares.slice(0,4) );
-	console.log(comb === key); // => false
-	
-	// combine 5 shares
-	var comb = secrets.combine( shares.slice(4,9) );
-	console.log(comb === key); // => true
-	
-	// combine ALL shares
-	var comb = secrets.combine( shares );
-	console.log(comb === key); // => true
-	
-	// create another share with id 8
-	var newShare = secrets.newShare(8, shares); // => newShare = '808xxx...xxx'
-	
-	// reconstruct using 4 original shares and the new share:
-	var comb = secrets.combine( shares.slice(1,5).concat(newShare) );
-	console.log(comb === key); // => true
 
+```js
+// generate a 512-bit key
+var key = secrets.random(512); // => key is a hex string
+
+// split into 10 shares with a threshold of 5
+var shares = secrets.share(key, 10, 5); 
+// => shares = ['801xxx...xxx','802xxx...xxx','803xxx...xxx','804xxx...xxx','805xxx...xxx']
+
+// combine 4 shares
+var comb = secrets.combine( shares.slice(0,4) );
+console.log(comb === key); // => false
+
+// combine 5 shares
+var comb = secrets.combine( shares.slice(4,9) );
+console.log(comb === key); // => true
+
+// combine ALL shares
+var comb = secrets.combine( shares );
+console.log(comb === key); // => true
+
+// create another share with id 8
+var newShare = secrets.newShare(8, shares); // => newShare = '808xxx...xxx'
+
+// reconstruct using 4 original shares and the new share:
+var comb = secrets.combine( shares.slice(1,5).concat(newShare) );
+console.log(comb === key); // => true
+```
 
 Divide a password containing a mix of numbers, letters, and other characters, requiring that any 3 shares must be present to reconstruct the original password:
 
-	var pw = '<<PassWord123>>';
-	
-	// convert the text into a hex string
-	var pwHex = secrets.str2hex(pw); // => hex string
-	
-	// split into 5 shares, with a threshold of 3
-	var shares = secrets.share(pwHex, 5, 3);
-	
-	
-	// combine 2 shares:
-	var comb = secrets.combine( shares.slice(1,3) );
-	
-	//convert back to UTF string:
-	comb = secrets.hex2str(comb);
-	console.log( comb === pw  ); // => false
-	
-	
-	// combine 3 shares:
-	var comb = secrets.combine( [ shares[1], shares[3], shares[4] ] );
-	
-	//convert back to UTF string:
-	comb = secrets.hex2str(comb);
-	
-	console.log( comb === pw  ); // => true
+```js
+var pw = '<<PassWord123>>';
+
+// convert the text into a hex string
+var pwHex = secrets.str2hex(pw); // => hex string
+
+// split into 5 shares, with a threshold of 3
+var shares = secrets.share(pwHex, 5, 3);
+
+
+// combine 2 shares:
+var comb = secrets.combine( shares.slice(1,3) );
+
+//convert back to UTF string:
+comb = secrets.hex2str(comb);
+console.log( comb === pw  ); // => false
+
+
+// combine 3 shares:
+var comb = secrets.combine( [ shares[1], shares[3], shares[4] ] );
+
+//convert back to UTF string:
+comb = secrets.hex2str(comb);
+
+console.log( comb === pw  ); // => true
+```
 
 ## Installation and usage
 secrets.js is available on [npm](https://npmjs.org/package/secrets.js). Install using
@@ -195,22 +198,23 @@ Shamir's secret sharing scheme is "information-theoretically secure" and "perfec
 
 When `secrets.share()` is called with a `padLength`, the `secret` is zero-padded so that it's length is a multiple of the padLength. The second example above can be modified to use 1024-bit zero-padding, producing longer shares:
 	
-	var pw = '<<PassWord123>>';
-	
-	// convert the text into a hex string
-	var pwHex = secrets.str2hex(pw); // => 240-bit password
+```js
+var pw = '<<PassWord123>>';
 
-	// split into 5 shares, with a threshold of 3, WITH zero-padding
-	var shares = secrets.share(pwHex, 5, 3, 1024); // => 1024-bit shares
-	
-	// combine 3 shares
-	var comb = secrets.combine( [ shares[1], shares[3], shares[4] ] );
-	
-	// convert back to UTF string
-	comb = secrets.hex2str(comb);
-	
-	console.log( comb === pw  ); // => true
+// convert the text into a hex string
+var pwHex = secrets.str2hex(pw); // => 240-bit password
 
+// split into 5 shares, with a threshold of 3, WITH zero-padding
+var shares = secrets.share(pwHex, 5, 3, 1024); // => 1024-bit shares
+
+// combine 3 shares
+var comb = secrets.combine( [ shares[1], shares[3], shares[4] ] );
+
+// convert back to UTF string
+comb = secrets.hex2str(comb);
+
+console.log( comb === pw  ); // => true
+```
 
 ## License
 secrets.js is released under the MIT License. See `LICENSE`.
