@@ -1,6 +1,9 @@
 secrets.js
 ==========
 
+## NOTICE: This project is no longer maintained.
+
+
 See it in action at http://passguardian.com
 
 - [What is it?](#what-is-it)
