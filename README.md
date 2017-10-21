@@ -3,6 +3,8 @@ secrets.js
 
 ## NOTICE: This project is no longer maintained.
 
+Take a look at https://github.com/grempe/secrets.js for many improvements and enhancement on my original project.
+
 
 See it in action at http://passguardian.com
 
